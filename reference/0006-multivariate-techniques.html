@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Multivariate Techniques</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 6</p>
+<h1>Multivariate Visualization Techniques</h1>
+
+<table>
+<tr><th>เทคนิค</th><th>หลักการ</th><th>ข้อควรระวัง</th></tr>
+<tr><td><strong>Ternary Plot</strong></td><td>3 ตัวแปรที่รวมกันได้ค่าคงที่ (เช่น สัดส่วน 100%) พล็อตในสามเหลี่ยม 2D</td><td>ใช้ได้เฉพาะเมื่อ 3 ตัวแปรบวกกันเป็นค่าคงที่เท่านั้น</td></tr>
+<tr><td><strong>Glyph</strong> (เช่น Chernoff Face)</td><td>รวมหลาย visual variable ไว้ใน mark เดียว (ไอคอนผสม) แต่ละมิติข้อมูล = 1 คุณลักษณะของ glyph</td><td>ยิ่งมิติเยอะ ยิ่งตีความยาก ต้องมี legend อธิบายการแมปชัดเจน</td></tr>
+<tr><td><strong>Dimension Stacking</strong></td><td>ซ้อนหลายมิติ categorical เข้าไปใน chart เดียว ผ่าน facet (column/row) + color</td><td>เพิ่มมิติเรื่อย ๆ จะทำให้ subplot เล็กจนอ่านยาก</td></tr>
+<tr><td><strong>Scatterplot Matrix (SPLOM)</strong></td><td>ตาราง scatter plot ของทุกคู่ตัวแปร (pairwise)</td><td>จำนวน subplot โต O(n²) ตามจำนวนตัวแปร — ใช้ได้จริงกับตัวแปรไม่มาก</td></tr>
+<tr><td><strong>Radar/Spider Chart</strong></td><td>แต่ละแกนพุ่งจากจุดศูนย์กลาง 1 แกน = 1 มิติ เชื่อมจุดเป็นรูปหลายเหลี่ยม</td><td>พื้นที่รูปหลายเหลี่ยมบิดเบือนได้ง่าย ขึ้นกับลำดับแกนที่วาง (Surfacing Visualization Mirages, CHI 2020)</td></tr>
+<tr><td><strong>Parallel Coordinates Plot</strong></td><td>แต่ละมิติ = 1 แกนตั้งขนานกัน แต่ละแถวข้อมูล = เส้น polyline ที่ลากผ่านทุกแกน</td><td>ลำดับแกน (axis order) มีผลมากต่อ pattern ที่มองเห็น — ต้องลองสลับลำดับ</td></tr>
+</table>
+
+<h2>ทำไม 4D+ ถึงยาก: Many-to-One Mapping</h2>
+<p>Visual Mark 1 ชิ้นรับ Visual Variable ได้จำกัด — ยิ่งยัดหลายมิติเข้า mark เดียว (เช่น position x, position y, size, color, shape พร้อมกัน) ยิ่งเกิด <strong>many-to-one mapping</strong> ที่ตีความสับสน (Tamara Munzner, 2014).</p>
+
+<h2>Visual Variable Separability (Munzner, 2014)</h2>
+<table>
+<tr><th>คู่ Visual Variable</th><th>ระดับการรบกวน</th></tr>
+<tr><td>Position + Hue</td><td>Fully separable</td></tr>
+<tr><td>Size + Hue</td><td>Some interference</td></tr>
+<tr><td>Width + Height</td><td>Some/significant interference</td></tr>
+<tr><td>Red + Green</td><td>Major interference (ซ้ำปัญหา color blindness)</td></tr>
+</table>
+
+<h2>Simpson's Paradox</h2>
+<p>แนวโน้ม (trend) ที่เห็นในข้อมูลภาพรวม อาจ<strong>กลับทิศทาง</strong>เมื่อแบ่งข้อมูลเป็นกลุ่มย่อย (subgroup) — เช่น ภาพรวมเป็นขาขึ้น แต่ทุกกลุ่มย่อยกลับเป็นขาลง เกิดจากตัวแปรแฝง (confounding variable) ที่ไม่ได้แสดงในชาร์ต.</p>
+
+<hr>
+<p><a href="../lessons/0006-multivariate-data-visualization.html">← กลับไป Lesson 6</a></p>
+
+</body>
+</html>

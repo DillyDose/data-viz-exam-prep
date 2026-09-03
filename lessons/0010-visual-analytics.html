@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 10: Visual Analytics</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 10 / 13 · Visual Analytics</span>
+  <span><a href="../reference/0010-visual-analytics-cheatsheet.html">Reference: Visual Analytics Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-10-analytics.pdf</p>
+<h1>Visual Analytics</h1>
+
+<p>Lesson 9 สอน "เทคนิค" interaction ทีละแบบ บทนี้ถอยออกมามองภาพใหญ่: interaction ทั้งหมดนั้นมีไว้ทำอะไรกันแน่? คำตอบคือ Visual Analytics — การใช้ visualization และ interaction เป็นเครื่องมือ<em>คิด</em> ไม่ใช่แค่เครื่องมือ<em>แสดงผล</em> อาจารย์ใช้ dataset เหรียญทองซีเกมส์ (ชุดเดียวกับที่ทำ D3.js/Altair ตอน Lesson 4-5) มาสาธิตกระบวนการทั้งหมดแบบ end-to-end.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Daniel Keim, Florian Mansmann, Jörn Schneidewind, Jim Thomas, Hartmut Ziegler, <a href="https://www.google.com/search?q=Visual+Analytics%3A+Scope+and+Challenges+Keim" target="_blank" rel="noopener">"Visual Analytics: Scope and Challenges"</a> (2008) — บทความสั้นที่นิยาม visual analytics ไว้ชัดเจนที่สุด ตรงกับกรอบคิดที่บทนี้ใช้ตลอด.
+</div>
+
+<h2>1. ทำไมต้อง "มองเห็น" ก่อนวิเคราะห์: หลักคิดจาก Tukey</h2>
+<p>รากฐานทางปรัชญาของ Visual Analytics ย้อนไปถึงยุค 1960 ก่อนมีคำว่า "data visualization" ด้วยซ้ำ:</p>
+
+<figure>
+<img src="../assets/slides/vis10-p41-tukey-quote.png" alt="Portrait of John Tukey with his 1962 quote: Far better an approximate answer to the right question, which is often vague, than an exact answer to the wrong question, which can always be made precise">
+<figcaption>Slide: John W. Tukey, "The Future of Data Analysis" (1962) (vis-10-analytics.pdf, p.41)</figcaption>
+</figure>
+<p>คำพูดของ Tukey นี้ตรงข้ามกับสัญชาตญาณของคนเรียนสถิติทั่วไปที่มักอยากได้ "คำตอบแม่นยำ" — Tukey บอกว่าคำถามที่ดี (เช่น "ทำไมยอดขายตก") มักตอบแบบแม่นยำ 100% ไม่ได้ตั้งแต่ต้น (VAGUE) แต่ก็ยังดีกว่าคำถามที่ตอบได้แม่นยำเป๊ะ (เช่น "ค่าเฉลี่ยคือเท่าไหร่") แต่ไม่ตรงประเด็นที่อยากรู้จริง ๆ — โน้ตกำกับไว้ว่า "หาคำตอบมันง่าย คำถามที่ดีจะหาคำตอบเป๊ะ ๆ ไม่ได้" นี่คือเหตุผลที่ Visual Analytics เน้น "สำรวจ" (explore) มากกว่า "คำนวณให้จบ" (compute to completion) — บางทีภาพที่ให้แค่คำตอบคร่าว ๆ ต่อคำถามที่ใช่ มีค่ากว่าตัวเลขแม่นยำต่อคำถามที่ไม่มีใครถาม.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Tukey's Philosophy</span></div>
+  <div class="qtext">ตามคำพูดของ Tukey (1962) ข้อใดดีกว่ากัน?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">คำตอบโดยประมาณของคำถามที่ถูกต้อง ดีกว่าคำตอบแม่นยำของคำถามที่ผิด</button>
+    <button class="opt" data-correct="false">คำตอบแม่นยำของคำถามที่ผิด ดีกว่าคำตอบโดยประมาณของคำถามที่ถูกต้องเสมอ</button>
+    <button class="opt" data-correct="false">คำถามที่ตอบได้แม่นยำเท่านั้นถึงมีค่าควรถาม</button>
+    <button class="opt" data-correct="false">ไม่มีคำถามไหนสำคัญกว่ากันเลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p>สไลด์ถัดมาแปลงคำพูดของ Tukey ให้เป็นกราฟ 2 แกนที่จำง่ายกว่าเดิม:</p>
+
+<figure>
+<img src="../assets/slides/vis10-p40-quality-of-question.png" alt="A two-axis diagram with Quality of Question on the x-axis and Method and evidence Sophistication on the y-axis: an orange star sits high on sophistication but far left on question quality, labeled Wrong (and Precise) Question, using Statistics and Machine learning; a blue star sits high on both axes, labeled Right (and Vague) Question; a large arrow points from the wrong-question star to the right-question star, labeled What data science should really do">
+<figcaption>Slide: Method &amp; evidence Sophistication vs Quality of Question (vis-10-analytics.pdf, p.40, inspired by simplystatistics.org)</figcaption>
+</figure>
+<p>แกนตั้งคือ "ใช้วิธีการซับซ้อนแค่ไหน" (สถิติ/Machine Learning ขั้นสูง) แกนนอนคือ "คำถามที่ถามดีแค่ไหน" — ดาวสีส้มทางซ้ายอยู่สูงบนแกนตั้ง (ใช้ ML ขั้นสูงมาก) แต่อยู่ซ้ายสุดบนแกนนอน (คำถามผิด แต่แม่นยำ — "WRONG & PRECISE Question") ส่วนดาวสีน้ำเงินทางขวาอยู่สูงพอกันบนแกนตั้ง แต่อยู่ขวาสุดบนแกนนอน (คำถามถูก แต่ยังคลุมเครือ — "RIGHT & VAGUE Question") ลูกศรใหญ่ตรงกลางชี้จากซ้ายไปขวา กำกับว่า "นี่คือสิ่งที่ data science ควรทำจริง ๆ" — กราฟนี้เตือนตรง ๆ ว่าการทุ่มเทเรียนเทคนิคซับซ้อน (deep learning, สถิติขั้นสูง) ไม่ได้แปลว่ากำลังทำงานที่มีคุณค่าเสมอไป ถ้าเทคนิคเหล่านั้นถูกใช้ตอบ "คำถามผิด" อยู่ ต่อให้แม่นยำแค่ไหนก็ยังอยู่มุมซ้ายของกราฟ ในขณะที่การถามคำถามที่ถูกทาง (แม้จะตอบได้แค่คร่าว ๆ ในตอนแรก) มีค่ามากกว่า — นี่คือ Tukey's quote ในรูปกราฟิกที่จับต้องได้ ตอกย้ำธีมเดียวกับหัวข้อ 1 อีกครั้งด้วยภาพคนละแบบ.</p>
+
+<h2>2. Visual Proof: ภาพก็เป็นหลักฐานทางคณิตศาสตร์ได้</h2>
+<p>Visual Analytics ไม่ได้จำกัดแค่ธุรกิจ/ข้อมูลขนาดใหญ่ — แม้แต่การพิสูจน์ทางคณิตศาสตร์ก็ใช้ "ภาพ" เป็นเครื่องมือคิดได้:</p>
+
+<figure>
+<img src="../assets/slides/vis10-p17-visual-proof.png" alt="A classic visual proof of the Pythagorean theorem using nested squares labeled a-squared, b-squared, and c-squared">
+<figcaption>Slide: Visual Proof — a visual proof of the Pythagorean theorem (vis-10-analytics.pdf, p.17)</figcaption>
+</figure>
+<p>ภาพนี้พิสูจน์ a² + b² = c² โดยไม่ต้องเขียนสมการพีชคณิตยาว ๆ เลยสักบรรทัด — แค่จัดสี่เหลี่ยมจัตุรัสของด้าน a, b, c ให้เห็นว่าพื้นที่ b² บวกกับสามเหลี่ยมเชื่อมสีน้ำเงินสามารถจัดเรียงใหม่พอดีกับ c² ได้ (ต้องอาศัยการเลื่อน/หมุนรูปในใจ) — โน้ตกำกับตรง ๆ ว่า "Visual Proof ทำข้อมูล(หรือในที่นี้คือข้อพิสูจน์)เป็นภาพให้เข้าใจมากขึ้น" นี่คือตัวอย่างที่ชัดที่สุดว่า "การมองเห็น" กับ "การให้เหตุผล" ไม่ใช่คนละเรื่องกัน — บางครั้งภาพเดียวพิสูจน์ได้แน่นหนากว่าตัวอักษรทั้งหน้า.</p>
+
+<h2>3. SEA Games: ตัวอย่างครบวงจรของ Visual Analytics</h2>
+<p>อาจารย์เอาชุดข้อมูลเหรียญทองซีเกมส์ (dataset เดียวกับที่ใช้เขียนโค้ด D3.js/Altair) มาสาธิตว่า Visual Analytics แก้คำถามจริงได้อย่างไร ตั้งแต่ยังตอบไม่ได้จนตอบได้:</p>
+
+<figure>
+<img src="../assets/slides/vis10-p53-seagames-q1-chart.png" alt="Left: a plain bar chart of total gold medals per year that cannot answer which country won each year. Right: the same bars split and colored by country, revealing the answer at a glance">
+<figcaption>Slide: SEA Games — "Which country had the most gold medals of each year?" (vis-10-analytics.pdf, p.53)</figcaption>
+</figure>
+<p>Bar chart ทางซ้ายตอบคำถาม "ปีไหนมีเหรียญทองรวมเยอะสุด" ได้ แต่ตอบ<strong>ไม่ได้</strong>เลยว่า "ปีไหนประเทศไหนได้เยอะสุด" เพราะข้อมูลประเทศถูกยุบรวมหายไปหมด — พอแค่ "แยกแท่งเดิมเป็นแท่งย่อยซ้อนกัน แล้วให้สีแทนประเทศ" (ไม่ได้เปลี่ยนข้อมูลเลย แค่เปลี่ยน visual mapping) คำถามเดิมก็ตอบได้ทันที: มองแถบสีแดง (Indonesia) ที่มักอยู่บนสุดของแท่งตั้งแต่ปี 1990 เป็นต้นมา บอกได้เลยว่า Indonesia คือประเทศที่มักได้เหรียญทองมากสุดของปีนั้น ๆ บ่อยครั้ง — นี่คือตัวอย่างรูปธรรมของ "interaction" ในความหมายกว้าง: แค่เปลี่ยน encoding ก็เปลี่ยนจากตอบไม่ได้เป็นตอบได้.</p>
+
+<figure>
+<img src="../assets/slides/vis10-p58-seagames-q2-chart.png" alt="Small multiples showing mean gold medals for hosting years versus non-hosting years, one panel per country, with almost every country's hosting-year bar taller than its non-hosting-year bar">
+<figcaption>Slide: SEA Games — "Are hosting countries more likely to have more medals?" Answer: Yes (vis-10-analytics.pdf, p.58)</figcaption>
+</figure>
+<p>คำถามที่สองซับซ้อนกว่าเดิม: "ประเทศเจ้าภาพมักได้เหรียญทองเยอะกว่าไหม" — ต้องเทียบ "ค่าเฉลี่ยเหรียญทองตอนเป็นเจ้าภาพ" กับ "ค่าเฉลี่ยตอนไม่ได้เป็นเจ้าภาพ" ของแต่ละประเทศแยกกัน สไลด์นี้ใช้ small multiples (1 แผงต่อ 1 ประเทศ) เทียบแท่ง "n" (ไม่ได้เป็นเจ้าภาพ) กับ "y" (เป็นเจ้าภาพ) — ผลคือแทบทุกประเทศ (อินโดนีเซีย เวียดนาม ไทย ฯลฯ) แท่ง "y" สูงกว่าแท่ง "n" อย่างชัดเจน (เวียดนามต่างกันมากสุด: ~32 ตอนไม่เป็นเจ้าภาพ เทียบ ~158 ตอนเป็นเจ้าภาพ) — คำตอบ "Yes" ที่ได้ไม่ได้มาจากการเดา แต่มาจากการออกแบบ visualization ที่ตรงกับคำถามพอดี.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>SEA Games Case Study</span></div>
+  <div class="qtext">การเปลี่ยนจาก bar chart ธรรมดาเป็น stacked bar chart (แยกสีตามประเทศ) ในตัวอย่าง SEA Games ทำให้ตอบคำถามอะไรได้ที่เดิมตอบไม่ได้?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ปีไหนประเทศไหนได้เหรียญทองมากที่สุด</button>
+    <button class="opt" data-correct="false">ปีไหนมีเหรียญทองรวมทั้งหมดมากที่สุด</button>
+    <button class="opt" data-correct="false">มีกี่ประเทศเข้าร่วมการแข่งขันทั้งหมด</button>
+    <button class="opt" data-correct="false">ปีไหนจัดการแข่งขันที่ประเทศไทย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 3</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: ทำไมต้องใช้ small multiples (แยกแผงต่อประเทศ) แทนที่จะยัดทุกประเทศไว้ในชาร์ตเดียวเพื่อตอบคำถาม "เจ้าภาพได้เหรียญเยอะกว่าไหม"?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">เพราะคำถามต้องการเทียบ "ตัวเอง (เป็นเจ้าภาพ) กับตัวเอง (ไม่ได้เป็นเจ้าภาพ)" แยกทีละประเทศ ไม่ใช่เทียบข้ามประเทศ ถ้ายัดทุกประเทศไว้ชาร์ตเดียวจะสับสนว่ากำลังเทียบประเทศกับประเทศ หรือเทียบ host-status ภายในประเทศเดียวกัน small multiples แยกแต่ละประเทศออกจากกันทำให้เปรียบเทียบ n vs y ภายในประเทศเดียวได้ชัดเจน แล้วค่อยสแกนดูภาพรวมว่า pattern นี้เกิดซ้ำในเกือบทุกประเทศหรือไม่</div>
+</div>
+
+<h2>4. Sensemaking: คำถามเปิด vs คำถามปิด</h2>
+<p>คำถาม "ปีไหนได้เหรียญทองเยอะสุด" เป็นคำถาม<em>ปิด</em> (closed-ended) มีคำตอบเดียวชัดเจน แต่คำถามอย่าง "ทำไมประเทศเจ้าภาพถึงได้เหรียญเยอะกว่า" เป็นคำถาม<em>เปิด</em> (open-ended, "How &amp; Why") ที่ต้องอาศัยการสำรวจต่อ ไม่มีคำตอบสำเร็จรูปในข้อมูลชุดเดียว — slide เตือนไว้ว่า ถ้าเครื่องมือ (dashboard/tool) ควบคุมผู้ใช้มากเกินไป (บังคับดูได้แค่มุมที่กำหนดไว้) จะตอบคำถามเปิดแบบนี้ไม่ได้เลย ต้องเปิดให้ผู้ใช้ปรับเปลี่ยนมุมมองได้อิสระในระดับหนึ่ง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Open vs Closed Questions</span></div>
+  <div class="qtext">คำถามแบบ "How &amp; Why" (open-ended) มีลักษณะอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ต้องอาศัยการสำรวจต่อเนื่อง ไม่มีคำตอบสำเร็จรูปเดียว</button>
+    <button class="opt" data-correct="false">มีคำตอบตายตัวเดียวเสมอ หาได้จากสูตรคำนวณเดียว</button>
+    <button class="opt" data-correct="false">ตอบได้จากการดูตัวเลขเดียวในตารางเท่านั้น</button>
+    <button class="opt" data-correct="false">ไม่เกี่ยวข้องกับการออกแบบ interaction เลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>5. Visual Analytics Mantra: 3 เวอร์ชันที่ขัดแย้งกันเอง</h2>
+<p>Shneiderman's mantra จาก Lesson 9 ("Overview first, zoom and filter, then details-on-demand") ไม่ใช่คำตอบสุดท้าย — สไลด์นี้เทียบ 3 เวอร์ชันที่พัฒนาต่อกันมา:</p>
+
+<figure>
+<img src="../assets/slides/vis10-p78-visual-info-seeking-mantra.png" alt="Three competing mantras compared: Shneiderman's overview-first mantra, Keim's analyze-first Visual Analytics mantra, and van den Elzen and van Wijk's reversed details-first mantra, with handwritten annotations circling the differences">
+<figcaption>Slide: Visual Analytics "Mantra" — Shneiderman (1996) vs Keim (2006) vs van den Elzen &amp; van Wijk (2014) (vis-10-analytics.pdf, p.78)</figcaption>
+</figure>
+<p>Shneiderman (1996) เริ่มที่ "Overview first" — สมเหตุสมผลตอนข้อมูลยังพอมองเห็นภาพรวมได้ในจอเดียว แต่ Keim (2006) เปลี่ยนเป็น "Analyze first" แทน — โน้ตกำกับเหตุผลไว้ตรง ๆ ว่า "แรก overview ไม่ได้ [เพราะข้อมูล] เยอะมากเกิน" — พอข้อมูลเข้าสู่ยุค Big Data (หลายล้านแถว) การแสดง "overview" ตรง ๆ กลายเป็นจุดดำทึบไม่มีความหมาย ต้องให้ machine วิเคราะห์/สรุปก่อน ถึงจะมีอะไรให้ดูเป็น overview ที่มีความหมายได้ ส่วน van den Elzen &amp; van Wijk (2014) กลับด้านไปไกลกว่านั้นอีก: เริ่มจาก "Details" ก่อนเลย (ชื่อ mantra ของพวกเขาคือ "Namredienhs" — สะกดกลับคำว่า "Shneiderman" เป็นการเล่นคำแบบตั้งใจล้อกับต้นตำรับ) — บทเรียนคือ: ไม่มี mantra ไหนถูกเสมอ ลำดับขั้นตอนที่เหมาะสมขึ้นอยู่กับขนาด/ลักษณะข้อมูลที่มีอยู่ตรงหน้า.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Visual Analytics Mantra</span></div>
+  <div class="qtext">Daniel Keim (2006) เปลี่ยน mantra ของ Shneiderman จาก "Overview first" เป็น "Analyze first" เพราะเหตุผลใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ข้อมูลยุค Big Data ใหญ่เกินกว่าจะแสดง overview ที่มีความหมายได้ตั้งแต่ต้น ต้องให้ machine วิเคราะห์ก่อน</button>
+    <button class="opt" data-correct="false">เพราะ overview ใช้พื้นที่หน้าจอน้อยเกินไป</button>
+    <button class="opt" data-correct="false">เพราะผู้ใช้ส่วนใหญ่ไม่ชอบดูภาพรวมก่อน</button>
+    <button class="opt" data-correct="false">เพราะ analyze ทำได้เร็วกว่า overview เสมอไม่ว่าข้อมูลจะขนาดไหน</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Visual Analytics Mantra</span></div>
+  <div class="qtext">ชื่อ mantra ของ van den Elzen &amp; van Wijk (2014) ที่ว่า "Namredienhs" มีที่มาจากอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เป็นการสะกดกลับคำว่า "Shneiderman" เพื่อล้อว่าลำดับขั้นตอนกลับด้านกัน</button>
+    <button class="opt" data-correct="false">เป็นชื่อเมืองที่ทีมวิจัยทำงานอยู่</button>
+    <button class="opt" data-correct="false">เป็นตัวย่อของชื่อ algorithm ที่ใช้</button>
+    <button class="opt" data-correct="false">ไม่มีความหมายพิเศษใด ๆ เป็นแค่ชื่อสุ่ม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. Explainable AI (XAI): Visual Analytics ประยุกต์กับโมเดล ML</h2>
+<p>เมื่อโมเดล machine learning กลายเป็น "black box" ที่รู้แค่ input/output แต่ไม่รู้กลไกภายใน Visual Analytics เข้ามาช่วยเปิดกล่องดำนั้น:</p>
+
+<figure>
+<img src="../assets/slides/vis10-p87-xai-blackbox.png" alt="A real interactive tool (trackingai.org) plotting various AI chatbots on a political compass based only on their quiz answers, without knowing their internal reasoning">
+<figcaption>Slide: Explainable AI — treating an AI model as a black box, judged only by input/output (vis-10-analytics.pdf, p.87, via trackingai.org)</figcaption>
+</figure>
+<p>เครื่องมือนี้ให้ AI แชทบอทหลายตัว (ChatGPT, Claude, Grok, Llama ฯลฯ) ทำแบบทดสอบ Political Compass แล้วพล็อตตำแหน่งคะแนนของแต่ละตัวลงกราฟ 2 แกน (Economic Left/Right × Social Authoritarianism/Libertarianism) — สังเกตว่าเครื่องมือนี้<strong>ไม่รู้เลย</strong>ว่าโมเดลแต่ละตัวคิดหรือประมวลผลภายในอย่างไร รู้แค่ "ป้อนคำถามชุดเดียวกันเข้าไป (input) แล้วได้คำตอบอะไรออกมา (output)" — โน้ตกำกับตรงประเด็นเลยว่า "ไม่สนใจว่าจะได้คำตอบยังไง สนใจแค่ input คืออะไร output เป็นไง" นี่คือนิยามของ "black box" ในบริบท AI: ตัดสิน/วิเคราะห์พฤติกรรมโมเดลจากภายนอก โดยไม่จำเป็นต้องเข้าใจโครงสร้างภายในเลย — ซึ่งเป็นจุดตั้งต้นที่ Explainable AI พยายามแก้ไข (อยากรู้ "ทำไม" ไม่ใช่แค่ "อะไร").</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Explainable AI</span></div>
+  <div class="qtext">การมองโมเดล AI เป็น "black box" หมายความว่าอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">รู้แค่ input ที่ป้อนเข้าไปกับ output ที่ได้ออกมา แต่ไม่รู้กลไกการประมวลผลภายใน</button>
+    <button class="opt" data-correct="false">โมเดลนั้นไม่สามารถให้ output อะไรได้เลย</button>
+    <button class="opt" data-correct="false">โมเดลนั้นเขียนด้วยภาษาโปรแกรมมิงที่ไม่มีใครอ่านออก</button>
+    <button class="opt" data-correct="false">โมเดลนั้นถูกเข้ารหัส (encrypt) ไว้ทั้งหมด</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Explainable AI</span></div>
+  <div class="qtext">แนวทางหลัก 2 แบบในการแก้ปัญหา black box ของโมเดล ML ตาม slide คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สร้างโมเดลใหม่มาอธิบายโมเดลเดิม หรือ visualize โมเดลเดิมตรง ๆ</button>
+    <button class="opt" data-correct="false">ลบโมเดลเดิมทิ้งแล้วเริ่มเก็บข้อมูลใหม่ทั้งหมด</button>
+    <button class="opt" data-correct="false">เพิ่มจำนวนชั้น (layer) ของโมเดลให้มากขึ้นเสมอ</button>
+    <button class="opt" data-correct="false">ใช้มนุษย์ตรวจสอบผลลัพธ์ทุกครั้งแทนการใช้เครื่องมือ visualization</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรอธิบายได้ว่า Visual Analytics ต่างจากแค่ "ทำ interactive chart" อย่างไร (มันคือกระบวนการคิด/สำรวจ ไม่ใช่แค่ฟีเจอร์) ใช้ตัวอย่าง SEA Games อธิบายได้ว่าการเปลี่ยน encoding เปลี่ยนคำตอบที่ตอบได้อย่างไร เทียบ 3 mantra ได้ว่าต่างกันเพราะขนาดข้อมูล และเชื่อมโยง Explainable AI เข้ากับแนวคิด black box/sensemaking ที่เรียนมาตลอดบทได้.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (105 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-10-analytics.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง/งานวิจัยเชิงลึก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–14</td><td>ต่อยอด Interaction จาก Lesson 9 (Overview+Detail, Focus+Context ตัวอย่างเพิ่มเติม, minesweeper demo)</td><td>etc — ต่อยอดจาก Lesson 9 แล้ว ไม่ทำ quiz ซ้ำ</td></tr>
+<tr><td>15–16</td><td>เกริ่นนำ Visual Analytics (information asymmetry)</td><td>✓ ส่วนหนึ่งของบทนำ</td></tr>
+<tr><td>17–21</td><td>Visual Proof: พีทาโกรัส + อ้างอิง Philip Ording 99 Variations</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>22–26</td><td>ตัวอย่างเสริม + เกริ่นนำ Sensemaking</td><td>etc — เกริ่นนำหัวข้อ 4</td></tr>
+<tr><td>27–34</td><td>Sensemaking loop ตัวอย่าง (handwritten digit recognition, missing data charts อ้างอิง McNutt/Kindlmann/Correll ซ้ำจาก Lesson 6, Twitter network)</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>35</td><td>Open-ended (How &amp; Why) vs เครื่องมือที่ควบคุมผู้ใช้มากเกินไป</td><td>✓ หัวข้อ 4</td></tr>
+<tr><td>36</td><td>Data Scientist ประเภทต่าง ๆ (Type-A Analysts vs Type-B Builders)</td><td>etc — บริบทเสริม นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>37–39</td><td>เกริ่นนำ Method &amp; evidence Sophistication vs Quality of Question</td><td>✓ ส่วนหนึ่งของหัวข้อ 1</td></tr>
+<tr><td>40</td><td>Method &amp; evidence Sophistication vs Quality of Question ฉบับเต็ม</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>41</td><td>Tukey quote: "Far better an approximate answer..."</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>42–43</td><td>Tukey quote เพิ่มเติม (EXPOSURE, logic of mathematics)</td><td>✓ ส่วนหนึ่งของหัวข้อ 1 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>44–51</td><td>เกริ่นนำ SEA Games case study + ลิงก์ dataset</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>52</td><td>SEA Games คำถามที่ 1 เกริ่นนำ</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>53–54</td><td>SEA Games คำถามที่ 1: stacked bar chart แยกสีตามประเทศ</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>55–57</td><td>SEA Games คำถามที่ 2 เกริ่นนำ (highlight เจ้าภาพ, group by country)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>58</td><td>SEA Games คำถามที่ 2: small multiples เทียบ host vs non-host</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>59–63</td><td>SEA Games สรุปคำถาม-คำตอบ + interaction ที่เป็นไปได้เพิ่มเติม</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>64–74</td><td>Design Study methodology + อ้างอิงงานวิจัยเครื่องมือ VA จำนวนมาก + Polaris (ต้นแบบ Tableau)</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก แต่ Polaris ควรรู้ว่าคือต้นแบบ Tableau</td></tr>
+<tr><td>75</td><td>วิดีโอสาธิต Polaris (day filter)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>76–77</td><td>เกริ่นนำ Mantra (Shneiderman + van den Elzen แยกหน้า)</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>78</td><td>Mantra ทั้ง 3 เวอร์ชันเทียบกัน</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>79–83</td><td>อ้างอิง design study methodology (Sedlmair/Meyer/Munzner) + ML4VIS survey + เกริ่นนำ XAI</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>84–86</td><td>เกริ่นนำ Explainable AI (XAI) + Sensemaking loop สำหรับ AI</td><td>✓ ส่วนหนึ่งของหัวข้อ 6</td></tr>
+<tr><td>87</td><td>XAI: trackingai.org — AI เป็น black box</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>88–96</td><td>เครื่องมือ/งานวิจัย XAI เพิ่มเติม (Squares, PDPilot, LSTMVis, seq2seq-vis, ประเด็นจริยธรรม/fairness)</td><td>✓ ส่วนหนึ่งของหัวข้อ 6 (สรุปแนวทางหลักในเนื้อหาแล้ว)</td></tr>
+<tr><td>97–105</td><td>XAI แนวทางแก้ (สร้างโมเดลอธิบาย vs visualize โดยตรง) + งานวิจัยเชิงลึกปิดท้าย</td><td>✓ หัวข้อ 6</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0009-interactive-visualization.html">← Lesson 9: Interactive Visualization</a></span>
+  <span><a href="0011-visualization-validation.html">Lesson 11: Visualization Validation →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

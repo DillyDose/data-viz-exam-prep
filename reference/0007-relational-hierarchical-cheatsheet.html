@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Relational &amp; Hierarchical Techniques</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 7</p>
+<h1>Relational &amp; Hierarchical Data Cheat Sheet</h1>
+
+<h2>3 วิธีเก็บ Relational Data</h2>
+<table>
+<tr><th>วิธี</th><th>รูปแบบ</th><th>ข้อดี</th></tr>
+<tr><td><strong>Edge List</strong></td><td>รายการคู่ (A, B) ที่เชื่อมกัน</td><td>เขียน/อ่านง่าย เปลี่ยนแปลงได้ (add/remove เร็ว)</td></tr>
+<tr><td><strong>Adjacency List</strong></td><td>dictionary: node → รายชื่อ node ที่เชื่อมด้วย</td><td>หาเพื่อนบ้านของ node หนึ่งเร็ว</td></tr>
+<tr><td><strong>Adjacency Matrix</strong></td><td>ตาราง n×n ใส่ X ถ้าคู่นั้นเชื่อมกัน</td><td>เก็บเข้ารูปแบบตาราง เหมาะกับ matrix reordering/heatmap</td></tr>
+</table>
+
+<h2>Node-Link Visual Variables</h2>
+<table>
+<tr><th></th><th>Node</th><th>Link</th></tr>
+<tr><td>Position</td><td>X, Y (มักไม่มีความหมายตรง ๆ ใช้จัด layout ให้สวย)</td><td>—</td></tr>
+<tr><td>Size</td><td>✓</td><td>✓ (ความหนา)</td></tr>
+<tr><td>Color</td><td>✓ (lightness/hue)</td><td>✓ (lightness/hue)</td></tr>
+<tr><td>Shape</td><td>✓</td><td>—</td></tr>
+</table>
+
+<h2>ทางเลือกแทน Node-Link เมื่อกราฟใหญ่เกิน (แก้ปัญหา "Hairball")</h2>
+<ul>
+<li><strong>Arc Diagram</strong> — node เรียงเป็นเส้นตรง 1 แถว, link โค้งเป็นส่วนโค้งเหนือ/ใต้เส้น</li>
+<li><strong>Chord Diagram</strong> — node เรียงรอบวงกลม, link เป็นเส้นโค้งตัดผ่านวงกลม</li>
+<li><strong>Adjacency Matrix / Heatmap</strong> — วาดเป็นตาราง ใช้ matrix reordering (หลักการเดียวกับ Bertin's reorderable matrices ใน Lecture 5) เผย cluster ที่มองไม่เห็นใน node-link</li>
+</ul>
+
+<h2>เทคนิคสำหรับ Hierarchical Data</h2>
+<table>
+<tr><th>เทคนิค</th><th>หลักการ</th></tr>
+<tr><td>Reingold–Tilford Layout</td><td>ต้นไม้แนวตั้งมาตรฐาน แต่ละ level = 1 แถว</td></tr>
+<tr><td>Radial Tree</td><td>รากอยู่กลาง กิ่งกางออกเป็นวงกลม</td></tr>
+<tr><td>Cone Tree</td><td>ต้นไม้ 3 มิติ หมุนดูได้ (Mackinlay et al. 1991)</td></tr>
+<tr><td>Icicle Plot</td><td>แท่งซ้อนกันตาม hierarchy ความกว้าง = สัดส่วน/จำนวน</td></tr>
+<tr><td>Sunburst Chart</td><td>Icicle Plot ที่โค้งเป็นวงแหวนซ้อนกัน ความกว้างมุม = สัดส่วน (พื้นที่ยังถูกต้องตามลำดับชั้น)</td></tr>
+<tr><td>Treemap</td><td>Visual Variable = Containment (สี่เหลี่ยมซ้อนในสี่เหลี่ยม) พื้นที่ = ค่าข้อมูล</td></tr>
+<tr><td>Mosaic Plot / Marimekko</td><td>สี่เหลี่ยมแบ่งทั้งกว้างและสูงตามสัดส่วน 2 มิติพร้อมกัน</td></tr>
+</table>
+
+<div class="box">
+<div class="label">กับดักสำคัญ: Sunburst ≠ Rose Diagram</div>
+Sunburst chart เข้ารหัสด้วย<strong>มุม/พื้นที่วงแหวน</strong>ถูกต้องตามสัดส่วนจริง (เหมือน stacked bar chart ที่โค้งเป็นวงกลม) แต่ Rose Diagram / Polar Area Diagram (เช่นของ Florence Nightingale) เข้ารหัสด้วย<strong>รัศมี</strong>ตรง ๆ ทำให้พื้นที่บิดเบือน (พื้นที่ ∝ รัศมี² เหมือนกับดักวงกลม COVID map ใน Lecture 2) — สองอย่างนี้หน้าตาคล้ายกันมากแต่คนละหลักการเข้ารหัส
+</div>
+
+<h2>Curse of Dimensionality: อัตราส่วนปริมาตร Hypersphere/Hypercube</h2>
+<table>
+<tr><th>มิติ</th><th>อัตราส่วน</th></tr>
+<tr><td>2D</td><td>~75%</td></tr>
+<tr><td>3D</td><td>~50%</td></tr>
+<tr><td>4D</td><td>~30%</td></tr>
+<tr><td>...100D</td><td>→ 0%</td></tr>
+</table>
+<p>ยิ่งมิติเยอะ ยิ่งข้อมูลกระจายไปอยู่ "มุม" ของพื้นที่มากขึ้น จุดข้อมูลห่างกันหมด clustering ตามระยะทางแบบปกติเริ่มไม่ได้ผล — นี่คือเหตุผลที่ต้องมี embedding/dimensionality reduction (PCA, t-SNE, UMAP, MDS) มาบีบอัดกลับเหลือ 2D ก่อนจะมองเห็น pattern.</p>
+
+<hr>
+<p><a href="../lessons/0007-relational-hierarchical-data-visualization.html">← กลับไป Lesson 7</a></p>
+
+</body>
+</html>

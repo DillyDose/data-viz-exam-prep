@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Visualization Validation</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 11</p>
+<h1>Visualization Validation Cheat Sheet</h1>
+
+<h2>3 แกนของ Validation (เชื่อมกับ Lecture 1)</h2>
+<table>
+<tr><th>สิ่งที่วัด</th><th>คำในกรอบ Lecture 1</th></tr>
+<tr><td>Accuracy</td><td>Truthful-ness</td></tr>
+<tr><td>Ease of use</td><td>Functional-ity</td></tr>
+<tr><td>Knowledge gain</td><td>Insightful (ตัด -ful ออก)</td></tr>
+</table>
+
+<h2>Munzner's Nested Model (2009)</h2>
+<p>4 ชั้น: <strong>Problem</strong> (โดเมนจริง) → <strong>Task/Data</strong> (นามธรรม) → <strong>Encoding/Interaction</strong> (การออกแบบ) → <strong>Algorithm</strong> (การ implement) — แต่ละชั้นมี "Threat" (จุดที่ผิดพลาดได้) กับ "Validate" (วิธีตรวจสอบ) ของตัวเอง ผิดพลาดชั้นบน (เช่น เข้าใจปัญหาผิด) ทำให้ทุกชั้นล่างพังตามแม้ implement ถูกทุกอย่าง.</p>
+
+<h2>Quality Metrics ตัวอย่าง</h2>
+<table>
+<tr><th>Metric</th><th>ใช้กับ</th><th>สูตร/แนวคิด</th></tr>
+<tr><td>Faithfulness</td><td>Binning/aggregation</td><td>1 − (error รวม ÷ (n × half bin size))</td></tr>
+<tr><td>Simplicity</td><td>Graph/network layout</td><td>1 − (crossing ÷ crossing<sub>max</sub>)</td></tr>
+<tr><td>Data-ink ratio</td><td>ทุก chart (Tufte)</td><td>ยิ่งสูง ยิ่งดี — ลด non-data ink</td></tr>
+<tr><td>Recall / Inaccuracy / Misdirection</td><td>Tile grid map</td><td>Wongsuphasawat 2016</td></tr>
+</table>
+
+<h2>Usability Testing: 3 ขั้น</h2>
+<ol>
+<li><strong>Define tasks</strong> — closed-ended (มีคำตอบชัด) เช่น "หาเดือนที่อัตราว่างงานสูงสุด"</li>
+<li><strong>Find users</strong> — Convenience sampling (เพื่อน/ครอบครัว), Snowball sampling (เพื่อนของเพื่อน) — ไม่ต้อง random ก็ได้ แต่ห้าม re-test กลุ่มเดิมกับ prototype คนละเวอร์ชัน (learning effect)</li>
+<li><strong>Test</strong> — บอกผู้ใช้ว่ากำลังทดสอบระบบไม่ใช่ทดสอบผู้ใช้ ให้พูดคิดออกเสียง (think aloud) ผู้ทดสอบต้องเงียบ ไม่ช่วย ไม่ชี้จุดผิด</li>
+</ol>
+
+<h2>Task Taxonomy</h2>
+<table>
+<tr><th>คู่</th><th>ต่างกันอย่างไร</th></tr>
+<tr><td>Validation vs Estimation</td><td>Validation = มีเส้น/คำตอบให้ตัดสิน "ใช่/ไม่ใช่"; Estimation = ให้ผู้ใช้ตอบเองจากศูนย์</td></tr>
+<tr><td>Reproduction vs Freeform</td><td>Reproduction = ทำตามภาพต้นแบบ; Freeform = ให้ออกแบบอิสระ</td></tr>
+</table>
+
+<h2>Nielsen's 5-User Rule</h2>
+<p>Jakob Nielsen (1993): usability test แค่ ~5 ผู้ใช้ ก็เจอปัญหา usability ส่วนใหญ่แล้ว (ผลตอบแทนลดลงเรื่อย ๆ หลังจากนั้น) — ไม่จำเป็นต้อง test ผู้ใช้เป็นร้อยคนถึงจะเริ่มแก้ไขได้.</p>
+
+<hr>
+<p><a href="../lessons/0011-visualization-validation.html">← กลับไป Lesson 11</a></p>
+
+</body>
+</html>

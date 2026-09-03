@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Spatial &amp; Geographical Techniques</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 8</p>
+<h1>Spatial &amp; Geographical Data Cheat Sheet</h1>
+
+<h2>เทคนิคหลัก</h2>
+<table>
+<tr><th>เทคนิค</th><th>Visual Variable</th><th>จุดแข็ง</th><th>กับดัก</th></tr>
+<tr><td><strong>Choropleth Map</strong></td><td>สี (hue/lightness) ระบายทั้งพื้นที่</td><td>คุ้นตา อ่านง่าย</td><td>พื้นที่ใหญ่แต่ประชากรน้อยเด่นเกินจริง ("land doesn't vote")</td></tr>
+<tr><td><strong>Cartogram</strong></td><td>ขนาด/รูปทรงพื้นที่ถูกบิดตามข้อมูล (เช่นประชากร)</td><td>แก้ปัญหาพื้นที่เด่นเกินจริงของ choropleth</td><td>รูปทรงจำไม่ได้ อ่านตำแหน่งจริงยาก</td></tr>
+<tr><td><strong>(Proportional) Symbol Map</strong></td><td>ขนาด mark (วงกลม ฯลฯ) วางตามตำแหน่ง</td><td>รักษารูปทรงภูมิศาสตร์จริงไว้</td><td>ต้อง scale ด้วยพื้นที่ ไม่ใช่รัศมี (เหมือน Lecture 2)</td></tr>
+<tr><td><strong>Tile Grid Map</strong></td><td>Containment/position เป็นสัญลักษณ์เท่ากันทุกพื้นที่</td><td>ทุกพื้นที่ (รัฐ/จังหวัด) มีน้ำหนักภาพเท่ากัน ไม่ถูกพื้นที่ใหญ่บัง</td><td>เสียรูปทรง/ตำแหน่งภูมิศาสตร์จริง</td></tr>
+<tr><td><strong>Flow Map</strong></td><td>เส้น (ความหนา/สี) ทับแผนที่จริง</td><td>เห็นทิศทาง/ปริมาณการเคลื่อนที่</td><td>เส้นทับกันเยอะเมื่อข้อมูลหนาแน่น (เหมือน node-link hairball)</td></tr>
+</table>
+
+<h2>Choropleth Map Colors</h2>
+<ul>
+<li>Hue → nominal data (หมวดหมู่)</li>
+<li>Lightness/Saturation → ordinal/quantitative data (ไล่ระดับเข้ม-อ่อน)</li>
+<li>ห้ามใช้ rainbow colormap — ไล่ระดับไม่เป็นเส้นตรงในสายตา บอกไม่ได้ว่าสีไหน "มากกว่า" สีไหน</li>
+<li>ใช้ 1-2 hue พอ (หรือ diverging scale ถ้าข้อมูลมีจุดกึ่งกลางที่มีความหมาย เช่น 0)</li>
+</ul>
+
+<h2>การเลือก Threshold สำหรับ Choropleth</h2>
+<ul>
+<li>Min/Max, Min/Median/Max, Quartiles — วิธีง่าย ใช้ได้ทั่วไป</li>
+<li>Non-linear mapping (เช่น log scale) — เมื่อข้อมูลเบ้มาก</li>
+<li><strong>Jenks Natural Breaks</strong> — หาจุดแบ่งที่ minimize in-class variance และ maximize between-class variance (หา "หุบเขา" ของ histogram)</li>
+</ul>
+
+<div class="box">
+<div class="label">MAUP: Modifiable Areal Unit Problem</div>
+ข้อมูลชุดเดียวกัน วาดผลต่างกันได้ ถ้าขอบเขตพื้นที่ (เช่น เขตเลือกตั้ง, จังหวัด) เปลี่ยนไป — สรุปผลจาก choropleth map ต้องเช็คเสมอว่า "ขอบเขตพื้นที่ที่ใช้เปลี่ยนไปหรือเปล่า" ก่อนเทียบสองแผนที่ข้ามช่วงเวลา
+</div>
+
+<h2>Map Projection</h2>
+<p>ไม่มี projection ไหนรักษาทั้งพื้นที่ ระยะทาง และรูปทรงได้ถูกต้องพร้อมกัน — Mercator projection (ที่ใช้ในแผนที่เว็บทั่วไป) บิดเบือนพื้นที่แถบขั้วโลกให้ดูใหญ่เกินจริงมาก (เช่น กรีนแลนด์ดูใหญ่พอ ๆ กับแอฟริกา ทั้งที่จริงเล็กกว่ามาก 14 เท่า)</p>
+
+<h2>ทางเลือกจัดการจุดซ้อนทับบนแผนที่ (คล้าย overplotting ใน scatter plot)</h2>
+<ul>
+<li><strong>Spike Map</strong> — แท่งพุ่งขึ้นแนวตั้งแทนวงกลม ลดการซ้อนทับ</li>
+<li><strong>Necklace Map</strong> — ดึง symbol ออกมาเรียงรอบขอบพื้นที่แทนวางทับตำแหน่งจริง</li>
+<li><strong>Voronoi Diagram</strong> — แบ่งพื้นที่ตามจุดที่ใกล้ที่สุด ช่วยจัด symbol ไม่ให้ทับกัน</li>
+<li><strong>Sampling/Stippling</strong> — สุ่มแสดงจุดบางส่วนแทนทั้งหมด (หลักการเดียวกับ Lecture 5)</li>
+</ul>
+
+<hr>
+<p><a href="../lessons/0008-spatial-geographical-data-visualization.html">← กลับไป Lesson 8</a></p>
+
+</body>
+</html>

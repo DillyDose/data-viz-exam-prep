@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Visual Computing Taxonomy</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 1</p>
+<h1>Visual Computing แผนที่ทั้งสาขา</h1>
+
+<p>เอกสารนี้สรุป diagram จาก slide เรื่อง Visual Computing ให้ใช้ทบทวนไว หากข้อสอบถามให้จำแนกว่าเทคนิคหนึ่งอยู่ตรงไหนของสาขา.</p>
+
+<h2>แกนหลัก: Data ↔ Image</h2>
+<table>
+<tr><th>สาขา</th><th>ทิศทาง</th><th>นิยามสั้น</th></tr>
+<tr><td><strong>Computer Graphics</strong></td><td>Data → Image</td><td>สร้างภาพ (มักเน้น realistic) จากข้อมูล/โมเดล</td></tr>
+<tr><td><strong>Image Processing</strong></td><td>Image → Image</td><td>แปลงภาพเป็นภาพ (เช่น กรอง, ปรับสี)</td></tr>
+<tr><td><strong>Computer Vision</strong></td><td>Image → Data</td><td>สกัดข้อมูล/ความหมายออกจากภาพ</td></tr>
+<tr><td><strong>Visualization</strong></td><td>Data → Image</td><td>สร้างภาพจากข้อมูล เพื่อสื่อสาร ไม่เน้น realistic แต่เน้นสื่อความหมาย</td></tr>
+</table>
+
+<p><em class="term">Non-Visual Computing</em> คือส่วนที่ไม่เกี่ยวกับภาพเลย (data ↔ data / text ↔ text) — ใช้แยก visualization ออกจากงาน data processing ทั่วไปที่ไม่สร้างภาพ.</p>
+
+<h2>ใน Visualization เอง: Realistic → Abstract</h2>
+<ul>
+<li><strong>Scientific Visualization</strong> — ข้อมูลมีมิติเชิงพื้นที่/กายภาพจริง (เช่น การไหลของอากาศ, MRI) → ค่อนไปทาง realistic</li>
+<li><strong>Information Visualization</strong> — ข้อมูลนามธรรม ไม่มีมิติเชิงพื้นที่โดยธรรมชาติ (เช่น ยอดขาย, เครือข่ายสังคม) → abstract เต็มตัว</li>
+<li><strong>Visual Analytics</strong> — ผสาน visualization เข้ากับการวิเคราะห์เชิงโต้ตอบ (interactive) เพื่อหา insight ไม่ใช่แค่แสดงผล</li>
+</ul>
+
+<div class="box">
+<div class="label">จำไว้สั้น ๆ</div>
+Visualization = Computer Graphics ที่ "เสียสละความสมจริงเพื่อความหมาย" — เป้าหมายคือสื่อสารข้อมูลให้เข้าใจง่ายและถูกต้อง ไม่ใช่ให้ภาพสวยเหมือนจริง.
+</div>
+
+<hr>
+<p><a href="../lessons/0001-why-visualization.html">← กลับไป Lesson 1: ทำไมต้อง Visualization?</a></p>
+
+</body>
+</html>

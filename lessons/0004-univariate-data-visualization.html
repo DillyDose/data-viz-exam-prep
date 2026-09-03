@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 4: Univariate Data Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 4 / 13 · Univariate</span>
+  <span><a href="../reference/0004-scaffolding-checklist.html">Reference: Scaffolding Checklist →</a></span>
+</nav>
+
+<p class="kicker">vis-4-univariate-code.pdf</p>
+<h1>Univariate Data Visualization</h1>
+
+<p>Deck นี้มีสองส่วน: หลักการออกแบบ visualization สำหรับข้อมูล<strong>ตัวแปรเดียว (univariate)</strong> และการเริ่มเขียนโค้ด (D3.js/Altair) เพื่อสร้างมันขึ้นจริง เนื้อหาโค้ดเน้นสำหรับ mini project ของวิชานี้ — บทเรียนนี้จะเน้นหลักการที่ใช้วิเคราะห์/ออกแบบข้อสอบเป็นหลัก และแตะโค้ดเท่าที่ช่วยตอกย้ำหลักการเดิม.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Claus O. Wilke, <a href="https://clauswilke.com/dataviz/histograms-density-plots.html" target="_blank" rel="noopener">Fundamentals of Data Visualization — ch. 7 Visualizing Distributions</a> ครอบคลุม histogram, density plot สำหรับข้อมูลตัวแปรเดียวโดยตรง.
+</div>
+
+<h2>1. Univariate คืออะไร: เป้าหมาย 3 อย่าง</h2>
+<p>Univariate = ข้อมูล <strong>1 ตัวแปรต่อ 1 sample</strong> เป้าหมายเวลาแสดงผลมักเป็นหนึ่งใน 3 อย่างนี้:</p>
+<ul>
+<li><strong>Count</strong> — นับจำนวน</li>
+<li><strong>See how often the same values happen</strong> — ดูความถี่ของค่าที่ซ้ำกัน</li>
+<li><strong>See how they are distributed</strong> — ดูการกระจายตัวของข้อมูล</li>
+</ul>
+<p>กระบวนการออกแบบ: <strong>Determine the data type → Pick one appropriate visual variable → เติม scaffolding</strong>.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Univariate Goals</span></div>
+  <div class="qtext">Histogram ของอายุพนักงานในบริษัท ตอบเป้าหมายข้อใดของ univariate visualization โดยตรง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">See how they are distributed</button>
+    <button class="opt" data-correct="false">See two variables correlate</button>
+    <button class="opt" data-correct="false">See hierarchical structure</button>
+    <button class="opt" data-correct="false">See geographical pattern</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>2. Complete Chart = Scaffolding + Content (Alberto Cairo)</h2>
+<p>Cairo แยกชาร์ตออกเป็นสองชั้น: <em class="term">Content</em> (รูปทรง/เส้นที่เข้ารหัสข้อมูลจริง) กับ <em class="term">Scaffolding</em> (ทุกอย่างที่ทำให้ตีความ content ได้) — title/description, axes, legends, annotations. Slide สาธิตด้วยชาร์ตเดียวกัน 3 เวอร์ชัน: complete / scaffolding เท่านั้น (ไม่มีข้อมูล) / content เท่านั้น (ไม่มี scaffolding เลย ตีความไม่ได้).</p>
+
+<figure>
+<img src="../assets/slides/vis4-p61-scaffolding-vs-content.png" alt="Same murder-rate chart shown three ways: complete chart, scaffolding only, content only">
+<figcaption>Slide: Complete Chart = Scaffolding + Content (Alberto Cairo) (vis-4-univariate-code.pdf, p.61)</figcaption>
+</figure>
+<p>ลองทำการทดลองทางความคิดตามสไลด์นี้: ถ้าเห็นแค่คอลัมน์ "Content" ของ line chart อัตราฆาตกรรมสหรัฐฯ (เส้นสีแดงลากขึ้นลงบนพื้นเปล่า ไม่มีตัวเลขกำกับแกนเลย) คุณจะบอกได้แค่ว่า "มีค่าขึ้นตอนต้น แล้วค่อย ๆ ลงและทรงตัว" แต่บอกไม่ได้เลยว่านี่คือข้อมูลอะไร ช่วงปีไหน หน่วยอะไร — พอเติม scaffolding กลับเข้าไป (title "Murders", แกน "Rate per 100,000 people", ปี 1996-2014) ถึงจะรู้ว่านี่คืออัตราฆาตกรรมที่ลดลงต่อเนื่องเกือบ 20 ปี บทเรียนคือ: เส้น/รูปทรง (content) เป็นแค่ "รูปร่างเปล่า" ที่ไม่มีความหมายอะไรเลยจนกว่าจะมี scaffolding มาบอกบริบท — เวลาวิจารณ์ visualization ในข้อสอบ ถ้าขาด title หรือหน่วยกำกับแกน ให้ฟันธงได้เลยว่าไม่ Functional ต่อให้ data ที่เข้ารหัสไว้ถูกต้อง 100%.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Scaffolding</span></div>
+  <div class="qtext">ถ้าลบ scaffolding ออกจากชาร์ตจนเหลือแต่ content (เส้น/รูปทรงล้วน ๆ) จะเกิดอะไรขึ้น?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ข้อมูลยังอยู่ครบ แต่ตีความความหมายไม่ได้</button>
+    <button class="opt" data-correct="false">ข้อมูลบางส่วนจะหายไปจากภาพ</button>
+    <button class="opt" data-correct="false">ชาร์ตจะแม่นยำขึ้นเพราะไม่มีสิ่งรบกวน</button>
+    <button class="opt" data-correct="false">ชาร์ตจะกลายเป็นชนิดอื่นโดยอัตโนมัติ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Scaffolding</span></div>
+  <div class="qtext">ข้อใดต่อไปนี้ไม่ใช่องค์ประกอบของ scaffolding ตาม Cairo?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Visual mark ที่เข้ารหัสค่าข้อมูล</button>
+    <button class="opt" data-correct="false">Title และ description</button>
+    <button class="opt" data-correct="false">Legend</button>
+    <button class="opt" data-correct="false">Annotation</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. กฎ Tick Marks</h2>
+<table>
+<tr><th>หลักการ</th><th>ความหมาย</th></tr>
+<tr><td><strong>Simplicity</strong></td><td>ใช้ตัวคูณของ 2, 5, 10</td></tr>
+<tr><td><strong>Coverage</strong></td><td>ครอบคลุมข้อมูลทั้งหมด แต่ไม่เกินความจำเป็น</td></tr>
+<tr><td><strong>Density</strong></td><td>ไม่ถี่หรือห่างเกินไป</td></tr>
+<tr><td><strong>Legibility</strong></td><td>ตัวอักษรแนวนอนใหญ่พออ่านได้</td></tr>
+</table>
+
+<figure>
+<img src="../assets/slides/vis4-p69-tick-marks-rules.png" alt="Scaffolding tick marks slide listing Simplicity, Coverage, Density, Legibility">
+<figcaption>Slide: Scaffolding — Tick Marks (vis-4-univariate-code.pdf, p.69)</figcaption>
+</figure>
+<p>ลองใช้ 4 ข้อนี้ตรวจแกนที่มักเจอในโจทย์จริง: แกน y ที่มี tick ที่ 0, 17, 34, 51 (ห่างทีละ 17) ผิด Simplicity ทันทีเพราะ 17 ไม่ใช่เลขกลมที่คนคำนวณในหัวได้ง่าย ควรปรับเป็น 0, 20, 40, 60 แทน — แกน x ที่มีข้อมูลจริงอยู่แค่ปี 2015-2020 แต่ลาก tick ยาวไปถึงปี 2050 ผิด Coverage เพราะครอบคลุมเกินความจำเป็นจนพื้นที่ว่างเปล่าส่วนใหญ่ไม่มีข้อมูล — แกนที่มี tick ทุก ๆ 1 หน่วยจนตัวเลขทับกันอ่านไม่ออกผิดทั้ง Density (ถี่เกินไป) และ Legibility (อ่านไม่ออก) พร้อมกัน — 4 ข้อนี้จึงไม่ใช่ทฤษฎีลอย ๆ แต่เป็น checklist ที่ใช้เช็คทีละแกนได้จริงเวลาวิเคราะห์ชาร์ตในข้อสอบ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Tick Marks</span></div>
+  <div class="qtext">แกน y ที่มี tick marks ที่ 0, 3, 6, 9, 12, 15, 18, 21 (ห่างทีละ 3 หน่วย แต่ถี่มากจนตัวเลขทับกัน) ละเมิดหลักการข้อใดมากที่สุด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Density และ Legibility</button>
+    <button class="opt" data-correct="false">Simplicity เท่านั้น</button>
+    <button class="opt" data-correct="false">Coverage เท่านั้น</button>
+    <button class="opt" data-correct="false">ไม่ละเมิดข้อใดเลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p>Scaffolding ที่สำคัญอีกชนิดคือ <strong>label</strong> — ป้ายชื่อกำกับเส้น/จุดข้อมูล อาจารย์ยกเทคนิคที่ใช้ Voronoi diagram มาช่วยวางตำแหน่งป้ายให้อ่านง่ายที่สุด:</p>
+
+<figure>
+<img src="../assets/slides/vis4-p73-voronoi-direct-labeling.png" alt="Three colored line charts (red, blue, orange) with the entire background divided into three matching colored Voronoi regions based on which line is nearest at each point, with each line's numeric label placed directly at its end point colored to match, and a handwritten Thai note about using Voronoi to find the largest area to place the label">
+<figcaption>Slide: Direct labelling ด้วย Voronoi diagram (vis-4-univariate-code.pdf, p.73, Harry Stevens/Observable)</figcaption>
+</figure>
+<p>แทนที่จะใช้ legend แยกกล่องไว้มุมภาพ (ต้องกวาดตาไปมาระหว่างเส้นกับกล่อง legend) เทคนิคนี้ใส่ตัวเลขกำกับ (17.04, 14.13, 8.72) ไว้ตรงปลายเส้นแต่ละเส้นโดยตรง — ปัญหาคือถ้าเส้นสองเส้นวิ่งเบียดกันในบางช่วง จะใส่ป้ายตรงไหนถึงไม่ทับเส้นอื่น? คำตอบของเทคนิคนี้คือใช้ Voronoi diagram แบ่งพื้นที่ทั้งภาพออกเป็นโซนสีตามว่า "จุดไหนใกล้เส้นสีอะไรที่สุด ณ เวลานั้น" (พื้นที่สีฟ้า = ใกล้เส้นน้ำเงินที่สุด, พื้นที่สีชมพู = ใกล้เส้นแดงที่สุด) แล้ววางป้ายตรงจุดที่โซนสีของเส้นนั้นกว้างที่สุด — โน้ตกำกับสรุปตรง ๆ ว่า "ใช้ Voronoi หาพื้นที่ที่ใหญ่สุดเพื่อวาด label" นี่คือตัวอย่างที่ scaffolding (การวางป้ายกำกับ) ก็มีอัลกอริทึมเบื้องหลังให้ออกแบบอย่างมีหลักการได้ ไม่ใช่แค่วางตามความเคยชิน.</p>
+
+<p>อีกตัวอย่างหนึ่งแสดง annotation ที่ซับซ้อนกว่านั้นมาก — ระบบที่ดึงข่าวจริงมาผูกกับจุดบนกราฟหุ้นโดยอัตโนมัติ:</p>
+
+<figure>
+<img src="../assets/slides/vis4-p83-contextifier-stock-annotation.png" alt="An automatically annotated Wal-Mart stock price line chart with a volume bar chart below it, where real news headlines like Wal-Mart Indicates Readiness For Target's Canadian Entry and UPDATE: Rona Rejects Lowe's Unsolicited Takeover Proposal are connected by arrows to the exact price points they relate to, with callout labels explaining that messages are chosen based on relevancy, volume, and visual saliency">
+<figcaption>Slide: Jessica Hullman et al., "Contextifier: Automatic Generation of Annotated Stock Visualizations", CHI 2013 (vis-4-univariate-code.pdf, p.83)</figcaption>
+</figure>
+<p>กราฟราคาหุ้น Wal-Mart เส้นนี้ไม่ได้แค่แสดงราคา (content) เฉย ๆ — ระบบดึงพาดหัวข่าวจริงในช่วงเวลานั้นมาผูกกับจุดราคาที่เกี่ยวข้องโดยอัตโนมัติ เช่น "Wal-Mart Indicates Readiness For Target's Canadian Entry" ถูกโยงไปยังจุดราคาช่วงต้นปี 2011 หรือ "UPDATE: Rona Rejects Lowe's Unsolicited C$14.50/Share Takeover Proposal" ถูกโยงไปยังจุดพุ่งขึ้นแรงช่วงท้ายกราฟ — จุดสำคัญคือระบบไม่ได้ติดป้ายทุกข่าวที่มี (จะรกเกินไป) แต่เลือกเฉพาะข่าวที่ "relevancy สูง + volume การซื้อขายสูง (ดูจากกราฟแท่งด้านล่าง) + จุดนั้นเป็น visual saliency สูง (ราคาพุ่ง/ร่วงเห็นชัด)" — ผสาน 3 เกณฑ์เข้าด้วยกันเพื่อเลือกว่า annotation ไหน "คุ้มค่าพอ" ที่จะแสดง นี่คือระดับที่สูงกว่าการติด label ธรรมดามาก — เป็นตัวอย่างว่า scaffolding ที่ดีที่สุดไม่ใช่แค่ "มีคำอธิบายกำกับ" แต่ต้อง "เลือกคำอธิบายที่ตรงจุดและสำคัญที่สุด" ด้วย.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Voronoi Labeling</span></div>
+  <div class="qtext">เทคนิค direct labelling ด้วย Voronoi diagram แก้ปัญหาอะไรของการติดป้ายกำกับเส้นกราฟหลายเส้น?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">หาตำแหน่งที่ป้ายของแต่ละเส้นจะไม่ทับซ้อนกับเส้นอื่น โดยวางไว้ในพื้นที่ที่ใกล้เส้นของตัวเองมากที่สุด</button>
+    <button class="opt" data-correct="false">ทำให้เส้นกราฟทุกเส้นมีสีเดียวกัน</button>
+    <button class="opt" data-correct="false">ลดจำนวนจุดข้อมูลที่ต้องแสดงบนกราฟ</button>
+    <button class="opt" data-correct="false">แปลงกราฟเส้นให้กลายเป็น bar chart โดยอัตโนมัติ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 6</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">ระบบ Contextifier เลือกข่าวมาติด annotation บนกราฟหุ้นโดยใช้เกณฑ์อะไรบ้าง และทำไมถึงต้องมีเกณฑ์คัดเลือก ไม่ใช่ติดทุกข่าวที่มี?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ใช้ 3 เกณฑ์ร่วมกัน: relevancy ของข่าว, volume การซื้อขาย ณ ช่วงเวลานั้น, และ visual saliency ของจุดบนกราฟ (เช่นราคาพุ่ง/ร่วงชัดเจน) ต้องมีเกณฑ์คัดเลือกเพราะถ้าติด annotation ทุกข่าวที่มีในช่วงเวลานั้น กราฟจะรกจนอ่านไม่ออก scaffolding ที่ดีต้องเลือกเฉพาะข้อมูลที่สำคัญและเกี่ยวข้องที่สุด ไม่ใช่ใส่ทุกอย่างที่มี</div>
+</div>
+
+<h2>4. เครื่องมือแบบ Code → เชื่อมกลับกรอบคิดหลัก</h2>
+<p>Slide ชี้จุดแข็งของเครื่องมือแบบเขียนโค้ด (D3.js, Vega/Vega-Lite, Altair, R) เทียบกับเครื่องมือลากวาง และเชื่อมมันกลับเข้ากรอบคิด Effective/Convincing/Insightful ที่เรียนมาตั้งแต่ Lesson 1 โดยตรง:</p>
+<ul>
+<li><strong>Pixel precise → Truthful</strong> — ควบคุมตำแหน่งทุกพิกเซลได้ ลดการบิดเบือนโดยไม่ตั้งใจ</li>
+<li><strong>Reusable</strong> — ใช้โค้ดเดิมกับข้อมูลชุดใหม่ได้</li>
+<li><strong>(Possibly) interactive → Insightful</strong> — ผู้ใช้สำรวจข้อมูลเองได้ ไม่ใช่แค่ดูภาพนิ่ง</li>
+</ul>
+
+<figure>
+<img src="../assets/slides/vis4-p87-code-tools-pros.png" alt="Coding for Visualization slide listing R, D3.js, Vega, Vega-Lite, Altair; Pros: Pixel precise → Truthful, Reusable, (Possibly) interactive → Insightful">
+<figcaption>Slide: Coding for Visualization — Pros (vis-4-univariate-code.pdf, p.87)</figcaption>
+</figure>
+<p>ลองเทียบกับเครื่องมือลากวางอย่าง Canva หรือ Excel: ถ้าอยากวางวงกลม 2 วงให้พื้นที่ต่างกันตามสูตร r=√d เป๊ะ ๆ การลากด้วยเมาส์ทำได้แค่กะด้วยตา คลาดเคลื่อนแน่นอน แต่โค้ดคำนวณ r=√d ให้ตรงทุกทศนิยม นี่คือที่มาของ "Pixel precise → Truthful" — และถ้าอยากให้ผู้อ่าน drag เมาส์ zoom เข้าดูจุดที่สนใจเองได้ (ไม่ใช่แค่ดูภาพนิ่งที่คนทำเลือกมุมมองไว้ให้แล้ว) ก็ต้องเขียนโค้ดเปิด interaction ซึ่งเครื่องมือลากวางทำไม่ได้เลย นี่คือ "(Possibly) interactive → Insightful" — ส่วน "Reusable" คือพอเขียนโค้ดสร้างกราฟจากข้อมูลชุดแรกเสร็จ พอมีข้อมูลเดือนใหม่มา แค่เปลี่ยนไฟล์ CSV แล้วรันซ้ำ ไม่ต้องลากวางใหม่ทั้งหมด.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Code Tools</span></div>
+  <div class="qtext">คุณสมบัติ "pixel precise" ของเครื่องมือแบบเขียนโค้ดเชื่อมโยงกับเสาหลักใดของกรอบคิด Effective/Convincing/Insightful?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Convincing (Truthful)</button>
+    <button class="opt" data-correct="false">Effective (Functional)</button>
+    <button class="opt" data-correct="false">Insightful (Expressive)</button>
+    <button class="opt" data-correct="false">ไม่เชื่อมกับข้อใดเลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>5. Mark + Variable ในโค้ดจริง: D3.js และ Altair</h2>
+<p>ทั้งสองเครื่องมือแยก <em class="term">Mark</em> ออกจาก <em class="term">Variable</em> อย่างชัดเจนในไวยากรณ์เอง — ตรงกับทฤษฎีที่เรียนมาตั้งแต่ Lesson 2 ทุกตัวอักษร:</p>
+<pre><code># Altair: mark_circle() = Visual Mark, encode(x=...) = Visual Variable
+alt.Chart(data).mark_circle().encode(x='x')</code></pre>
+<pre><code>// D3.js: circle = Visual Mark, .attr("r", ...) = Visual Variable
+circle.data([32, 57, 112]);
+circle.attr("r", (d) => Math.sqrt(d));</code></pre>
+
+<figure>
+<img src="../assets/slides/vis4-p101-d3-mark-variable.png" alt="D3 Data Binding diagram labeling circle.data as Visual Mark and circle.attr r as Visual Variable">
+<figcaption>Slide: D3 Data Binding — Visual Mark vs Visual Variable in code (vis-4-univariate-code.pdf, p.101)</figcaption>
+</figure>
+<p>ลองไล่โค้ดทีละบรรทัดแบบเดียวกับที่สไลด์ทำ: บรรทัด <code>circle.data([32, 57, 112])</code> แค่บอกว่า "มีข้อมูล 3 ตัว ให้จับคู่กับวงกลม 3 วง" — นี่คือการเลือก mark (วงกลม) ยังไม่ได้บอกเลยว่าตัวเลข 32, 57, 112 จะไปปรากฏเป็นอะไรบนภาพ ต้องรอบรรทัดถัดมา <code>circle.attr("r", (d) => Math.sqrt(d))</code> ถึงจะกำหนดว่า "เอาค่าตัวเลขไปกำหนดรัศมี" — ถ้าสลับความคิดแบบนี้ไม่ออก จะเขียนโค้ดแบบ Altair ไม่ได้เลย เพราะ <code>mark_circle().encode(x='x')</code> ก็แยกสองขั้นตอนเดียวกันนี้ (มี mark อะไร → encode ด้วย variable อะไร) แค่เขียนคนละภาษา หลักคิดเหมือนกันทุกตัวอักษร.</p>
+
+<p>สังเกต <code>Math.sqrt(d)</code> — นี่คือการแก้ปัญหา "วงกลมสัดส่วนผิด" ที่เจอใน Lesson 2 (COVID map ที่ scale รัศมีตรง ๆ) โดยตรง: ถ้าต้องการให้<strong>พื้นที่</strong>วงกลมแปรผันตรงกับค่าข้อมูล d ต้อง set รัศมี r = √d (เพราะพื้นที่ = πr²) ไม่ใช่ r = d.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>D3.js Mark/Variable</span></div>
+  <div class="qtext">ในโค้ด <code>circle.attr("r", (d) => Math.sqrt(d))</code> ทำไมต้องใช้ square root แทนการ set r = d ตรง ๆ?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เพื่อให้พื้นที่วงกลม (ไม่ใช่รัศมี) แปรผันตรงกับค่าข้อมูล</button>
+    <button class="opt" data-correct="false">เพื่อให้โค้ดรันเร็วขึ้น</button>
+    <button class="opt" data-correct="false">เพราะ D3.js ไม่รองรับเลขจำนวนเต็มในแอตทริบิวต์ r</button>
+    <button class="opt" data-correct="false">เพื่อให้วงกลมทุกวงมีสีเดียวกัน</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Altair Data Types</span></div>
+  <div class="qtext">ใน Altair, <code>encode(color='x:Q')</code> vs <code>encode(color='x:N')</code> ต่างกันอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">:Q ให้สเกลสีไล่ระดับต่อเนื่อง ส่วน :N ให้สีแยกตามหมวดหมู่</button>
+    <button class="opt" data-correct="false">:Q ใช้กับข้อมูลตัวอักษรเท่านั้น ส่วน :N ใช้กับตัวเลขเท่านั้น</button>
+    <button class="opt" data-correct="false">:Q แสดงผลเร็วกว่า :N เสมอ</button>
+    <button class="opt" data-correct="false">ทั้งสองแบบให้ผลลัพธ์เหมือนกันทุกกรณี</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<figure>
+<img src="../assets/slides/vis4-p119-altair-data-types.png" alt="Altair code encode(color='x:Q') with :O and :N alternatives shown below it">
+<figcaption>Slide: Altair data-type suffixes :Q / :O / :N (vis-4-univariate-code.pdf, p.119)</figcaption>
+</figure>
+<p>ลองนึกภาพคอลัมน์ข้อมูล "ระดับความพึงพอใจ" ที่เก็บเป็นตัวเลข 1-5: ถ้าเขียน <code>encode(color='x:Q')</code> Altair จะมองว่าเป็นตัวเลขต่อเนื่อง แล้วให้สีไล่โทนอ่อน-เข้มอัตโนมัติ (เหมาะกับ ordinal จริง ๆ เพราะ 1 ถึง 5 มีลำดับ) แต่ถ้าใช้คอลัมน์เดียวกันนี้เข้ารหัส "รหัสแผนก" ที่บังเอิญเก็บเป็นตัวเลข 1-5 เหมือนกัน (1=ขาย, 2=การเงิน, …) แล้วเผลอเขียน <code>:Q</code> ไปด้วยความเคยชิน Altair จะให้สีไล่โทนทั้งที่แผนกไม่มีลำดับจริง ต้องเปลี่ยนเป็น <code>:N</code> เพื่อให้สีแยกเป็นกลุ่มแทน — โค้ดต่างกันแค่ตัวอักษรเดียว (Q↔N) แต่ผลลัพธ์คือกับดัก "เอา nominal ไปเข้ารหัสแบบ ordinal" ที่เรียนใน Lesson 2-3 เกิดขึ้นได้จริงในโค้ดบรรทัดเดียว.</p>
+
+<h2>6. Grammar Stack: Altair → Vega-Lite → Vega</h2>
+<p>Altair (Python) ไม่ได้วาดภาพเอง แต่คอมไพล์เป็น <strong>Vega-Lite spec (JSON)</strong> ซึ่งคอมไพล์ต่อเป็น <strong>Vega spec (JSON)</strong> แล้วจึงเรนเดอร์เป็นภาพจริง — เป็น "visual grammar" หลายชั้นที่แยก "จะวาดอะไร" (spec) ออกจาก "วาดยังไง" (renderer).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 10</span><span>Grammar Stack</span></div>
+  <div class="qtext">เรียงลำดับ pipeline การคอมไพล์ที่ถูกต้องเมื่อเขียนโค้ดด้วย Altair</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Altair → Vega-Lite spec → Vega spec → Visualization</button>
+    <button class="opt" data-correct="false">Vega spec → Altair → Vega-Lite spec → Visualization</button>
+    <button class="opt" data-correct="false">Visualization → Vega spec → Vega-Lite spec → Altair</button>
+    <button class="opt" data-correct="false">Altair → Visualization → Vega-Lite spec → Vega spec</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>7. ชาร์ตเฉพาะทางสำหรับข้อมูลตัวแปรเดียว</h2>
+<ul>
+<li><strong>Beeswarm plot</strong> — วางจุดข้อมูลชิดกันโดยไม่ทับซ้อน แสดงทั้งค่าจริงและความหนาแน่นของการกระจายตัวพร้อมกัน</li>
+<li><strong>Two-tone pseudo coloring</strong> (Saito et al., InfoVis 2005) — บีบอัดข้อมูล 1 มิติให้แสดงในพื้นที่กะทัดรัดด้วยสี 2 โทน แทนที่จะใช้แกนยาว ๆ</li>
+</ul>
+
+<figure>
+<img src="../assets/slides/vis4-p58-beeswarm-plot.png" alt="Beeswarm plot slide showing data points arranged side-by-side without overlapping">
+<figcaption>Slide: Beeswarm Plot (vis-4-univariate-code.pdf, p.58)</figcaption>
+</figure>
+<p>ลองเทียบกับ scatter plot 1 มิติธรรมดา: ถ้ามี 15 คนสอบได้คะแนน 8 เต็ม 10 เหมือนกัน scatter plot ปกติจะวาดจุดซ้อนทับกันสนิทจนเห็นเป็นจุดเดียว มองไม่ออกว่ามีกี่คน — beeswarm plot แก้ปัญหานี้ด้วยการดันจุดที่ชนกันให้ขยายออกทางซ้าย-ขวาแทน (ตำแหน่งซ้าย-ขวาไม่มีความหมายอะไร มีไว้กันชนอย่างเดียว) ทำให้นับจุดในกลุ่ม "8 คะแนน" ได้ด้วยตาว่ามี 15 จุดจริง ๆ พร้อมกับยังเห็นภาพรวมว่ากลุ่มไหนมีคนเยอะกว่ากัน (กองจุดกว้างกว่า) — ได้ประโยชน์ 2 อย่างพร้อมกันในกราฟเดียว: ทั้งค่าจริงของแต่ละคนและการกระจายตัวของทั้งชั้น ซึ่ง histogram ให้แค่อย่างหลังอย่างเดียว.</p>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 11</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: beeswarm plot ต่างจาก scatter plot ทั่วไปอย่างไร ในการแสดงข้อมูลตัวแปรเดียว?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">Beeswarm plot จัดตำแหน่งจุดในแนวขวางเพื่อไม่ให้จุดที่มีค่าใกล้เคียงกันทับซ้อนกัน (ต่างจาก scatter plot ที่จุดค่าเดียวกันจะซ้อนทับกันสนิท) ทำให้มองเห็นทั้งค่าจริงของแต่ละจุดและความหนาแน่น/การกระจายตัวของทั้งชุดข้อมูลได้พร้อมกันในภาพเดียว เหมาะกับข้อมูลตัวแปรเดียวที่ต้องการเห็นทั้งจุดแต่ละจุดและภาพรวมการกระจาย</div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 12</span><span>Assignment เชื่อมโยง</span></div>
+  <div class="qtext">Assignment ของ Lecture นี้ (โหลดข้อมูลเหรียญทอง SEA Games แล้วเขียนโค้ดแสดงผล) ฝึกขั้นตอนใดของ pipeline ที่เรียนใน Lesson 3 เป็นหลัก?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Data Presentation (Visual Mapping)</button>
+    <button class="opt" data-correct="false">Data Acquisition เท่านั้น</button>
+    <button class="opt" data-correct="false">Data Cleaning เท่านั้น</button>
+    <button class="opt" data-correct="false">ไม่เกี่ยวข้องกับ pipeline ที่เรียนมา</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรแยก content กับ scaffolding ในชาร์ตที่เห็นได้ทันที ท่องกฎ tick marks 4 ข้อได้ และเข้าใจว่าทำไมโค้ด <code>Math.sqrt(d)</code> ถึงสำคัญเวลา scale พื้นที่ตามข้อมูล — ครบเป็นเหตุผลเชิงเทคนิคที่ใช้อธิบายได้ทั้งตอนวิเคราะห์ visualization และตอนออกแบบเอง.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (128 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-4-univariate-code.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–37</td><td>Visualization Tools ทั้ง analog และ digital (กล้อง ปากกา, Power BI, Datawrapper, echarts, AntV) + งานวิจัยเสริม (soap medium ของอาจารย์, ChatGPT for visual analytics)</td><td>etc — รายชื่อ/ตัวอย่างเครื่องมือ ไม่ใช่ทฤษฎีที่ทำ quiz (ซ้ำบางส่วนจาก Lesson 3 ท้ายบท)</td></tr>
+<tr><td>38</td><td>ตัวอย่าง scatterplot matrix (Price/Mileage/Weight/Repair) + อ้างอิง Mackinlay 1986 ซ้ำ</td><td>etc — ตัวอย่างเสริม (SPLOM สอนละเอียดใน <a href="0006-multivariate-data-visualization.html">Lesson 6</a>)</td></tr>
+<tr><td>39–53</td><td>งานวิจัย/เครื่องมือ prototyping และ AI-assisted visualization (Chart Spark, viz2viz, FishLense, protograph.io, low→high fidelity draft)</td><td>etc — เนื้อหาเสริมเรื่อง workflow การออกแบบ ไม่ใช่ทฤษฎีหลักของวิชา</td></tr>
+<tr><td>54</td><td>Data &amp; Visualization Types: univariate/bivariate/multidimensional → common charts, hierarchical/relational → node-link, spatial → maps</td><td>etc — ภาพรวมก่อนเข้าหัวข้อ (บริบทของ Lesson 4-6)</td></tr>
+<tr><td>55</td><td>Scalability: ข้อมูลมาก row/column ขึ้น visualization ยากขึ้น</td><td>etc — ข้อสังเกตทั่วไป</td></tr>
+<tr><td>56</td><td>Univariate Data Visualization: เป้าหมาย count/frequency/distribution</td><td>✓ หัวข้อ 1</td></tr>
+<tr><td>57</td><td>อ้างอิง Two-tone pseudo coloring (Saito et al. 2005)</td><td>✓ หัวข้อ 7</td></tr>
+<tr><td>58</td><td>Beeswarm Plot</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>59</td><td>ตัวอย่างประกอบ Beeswarm (Facebook)</td><td>etc</td></tr>
+<tr><td>60</td><td>Univariate: กระบวนการ determine type → pick variable → scaffolding</td><td>✓ หัวข้อ 1</td></tr>
+<tr><td>61</td><td>Complete Chart = Scaffolding + Content</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>62</td><td>Scaffolding: title/axes/legends/annotations</td><td>✓ หัวข้อ 2</td></tr>
+<tr><td>63–68</td><td>ฟอนต์สำหรับ data visualization + ตัวอย่าง contextual elements</td><td>etc — เนื้อหาเสริมเรื่องการออกแบบตัวอักษร ไม่ใช่ทฤษฎีที่ทำ quiz</td></tr>
+<tr><td>69</td><td>Scaffolding: Tick Marks (Simplicity/Coverage/Density/Legibility)</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>70</td><td>Scaffolding: Labels + อ้างอิง Franconeri et al. 2021</td><td>etc — ต่อยอดจากหัวข้อ Scaffolding แต่ไม่มี quiz แยก</td></tr>
+<tr><td>71–72</td><td>เกริ่นนำ direct labelling (Lowy Institute COVID performance)</td><td>etc — เกริ่นนำก่อนภาพ p.73 (ลิงก์อ้างอิง)</td></tr>
+<tr><td>73</td><td>Direct labelling ด้วย Voronoi diagram</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>74–77</td><td>Voronoi labels ตัวอย่างเพิ่มเติม (Observable, mapbox/polylabel)</td><td>etc — ตัวอย่างเสริมเทคนิคเดียวกับ p.73</td></tr>
+<tr><td>78–82</td><td>เกริ่นนำ Annotation เพิ่มเติม (titledrops.net, NYT markets 2020, wealth percentiles)</td><td>etc — ตัวอย่างประกอบก่อนภาพ p.83 (ลิงก์อ้างอิง)</td></tr>
+<tr><td>83</td><td>Contextifier: Automatic Generation of Annotated Stock Visualizations</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>84</td><td>อ้างอิง Data Hunches: Incorporating Personal Knowledge into Visualizations</td><td>etc — งานวิจัยเสริมเรื่อง annotation นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>85–86</td><td>ลิงก์ Observable canvases + หัวข้อ Coding for Visualization (รายชื่อเครื่องมือซ้ำ)</td><td>etc</td></tr>
+<tr><td>87</td><td>Coding for Visualization: Pros (Pixel precise→Truthful, Reusable, Interactive→Insightful)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>88–98</td><td>D3.js เกริ่นนำ: JS library, พื้นฐาน HTML/DOM/SVG, ตัวอย่างวาด ellipse/circle</td><td>etc — พื้นฐานโค้ดก่อนเข้าเนื้อหาหลัก (มินิโปรเจกต์ใช้ตรง ๆ)</td></tr>
+<tr><td>99–100</td><td>D3: select/attr/style</td><td>etc — ไวยากรณ์พื้นฐาน</td></tr>
+<tr><td>101</td><td>D3: Data Binding — Visual Mark</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>102–106</td><td>D3: Data Binding ต่อ (Visual Variable) และ Data Join (enter/update/exit)</td><td>✓ ส่วนหนึ่งของหัวข้อ 5 (แนวคิดเดียวกับ p.101 อธิบายแล้ว)</td></tr>
+<tr><td>107–109</td><td>D3: Export (Bitmap/PDF/SVG) + ลิงก์ gallery</td><td>etc — ฟีเจอร์เสริม ไม่ใช่ทฤษฎี</td></tr>
+<tr><td>110–115</td><td>Vega/Vega-Lite/Altair grammar stack + งานวิจัยเสริม (accessibility, immersive viz)</td><td>✓ หัวข้อ 6 (อธิบายแนวคิด stack แล้ว)</td></tr>
+<tr><td>116–118</td><td>Altair 101: mark_circle(), encode(x=...), รายชื่อ mark ประเภทอื่น</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>119</td><td>Altair 101: encode(color='x:Q'/:O/:N)</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>120–122</td><td>Altair 101: aggregate functions, axis config, interactive()</td><td>etc — รายละเอียดไวยากรณ์เพิ่มเติม นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>123–127</td><td>ลิงก์ gallery/dataset + ตัวอย่างโค้ด D3/Altair โหลดข้อมูลจาก CSV จริง</td><td>etc — เตรียมทำ assignment โดยตรง</td></tr>
+<tr><td>128</td><td>Assignment: Code a Visualization (ข้อมูลเหรียญทอง SEA Games)</td><td>✓ หัวข้อ 10 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0003-visualization-pipeline.html">← Lesson 3: Visual Variables &amp; Pipeline</a></span>
+  <span><a href="0005-bivariate-data-visualization.html">Lesson 5: Bivariate Data Visualization →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

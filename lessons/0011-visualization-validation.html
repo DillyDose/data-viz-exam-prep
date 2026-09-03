@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 11: Visualization Validation</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 11 / 13 · Visualization Validation</span>
+  <span><a href="../reference/0011-visualization-validation-cheatsheet.html">Reference: Visualization Validation Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-11-validation.pdf</p>
+<h1>Visualization Validation</h1>
+
+<p>เราทำ visualization มา 10 บทแล้ว แต่ยังไม่เคยถามคำถามสำคัญ: "แล้วมันดีจริงไหม" บทนี้ให้เครื่องมือตอบคำถามนั้นอย่างเป็นระบบ — ไม่ใช่แค่ "ดูสวยดี" แต่วัดได้ด้วยตัวเลข ทดสอบได้กับผู้ใช้จริง และมีกรอบคิดที่บอกได้ว่า "ผิดพลาดตรงไหนในกระบวนการออกแบบ".</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Tamara Munzner, <a href="https://www.cs.ubc.ca/~tmm/papers/nestedmodel-vis09.pdf" target="_blank" rel="noopener">"A Nested Model for Visualization Design and Validation"</a>, TVCG 2009 — กรอบคิดหลักของทั้งบทนี้ ทุกหัวข้อด้านล่างแม็ปกลับเข้ากับโมเดลนี้ได้.
+</div>
+
+<h2>1. Validation คืออะไร: ย้อนกลับไปที่กรอบ Lecture 1</h2>
+<p>จำกรอบ Effective/Convincing/Insightful (หรือ Functional/Truthful/Insightful) จาก Lesson 1 ได้ไหม? Validation คือการเอากรอบนั้นมาวัดจริง ไม่ใช่แค่พูดลอย ๆ:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p5-validation-triad.png" alt="Slide listing three validation axes: Accuracy or validating Truthful-ness, Ease of use or validating Functional-ity, Knowledge gain or validating Insight">
+<figcaption>Slide: Validation — Accuracy, Ease of use, Knowledge gain (vis-11-validation.pdf, p.5)</figcaption>
+</figure>
+<p>สังเกตวิธีจับคู่คำ: "Accuracy" คือการวัดว่า visualization ยัง <strong>Truthful</strong> อยู่ไหม (ตัวเลขที่แสดงตรงกับข้อมูลจริงแค่ไหน) "Ease of use" คือวัด <strong>Functional-ity</strong> (ผู้ใช้ใช้งานได้จริงไหม ไม่ใช่แค่ทฤษฎีสวยแต่ใช้ยาก) และ "Knowledge gain" คือวัด <strong>Insight</strong> (ผู้ใช้ได้ความรู้ใหม่จากมันจริงไหม) — 3 แกนนี้แต่ละแกนต้องการวิธีวัดที่ต่างกันโดยสิ้นเชิง อย่างที่จะเห็นในหัวข้อถัดไป: แกนแรกวัดด้วย quality metrics (ตัวเลขคำนวณได้) ส่วนสองแกนหลังต้องใช้ usability testing (ทดสอบกับคนจริง).</p>
+
+<h2>2. เหตุผลงานวิจัยของอาจารย์เอง: ทำไมต้อง validate</h2>
+<p>อาจารย์ยกงานวิจัยของตัวเองมาเป็นตัวอย่างว่า validation เปลี่ยนการออกแบบจริงได้อย่างไร:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p7-transit-map-perception.png" alt="Two Bangkok transit maps side by side: the real geographically-accurate route on the left with curved lines following the actual city layout, and a redesigned schematic version on the right with straightened lines at clean angles">
+<figcaption>Slide: Chanisorn Kiratiwiriyaporn & Puripant Ruchikachorn, "A Study and Design of Transit Map based on Visual Perception", PacificVis Poster 2019 (vis-11-validation.pdf, p.7)</figcaption>
+</figure>
+<p>แผนที่รถไฟฟ้ากรุงเทพฯ ทางซ้ายคือเส้นทางจริงตามภูมิศาสตร์ (โค้งเลี้ยวตามถนนจริง) ส่วนทางขวาคือฉบับออกแบบใหม่ที่ยืดเส้นทางให้ตรง/เอียงมุมคงที่ (สไตล์ Vignelli แบบแผนที่รถไฟใต้ดินลอนดอน/นิวยอร์ก) — งานวิจัยนี้ใช้หลักการรับรู้ทางสายตา (visual perception) มาออกแบบเวอร์ชันขวาอย่างมีหลักการ ไม่ใช่แค่ "ยืดให้ตรงเพราะดูเรียบร้อยกว่า" นี่คือตัวอย่างว่างานวิจัย validation ไม่ได้อยู่แค่ในตำรา — มันคือสิ่งที่อาจารย์เองก็ทำวิจัยอยู่ และนำมาสอนต่อในห้องเรียนนี้.</p>
+
+<h2>3. Munzner's Nested Model: แผนที่ของทุกจุดที่ผิดพลาดได้</h2>
+<p>กรอบคิดสำคัญที่สุดของบทนี้ — โมเดลนี้บอกว่า visualization ทุกชิ้นสร้างผ่าน 4 ชั้นซ้อนกัน และแต่ละชั้นมีจุดที่ผิดพลาดได้ (Threat) กับวิธีตรวจสอบของตัวเอง (Validate):</p>
+
+<figure>
+<img src="../assets/slides/vis11-p42-munzner-nested-model.png" alt="Nested rectangles diagram: outermost Problem layer, then Task/Data, then Encoding/Interaction, innermost Implementation/Algorithm, each with its own Threat and Validate method listed">
+<figcaption>Slide: Tamara Munzner, "A Nested Model for Visualization Design and Validation", TVCG 2009 (vis-11-validation.pdf, p.42)</figcaption>
+</figure>
+<p>ไล่จากนอกสุดเข้าใน: ชั้น <strong>Problem</strong> — Threat คือ "แก้ปัญหาผิดตัว" วิธี validate คือไปสัมภาษณ์/สังเกตผู้ใช้เป้าหมายจริง ๆ ชั้น <strong>Task/Data</strong> — Threat คือ "เข้าใจ task/data ผิด" ชั้น <strong>Encoding/Interaction</strong> — Threat คือ "เลือก encoding ที่ไม่มีประสิทธิภาพ" validate ด้วยการอธิบายเหตุผลของ design (justify) หรือทำ lab study วัดเวลา/ความผิดพลาดของผู้ใช้จริง ชั้นในสุด <strong>Algorithm</strong> — Threat คือ "algorithm ช้าเกินไป" validate ด้วยการวิเคราะห์ computational complexity หรือวัดเวลา/memory จริงหลัง implement ประเด็นสำคัญที่สุด: ถ้าเข้าใจ "Problem" ผิดตั้งแต่ชั้นนอกสุด ต่อให้ทุกชั้นในทำถูกหมด (algorithm เร็ว, encoding สวย) มันก็ยังเป็น visualization ที่ผิด เพราะแก้ปัญหาที่ไม่มีใครมีจริง — ผิดพลาดชั้นนอกทำให้ทุกชั้นในไร้ความหมาย ไม่ใช่กลับกัน.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Munzner's Nested Model</span></div>
+  <div class="qtext">ถ้าทีมออกแบบเข้าใจ "Problem" (ปัญหาของผู้ใช้จริง) ผิดตั้งแต่ต้น แต่ implement algorithm ได้เร็วมากและ encoding สวยงาม ผลลัพธ์คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">visualization ยังผิดอยู่ดี เพราะแก้ปัญหาที่ไม่มีใครมีจริง</button>
+    <button class="opt" data-correct="false">visualization จะถูกต้องเสมอ เพราะชั้นในสำคัญกว่าชั้นนอก</button>
+    <button class="opt" data-correct="false">ไม่มีผลกระทบใด ๆ ต่อคุณภาพของ visualization</button>
+    <button class="opt" data-correct="false">ปัญหานี้แก้ได้ด้วยการ optimize algorithm เพิ่มเติม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. Quality Metrics: วัดคุณภาพด้วยตัวเลข</h2>
+<p>Quality metrics คือวิธี validate แกน "Accuracy" (Truthful-ness) แบบไม่ต้องใช้คนทดสอบเลย — คำนวณจากตัวข้อมูล/ภาพโดยตรง ตัวอย่างแรก: วัดว่า binning/aggregation (เช่น density plot, heatmap) ยัง "ซื่อสัตย์" กับข้อมูลดิบแค่ไหน:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p45-faithfulness-metric.png" alt="Left panel shows raw scatter points on a grid at x-values 7.1 and 7.8 within the same bin; right panel shows the same data aggregated into a density tile grid, with the darkest tile marking the bin and formula error equals absolute value of 7.1 minus 7.5 plus absolute value of 7.8 minus 7.5">
+<figcaption>Slide: Quality Metrics — Faithfulness ของ binning (vis-11-validation.pdf, p.45, ผ่าน observablehq.com/@twitter/density-plot-introduction)</figcaption>
+</figure>
+<p>สมมติมีจุดข้อมูลจริงที่ x=7.1 และ x=7.8 ทั้งสองจุดตกอยู่ใน bin เดียวกันซึ่งมีจุดกึ่งกลางที่ x=7.5 (ตัวเลขบนแกน x คือค่ากึ่งกลาง bin หลังการ aggregate) — คำถามคือ "การเอาทั้ง bin ไปแทนด้วยจุดเดียวที่ 7.5 มันเพี้ยนจากความจริงไปแค่ไหน" คำนวณ error = |7.1 − 7.5| + |7.8 − 7.5| = 0.4 + 0.3 = 0.7 แล้วสูตร faithfulness = 1 − (error รวมของทุก bin ÷ (n × half bin size)) จะแปลงค่า error นี้ให้เป็นคะแนน 0 ถึง 1 — ยิ่ง error สะสมน้อย (จุดข้อมูลอยู่ใกล้จุดกึ่งกลาง bin ของตัวเอง) faithfulness ยิ่งเข้าใกล้ 1 นี่คือตัวอย่างที่แสดงว่า "ความสวยงาม" ของ binned chart ไม่ได้แปลว่ามันซื่อสัตย์กับข้อมูลดิบเสมอไป ยิ่ง bin กว้าง ยิ่งเสีย faithfulness มากขึ้นเรื่อย ๆ แม้ภาพจะดูเรียบร้อยกว่า.</p>
+
+<p>ตัวอย่างที่สอง: วัดความ "เรียบง่าย" ของ graph/network layout ด้วยจำนวนเส้นตัดกัน (edge crossing) — ยิ่งเส้นตัดกันน้อย ยิ่งอ่านง่าย:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p47-simplicity-crossing.png" alt="Four different layouts of the same 4-node graph with nodes 1, 2, 3, 4, each labeled with its edge-crossing count: 0, 1, 0, 0, alongside the formula simplicity equals crossing-max minus crossing">
+<figcaption>Slide: Quality Metrics — Simplicity จากจำนวนเส้นตัดกัน (vis-11-validation.pdf, p.47, อ้างอิง Helen Purchase 2002)</figcaption>
+</figure>
+<p>กราฟทั้ง 4 ผังนี้คือโหนด {1, 2, 3, 4} ชุดเดียวกัน เชื่อมด้วยเส้นชุดเดียวกัน แต่จัดตำแหน่ง (layout) ต่างกัน — ผังบนซ้ายและล่างทั้งสองมี crossing = 0 (ไม่มีเส้นไหนตัดกันเลย อ่านง่ายสุด) ส่วนผังบนขวามี crossing = 1 (เส้น 1-3 กับเส้น 2-4 ตัดกันตรงกลาง อ่านยากกว่านิดหน่อย) โน้ตกำกับว่าสูตรที่แม่นกว่าคือ simplicity = 1 − (crossing ÷ crossing<sub>max</sub>) ซึ่งทำให้ตัวเลขเทียบกันข้ามกราฟขนาดต่างกันได้ (ไม่ใช่แค่นับ crossing ดิบ ๆ) — ข้อคิดสำคัญ: ข้อมูล (โหนด/เส้น) เหมือนกันทุกประการ แต่แค่จัดตำแหน่งใหม่ ก็เปลี่ยนคะแนนคุณภาพได้ทันที นี่คือเหตุผลที่ graph layout algorithm (เช่น force-directed) พยายามลด crossing ให้น้อยที่สุด.</p>
+
+<p>quality metrics ไม่ได้จำกัดแค่ทฤษฎี — มันถูกใช้เทียบของจริงระหว่างสำนักข่าวได้ด้วย เช่น tile grid map ของสหรัฐฯ ที่แต่ละสำนักออกแบบเอง:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p51-tilegrid-quality-metrics.png" alt="Six real tile grid maps of the United States from New York Times, NPR, Guardian, Washington Post, FiveThirtyEight, and Bloomberg, each placing the 50 states in slightly different grid positions">
+<figcaption>Slide: Krist Wongsuphasawat, "Quality metrics for tile grid maps", IEEE Vis 2016 (vis-11-validation.pdf, p.51)</figcaption>
+</figure>
+<p>ทั้ง 6 แผนที่นี้พยายามทำสิ่งเดียวกัน: จัดทั้ง 50 รัฐของสหรัฐฯ ลงตารางสี่เหลี่ยมขนาดเท่ากัน แต่แต่ละสำนัก (NYT, NPR, Guardian, Washington Post, FiveThirtyEight, Bloomberg) จัดตำแหน่งรัฐต่างกันเล็กน้อย (สังเกตตำแหน่งของ MI, WI, หรือการจัดกลุ่มแถบตะวันออกเฉียงเหนือ) — งานวิจัยนี้เสนอ 3 metric วัดคุณภาพของแต่ละผัง ได้แก่ recall สูงสุด (คนจำตำแหน่งรัฐถูกมากสุด) inaccuracy ต่ำสุด (คลาดเคลื่อนจากตำแหน่งภูมิศาสตร์จริงน้อยสุด) และ misdirection น้อยสุด (ไม่ทำให้เข้าใจทิศทาง/ความสัมพันธ์ผิด) — ข้อคิด: ไม่มีผังไหน "ถูกที่สุด" แบบสมบูรณ์ เพราะ recall กับ inaccuracy มักแลกกันเอง (ยิ่งจัดให้ตรงภูมิศาสตร์ ยิ่งอาจจำยากขึ้น) การมี metric ทำให้เทียบผังต่าง ๆ ได้อย่างเป็นกลาง แทนที่จะเถียงกันด้วยความรู้สึก.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Faithfulness Metric</span></div>
+  <div class="qtext">จากตัวอย่างจุดข้อมูล x=7.1 และ x=7.8 ที่ถูกรวมเข้า bin เดียวกันที่จุดกึ่งกลาง x=7.5 การคำนวณ error ทำอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">รวมค่าสัมบูรณ์ของผลต่างระหว่างแต่ละจุดข้อมูลจริงกับจุดกึ่งกลาง bin</button>
+    <button class="opt" data-correct="false">นับจำนวนจุดข้อมูลทั้งหมดใน bin นั้น</button>
+    <button class="opt" data-correct="false">หาค่าเฉลี่ยของจุดข้อมูลทั้งหมดในทุก bin</button>
+    <button class="opt" data-correct="false">วัดระยะห่างระหว่าง bin ที่ติดกัน</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Simplicity Metric</span></div>
+  <div class="qtext">กราฟ 4 โหนดชุดเดียวกัน (โหนด/เส้นเชื่อมเหมือนกันทุกประการ) แต่จัด layout ต่างกัน ทำไมคะแนน simplicity ถึงต่างกันได้?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เพราะการจัดตำแหน่งโหนดใหม่เปลี่ยนจำนวนเส้นที่ตัดกัน (crossing) ได้ แม้ข้อมูลเดิมทุกอย่าง</button>
+    <button class="opt" data-correct="false">เพราะจำนวนโหนดในแต่ละ layout ไม่เท่ากัน</button>
+    <button class="opt" data-correct="false">เพราะสีของเส้นเชื่อมต่างกัน</button>
+    <button class="opt" data-correct="false">simplicity เป็นค่าคงที่ ไม่ขึ้นกับ layout เลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 4</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">จากตัวอย่าง tile grid map 6 สำนักข่าว อธิบายสั้น ๆ ว่าทำไม "recall" กับ "inaccuracy" ถึงมักแลกกันเอง (tradeoff) ในการออกแบบ tile grid map?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ถ้าจัดตำแหน่งรัฐให้ตรงกับภูมิศาสตร์จริงเป๊ะที่สุด (inaccuracy ต่ำ) รูปทรงตารางอาจซับซ้อนขึ้น มีรัฐเล็ก ๆ เบียดกันแน่น ทำให้คนจำตำแหน่งยากขึ้น (recall ต่ำ) กลับกันถ้าจัดให้จำง่าย (จัดเป็นแถว/คอลัมน์ที่ดูสม่ำเสมอ) มักต้องยอมขยับตำแหน่งบางรัฐให้คลาดเคลื่อนจากภูมิศาสตร์จริง (inaccuracy สูงขึ้น) จึงไม่มีผังไหนได้คะแนนดีที่สุดพร้อมกันในทุกมิติ ต้องเลือกตามลำดับความสำคัญของแต่ละบริบท</div>
+</div>
+
+<h2>5. Usability Testing: เมื่อตัวเลขคำนวณเองไม่พอ</h2>
+<p>"Ease of use" กับ "Knowledge gain" วัดด้วยสูตรคณิตศาสตร์ไม่ได้ — ต้องเอาคนจริงมาทดสอบ กระบวนการมี 3 ขั้นตอน เริ่มจาก <strong>Define tasks</strong>: ต้องตั้งคำถามที่มีคำตอบชัดเจนตรวจสอบได้ (closed-ended):</p>
+
+<figure>
+<img src="../assets/slides/vis11-p65-usability-tasks.png" alt="Example usability testing task questions: find the month with the highest unemployment rate in 2019, in this node-link diagram how many friends each person has on average, which scatterplot has the highest correlation coefficient">
+<figcaption>Slide: Usability Testing: Tasks (vis-11-validation.pdf, p.65)</figcaption>
+</figure>
+<p>สังเกตว่าทั้ง 3 คำถามตัวอย่างนี้มีคำตอบเดียวที่ถูกต้องแน่นอน ("เดือนไหน" "ค่าเฉลี่ยเท่าไหร่" "scatterplot ไหน") — ไม่ใช่คำถามเปิดแบบ "คุณคิดยังไงกับภาพนี้" เพราะถ้าคำตอบไม่ชัดเจน จะวัด "ผู้ใช้ตอบถูกกี่ % ใช้เวลาเท่าไหร่" ไม่ได้เลย นี่คือหลักการเดียวกับ closed-ended question จาก Sensemaking ใน Lesson 10 — usability test ต้องใช้คำถามปิดเพื่อวัดผลได้ ส่วนคำถามเปิด (ทำไม/อย่างไร) เก็บไว้ใช้ตอนสัมภาษณ์หลัง task เสร็จแทน.</p>
+
+<p>คำถามปิดยังแบ่งชนิดย่อยได้อีก งานวิจัยปี 2023 นี้แยกความต่างระหว่าง "Validation task" กับ "Estimation task" ชัดเจนมาก:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p70-validation-vs-estimation.png" alt="Two scatterplots side by side: the left one, labeled Validation task, has a red horizontal line drawn across it for the participant to judge whether it matches the average; the right one, labeled Estimation task, has no line and asks the participant to determine the average from scratch">
+<figcaption>Slide: Daniel Braun et al., "Visual Validation versus Visual Estimation: A Study on the Average Value in Scatterplots", TVCG 2023 (vis-11-validation.pdf, p.70)</figcaption>
+</figure>
+<p>ทั้งสอง scatterplot มีจุดข้อมูลชุดเดียวกันทุกประการ ต่างกันแค่วิธีถาม: scatterplot ซ้าย ("Validation task") มีเส้นแดงลากไว้แล้ว คำถามคือ "เส้นนี้คือค่าเฉลี่ยใช่ไหม" — ผู้ใช้แค่ตัดสิน ใช่/ไม่ใช่ ส่วน scatterplot ขวา ("Estimation task") ไม่มีเส้นให้เลย คำถามคือ "ค่าเฉลี่ยอยู่ตรงไหน" — ผู้ใช้ต้องประเมินขึ้นมาเองจากศูนย์ งานวิจัยพบว่าความแม่นยำของทั้งสอง task ต่างกันอย่างมีนัยสำคัญ แม้ข้อมูลตั้งต้นจะเหมือนกันเป๊ะ — บทเรียนคือ "วิธีถามคำถาม" มีผลต่อผลลัพธ์การทดสอบพอ ๆ กับตัว visualization เอง ถ้าออกแบบ task ผิดชนิด อาจวัดคุณภาพ chart ผิดไปเลย.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Usability Testing: Tasks</span></div>
+  <div class="qtext">ทำไม usability testing task ต้องเป็นคำถามแบบ closed-ended (มีคำตอบเดียวชัดเจน)?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เพื่อวัดได้ว่าผู้ใช้ตอบถูกกี่เปอร์เซ็นต์และใช้เวลาเท่าไหร่ ซึ่งคำถามเปิดวัดแบบนี้ไม่ได้</button>
+    <button class="opt" data-correct="false">เพราะผู้ใช้ชอบคำถามปิดมากกว่าคำถามเปิดเสมอ</button>
+    <button class="opt" data-correct="false">เพราะคำถามปิดใช้เวลาตอบนานกว่า วัดผลได้ละเอียดกว่า</button>
+    <button class="opt" data-correct="false">closed-ended ไม่มีเหตุผลพิเศษ เป็นธรรมเนียมปฏิบัติเท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Validation vs Estimation Task</span></div>
+  <div class="qtext">ความต่างหลักระหว่าง Validation task กับ Estimation task ในการทดสอบค่าเฉลี่ยบน scatterplot คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Validation task ให้เส้น/คำตอบมาให้ตัดสินใจ ใช่/ไม่ใช่ ส่วน Estimation task ให้ผู้ใช้ประเมินคำตอบขึ้นมาเองจากศูนย์</button>
+    <button class="opt" data-correct="false">Validation task ใช้กับ bar chart เท่านั้น ส่วน Estimation task ใช้กับ scatterplot เท่านั้น</button>
+    <button class="opt" data-correct="false">ทั้งสอง task เหมือนกันทุกประการ ต่างกันแค่ชื่อเรียก</button>
+    <button class="opt" data-correct="false">Estimation task ไม่มีจุดข้อมูลให้ดูเลย มีแต่คำถามข้อความ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. หา Users: ไม่ต้อง random ก็ทดสอบได้</h2>
+<p>ขั้นที่สองของ usability testing คือหาผู้ใช้มาทดสอบ ข่าวดีคือไม่ต้องสุ่มตัวอย่างอย่างเข้มงวดแบบงานวิจัยสถิติ — <strong>Convenience sampling</strong> (ชวนเพื่อน/ครอบครัวมาทดสอบ) และ <strong>Snowball sampling</strong> (ให้เพื่อนช่วยชวนเพื่อนของเพื่อนต่อ) เป็นวิธีที่ยอมรับได้ในบริบทนี้ ไม่มีเกณฑ์ include/exclude ที่เข้มงวด — แต่มีข้อควรระวังสำคัญข้อหนึ่ง: ถ้ามีหลาย prototype ห้าม re-test กลุ่มผู้ใช้เดิมซ้ำ เพราะเกิด "learning effect" — ผู้ใช้จะทำ task ได้ดีขึ้นเรื่อย ๆ จากการฝึกฝน ไม่ใช่เพราะ prototype เวอร์ชันหลังดีขึ้นจริง ทำให้ผลเปรียบเทียบระหว่าง prototype เพี้ยนไป จำนวนผู้ใช้ที่ต้องมีก็ไม่จำเป็นต้องเยอะ: Jakob Nielsen (1993) เสนอว่าแค่ ~5 คนก็เจอปัญหา usability ส่วนใหญ่แล้ว เพราะผลตอบแทนของผู้ใช้เพิ่มแต่ละคนลดลงเรื่อย ๆ หลังจากนั้น.</p>
+
+<h2>7. Test: วิธีดำเนินการทดสอบ</h2>
+<p>ขั้นสุดท้ายคือการทดสอบจริง — มีกฎสำคัญที่ผิดง่ายมาก: บอกผู้ใช้ก่อนเริ่มว่า "กำลังทดสอบตัวระบบ ไม่ได้ทดสอบตัวคุณ" และ "ถ้าติดขัด นั่นคือความผิดของระบบ ไม่ใช่ของคุณ" เพื่อลดความกดดัน จากนั้นให้ผู้ใช้พูดความคิดออกมาดัง ๆ ระหว่างทำ (think aloud) ส่วนตัวผู้ทำการทดสอบต้อง<strong>เงียบ</strong> — ห้ามช่วย ห้ามอธิบาย ห้ามชี้จุดที่ผู้ใช้ทำผิด แม้จะเห็นชัดเจนก็ตาม ถ้าผู้ใช้ติดขัดจริง ๆ ให้ข้ามไป task ถัดไปเลย เหตุผลคือ ถ้าช่วยแม้แต่นิดเดียว ข้อมูลที่เก็บได้จะไม่สะท้อนพฤติกรรมการใช้งานจริงอีกต่อไป — จุดที่ผู้ใช้สับสนหรือทำพลาดคือข้อมูลที่มีค่าที่สุดของการทดสอบทั้งหมด ไม่ใช่สิ่งที่ควรรีบแก้ไขระหว่างทาง.</p>
+
+<h2>8. อะไรทำให้คนจดจำ visualization ได้: Memorability</h2>
+<p>"Knowledge gain" ไม่ได้จบแค่ตอนดูภาพ — ถ้าจำไม่ได้ ความรู้ก็ไม่ persist งานวิจัยนี้ทดสอบภาพหลายร้อยภาพแล้วดูว่าอะไรทำให้คนจำได้นานกว่า:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p90-memorable-visualizations.png" alt="Three columns comparing memorable and forgettable visualizations: the most-memorable column is full of colorful pictorial infographics with illustrations, the middle column shows memorable charts even without recognizable pictorial shapes, and the least-memorable column is filled with plain generic bar charts, line charts, and tables">
+<figcaption>Slide: Michelle Borkin et al., "What Makes a Visualization Memorable?", TVCG 2013 (vis-11-validation.pdf, p.90)</figcaption>
+</figure>
+<p>คอลัมน์ซ้าย ("Most memorable") เต็มไปด้วย infographic สีสันจัดจ้าน มีภาพประกอบเฉพาะตัว (ไดโนเสาร์ นักฟุตบอล แผนที่ธารน้ำแข็ง) — จำง่ายเพราะมีเอกลักษณ์ทางสายตาที่ไม่เหมือนภาพอื่น คอลัมน์ขวา ("Least memorable") กลับเต็มไปด้วย bar chart, line chart, ตารางตัวเลขทั่วไปที่ดู "ถูกต้องตามหลักวิชา" ทุกอย่าง (สี minimal, ไม่มี chartjunk) แต่กลับจำไม่ได้เลย เพราะมันหน้าตาเหมือนกันหมดกับ chart อื่นนับพันที่เคยเห็นมา — ข้อคิดที่ขัดกับสัญชาตญาณ: หลักการออกแบบที่ "สะอาด เรียบง่าย ไม่มีของประดับ" (ที่เราเรียนมาตลอดคอร์สว่าคือ "ดี") อาจไม่ได้แปลว่า "จดจำได้" เสมอไป — บางครั้ง visual uniqueness (แม้จะดูเหมือน chartjunk) กลับช่วยให้ knowledge อยู่ในความจำระยะยาวได้ดีกว่า นี่คือเหตุผลที่คอลัมน์กลางแสดงว่าแม้ไม่มีรูปทรงที่จำได้ทันที (ไม่ใช่ infographic ที่มีรูปวาด) แต่ยังจำได้ ถ้ามีโครงสร้างภาพที่แปลกตาไม่ซ้ำใคร.</p>
+
+<p>ตัวอย่างสุดท้ายเชื่อมทุกอย่างเข้าด้วยกัน: usability test ที่วัด "Accuracy" ของการวินิจฉัยโรคจริง ไม่ใช่แค่ทดลองทั่วไป:</p>
+
+<figure>
+<img src="../assets/slides/vis11-p91-artery-diagnosis-accuracy.png" alt="Two comparisons of artery visualization for heart disease diagnosis: 3D view scored 39% diagnostic accuracy versus 2D view at 62%, and rainbow colormap scored 62% versus diverging colormap at 91%">
+<figcaption>Slide: Michelle Borkin et al., "Evaluation of Artery Visualizations for Heart Disease Diagnosis", TVCG 2011 (vis-11-validation.pdf, p.91)</figcaption>
+</figure>
+<p>นี่คือ usability test ที่มีเดิมพันสูงมาก: หมอวินิจฉัยโรคหลอดเลือดหัวใจจากภาพ ผลออกมาสวนทางกับสัญชาตญาณสองเรื่อง เรื่องแรก มุมมอง 3D (ที่ดู "ล้ำ" และให้ข้อมูลเชิงพื้นที่ครบกว่า) ให้ความแม่นยำในการวินิจฉัยแค่ 39% ในขณะที่มุมมอง 2D แบบเรียบง่ายกลับแม่นยำถึง 62% — เพราะ 3D มีปัญหาบดบังกันเอง (occlusion) และ perspective ทำให้ตีความระยะยากกว่าที่คิด เรื่องที่สอง: colormap แบบ rainbow (ที่ใช้กันแพร่หลายเพราะดูมีสีสันครบ) ให้ความแม่นยำแค่ 62% เทียบกับ colormap แบบ diverging (สองสีไล่เฉดจากกึ่งกลาง) ที่แม่นยำถึง 91% — ตรงกับสิ่งที่เรียนมาตั้งแต่ Lesson 2 ว่า rainbow colormap มีปัญหาเรื่อง perceptual uniformity (แต่ละสีในสายตามนุษย์ไม่ได้ "ห่างกันเท่ากัน" ตามค่าตัวเลขจริง) แต่ที่นี่ตัวเลขนี้ไม่ใช่แค่ทฤษฎีอีกต่อไป — มันคือเปอร์เซ็นต์ความถูกต้องในการวินิจฉัยโรคจริงของหมอจริง นี่คือเหตุผลที่แท้จริงว่าทำไม validation ถึงสำคัญ: การเลือก visual encoding ผิด ไม่ใช่แค่เรื่อง "รสนิยม" แต่กระทบผลลัพธ์ที่วัดได้และมีความหมายจริงในโลกจริง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Memorability</span></div>
+  <div class="qtext">งานวิจัย "What Makes a Visualization Memorable?" พบว่าอะไรทำให้ visualization จดจำได้ดี?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">visual uniqueness/เอกลักษณ์ทางภาพที่ไม่เหมือนใคร แม้บางครั้งจะขัดกับหลักการออกแบบแบบเรียบง่าย</button>
+    <button class="opt" data-correct="false">การใช้สีขาว-ดำเท่านั้น ไม่มีสีสัน</button>
+    <button class="opt" data-correct="false">การมีตัวเลขในตารางให้มากที่สุดเท่าที่จะทำได้</button>
+    <button class="opt" data-correct="false">ขนาดไฟล์ภาพที่เล็กที่สุด</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Artery Diagnosis Study</span></div>
+  <div class="qtext">จากงานวิจัย Evaluation of Artery Visualizations (Borkin et al. 2011) การใช้ diverging colormap เทียบกับ rainbow colormap ให้ผลอย่างไรต่อความแม่นยำในการวินิจฉัย?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">diverging colormap แม่นยำกว่ามาก (91% เทียบกับ 62%)</button>
+    <button class="opt" data-correct="false">ทั้งสองแบบให้ความแม่นยำเท่ากันทุกประการ</button>
+    <button class="opt" data-correct="false">rainbow colormap แม่นยำกว่า diverging colormap</button>
+    <button class="opt" data-correct="false">colormap ไม่มีผลต่อความแม่นยำในการวินิจฉัยเลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Usability Testing: Users</span></div>
+  <div class="qtext">ทำไมการทดสอบ prototype หลายเวอร์ชันกับ "กลุ่มผู้ใช้กลุ่มเดิม" ซ้ำ ๆ ถึงเป็นปัญหา?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เกิด learning effect — ผู้ใช้ทำได้ดีขึ้นจากการฝึกฝน ไม่ใช่เพราะ prototype ดีขึ้นจริง ทำให้ผลเปรียบเทียบเพี้ยน</button>
+    <button class="opt" data-correct="false">เพราะผู้ใช้กลุ่มเดิมจะให้ feedback แบบเดิมทุกครั้งไม่มีประโยชน์เลย</button>
+    <button class="opt" data-correct="false">เพราะกฎหมายห้ามทดสอบซ้ำกับคนกลุ่มเดิม</button>
+    <button class="opt" data-correct="false">ไม่มีปัญหาอะไร เป็นวิธีที่แนะนำมากที่สุด</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 10</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">ตอนทดสอบผู้ใช้ (usability test) ทำไมผู้ทำการทดสอบถึงต้อง "เงียบ" ไม่ช่วยเหลือแม้เห็นผู้ใช้กำลังทำผิด?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">เพราะเป้าหมายของการทดสอบคือดูว่าผู้ใช้จริงใช้งานระบบได้ด้วยตัวเองหรือไม่ ถ้าผู้ทดสอบช่วยหรือชี้จุดผิด ข้อมูลที่ได้จะไม่สะท้อนพฤติกรรมการใช้งานจริงอีกต่อไป จุดที่ผู้ใช้สับสนหรือทำพลาดคือ "ข้อมูล" ที่มีค่าที่สุดของการทดสอบ ไม่ใช่สิ่งที่ควรรีบแก้ไขระหว่างทาง — การเข้าไปช่วยจะกลบปัญหาการออกแบบที่ต้องแก้จริง ๆ ไปเสีย</div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรอธิบาย Munzner's Nested Model ได้ครบ 4 ชั้นพร้อมยกตัวอย่าง Threat/Validate ของแต่ละชั้น คำนวณ faithfulness/simplicity metric แบบง่าย ๆ ได้ ออกแบบ usability test task แบบ closed-ended ได้ถูกต้อง และอธิบายได้ว่าทำไมผลการวิจัยเรื่อง 3D-vs-2D กับ rainbow-vs-diverging ถึงสำคัญกับการตัดสินใจออกแบบจริง.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (92 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-11-validation.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง/งานวิจัยเชิงลึก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3</td><td>Visualization Skills: generative vs evaluative</td><td>✓ ส่วนหนึ่งของบทนำ (evaluative skill = สิ่งที่บทนี้สอน)</td></tr>
+<tr><td>4</td><td>Validation: Accuracy/Ease of use/Knowledge gain (เกริ่นนำ)</td><td>✓ ส่วนหนึ่งของหัวข้อ 1</td></tr>
+<tr><td>5</td><td>Validation จับคู่กับ Truthful/Functional/Insight</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>6</td><td>หน้าว่าง/transition</td><td>etc</td></tr>
+<tr><td>7</td><td>งานวิจัยอาจารย์: Transit Map based on Visual Perception</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>8</td><td>Why Validating? (new techniques/users/environments)</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>9–12</td><td>ตัวอย่างงานวิจัย validation เพิ่มเติม (anthropomorphizing data, ตัวอย่างสื่อ)</td><td>etc — ตัวอย่างประกอบหัวข้อ 2 ไม่ลงรายละเอียด</td></tr>
+<tr><td>13–14</td><td>หน้าว่าง/transition</td><td>etc</td></tr>
+<tr><td>15</td><td>Applying Uncommon Visualizations to Government Dashboards (งานวิจัยอาจารย์)</td><td>etc — เสริมหัวข้อ 2 ไม่ลง quiz แยก</td></tr>
+<tr><td>16–17</td><td>VLAT / CALVI: แบบทดสอบ visualization literacy</td><td>etc — เครื่องมือวัด literacy ไม่ใช่ตัว visualization</td></tr>
+<tr><td>18–34</td><td>ตัวอย่างสื่อ/งานวิจัยหลากหลาย (responsive design, animation vs small multiples, 3D/AR/VR visualization, Sensemaking loop ต่อจาก Lesson 10)</td><td>etc — ตัวอย่างประกอบกว้าง ๆ นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>35</td><td>Prototyping: "a prototype is worth 1000 meetings" (IDEO)</td><td>etc — แนวคิดเสริม เชื่อมสู่หัวข้อถัดไป</td></tr>
+<tr><td>36–38</td><td>งานวิจัยเสริมเรื่อง glanceable viz, sketching, network layout</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>39–41</td><td>Validation Methods: ticket sales/rating vs Quality metrics vs Usability testing; Accuracy/Faithfulness/Readability</td><td>✓ ส่วนหนึ่งของหัวข้อ 4/5 (เกริ่นนำ)</td></tr>
+<tr><td>42–43</td><td>Munzner's Nested Model</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>44</td><td>เกริ่นนำ Quality Metrics (density plot)</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>45–46</td><td>Faithfulness metric (worked example)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>47–50</td><td>Simplicity metric (crossing count worked example)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>51–52</td><td>Tile grid map quality metrics (recall/inaccuracy/misdirection)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>53–54</td><td>Data-ink ratio (Tufte)</td><td>✓ อยู่ใน reference cheat sheet</td></tr>
+<tr><td>55–62</td><td>Diagnostics tools (ScagExplorer, ParSetgnostics) + Information theory metrics (entropy, visualization capacity)</td><td>etc — งานวิจัยเชิงลึกทางคณิตศาสตร์ นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>63–64</td><td>Usability Testing เกริ่นนำ (define tasks/find users/test) + Flannery O'Connor quote</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>65–66</td><td>Usability Testing: Tasks ตัวอย่างคำถาม</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>67–69</td><td>Lineup Protocol (residual diagnostics)</td><td>etc — เทคนิคเฉพาะทางสถิติ นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>70</td><td>Validation task vs Estimation task</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>71–72</td><td>Reproduction task vs Freeform task + ตัวอย่างเพิ่มเติม</td><td>✓ ส่วนหนึ่งของหัวข้อ 5 (สรุปในตาราง reference)</td></tr>
+<tr><td>73–74</td><td>ตัวอย่างบทความ/งานวิจัยเสริมเรื่องการวัดคุณภาพ visualization</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>75–78</td><td>Usability Testing: Users (Nielsen 5-user rule, sampling methods, learning effect)</td><td>✓ หัวข้อ 6</td></tr>
+<tr><td>79–81</td><td>Usability Testing: Test (brief user, think aloud, ห้ามช่วย)</td><td>✓ หัวข้อ 7</td></tr>
+<tr><td>82–87</td><td>Eye-tracking/gaze-based testing tools (งานวิจัยอาจารย์: Sparklines eye-tracking + เครื่องมืออื่น ๆ)</td><td>etc — เทคนิคเสริมเฉพาะทาง นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>88–89</td><td>งานวิจัยเสริมเรื่อง aesthetic preference/chart type ที่คนเลือกใช้จริง</td><td>etc — บริบทเสริมก่อนเข้าเรื่อง memorability</td></tr>
+<tr><td>90</td><td>What Makes a Visualization Memorable?</td><td>✓ หัวข้อ 8 (มีรูป)</td></tr>
+<tr><td>91</td><td>Evaluation of Artery Visualizations for Heart Disease Diagnosis</td><td>✓ หัวข้อ 8 (มีรูป)</td></tr>
+<tr><td>92</td><td>ลิงก์บทความปิดท้าย (nature.com)</td><td>etc — ลิงก์อ้างอิงปิดท้าย</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0010-visual-analytics.html">← Lesson 10: Visual Analytics</a></span>
+  <span><a href="0012-storytelling-narrative-visualization.html">Lesson 12: Storytelling & Narrative Visualization →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 9: Interactive Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 9 / 13 · Interactive Visualization</span>
+  <span><a href="../reference/0009-interactive-visualization-cheatsheet.html">Reference: Interaction Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-9-interactive.pdf</p>
+<h1>Interactive Visualization</h1>
+
+<p>บทนี้เริ่มด้วยการต่อเรื่อง Flow Map จาก Lesson 8 อีกนิด (edge bundling ช่วยลดเส้นทับกันในแผนที่/กราฟหนาแน่น) แล้วเปิดประเด็นใหม่ที่ยึดเป็นแกนของทั้งบท: <strong>Space-Time Tradeoff</strong> — ยิ่งประหยัดพื้นที่จอ ยิ่งต้องแลกด้วยเวลาที่ผู้ใช้ต้องเสียไปโต้ตอบ/รอดู แนวคิดนี้อธิบายได้ทั้ง animation vs small multiples, dashboard, และปิดท้ายด้วยเทคนิค interaction ทีละแบบพร้อมภาพหน้าจอ Tableau จริง.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Ben Shneiderman's classic "Visual Information-Seeking Mantra" (Overview first, zoom/filter, details-on-demand) คือรากฐานของหัวข้อ interaction techniques ทั้งหมดในบทนี้ — ลองอ่าน <a href="https://www.cs.umd.edu/~ben/papers/Shneiderman1996eyes.pdf" target="_blank" rel="noopener">The Eyes Have It (Shneiderman, 1996)</a> ต้นฉบับ.
+</div>
+
+<h2>1. Spatiotemporal Data: เพิ่มมิติเวลาเข้าไปในแผนที่</h2>
+<p>เมื่อข้อมูลมีทั้งพิกัด (space) และเวลา (time) พร้อมกัน มี 2 วิธีหลักในการแสดง:</p>
+
+<figure>
+<img src="../assets/slides/vis9-p18-spatiotemporal-two-ways.png" alt="Slide listing two main ways to show map+time data: small multiples and animation, illustrated with a dot map of the US labeled 1961">
+<figcaption>Slide: Spatiotemporal Data — Small Multiples vs Animation (vis-9-interactive.pdf, p.18)</figcaption>
+</figure>
+<p>ภาพตัวอย่างนี้มาจากกราฟ animated ยอดสาขา Walmart ที่ขยายตัวทั่วสหรัฐฯ ทีละปี (เริ่มจากปี 1961 ที่มีจุดน้อยมาก) — ถ้าทำเป็น <strong>small multiples</strong> ต้องพิมพ์แผนที่ปีละภาพวางเรียงกันหลายสิบภาพ (เห็นทุกปีพร้อมกัน แต่กินพื้นที่มหาศาล) ถ้าทำเป็น <strong>animation</strong> ใช้พื้นที่แค่ภาพเดียว แต่ผู้ดูต้องนั่งดูจนจบถึงจะเห็นภาพรวมทั้งหมด (พลาดปีไหนไปก็ต้องย้อนดูใหม่) — สังเกตว่าทั้งสองวิธีให้ข้อมูลเหมือนกันทุกประการ ต่างกันแค่ "จะให้คนดูแลกอะไรกับอะไร": พื้นที่จอ (small multiples แพงกว่า) กับเวลาที่ต้องเสีย (animation แพงกว่า).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Spatiotemporal Data</span></div>
+  <div class="qtext">ข้อเสียหลักของการแสดงข้อมูล spatiotemporal ด้วย animation (เทียบกับ small multiples) คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ผู้ดูต้องเสียเวลารอดูจนจบ พลาดช่วงไหนไปต้องย้อนดูใหม่</button>
+    <button class="opt" data-correct="false">ใช้พื้นที่จอมากกว่า small multiples เสมอ</button>
+    <button class="opt" data-correct="false">ไม่สามารถแสดงข้อมูลตำแหน่งได้เลย</button>
+    <button class="opt" data-correct="false">ใช้ได้กับข้อมูล nominal เท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>2. Space-Time Tradeoff: แกนของทั้งบท</h2>
+<p>แนวคิดเดียวกับหัวข้อ 1 ขยายไปใช้อธิบายได้อีกหลายเรื่องตลอดบทนี้ — เช่น <strong>Dashboard</strong> ที่ยัดชาร์ตหลายตัวในจอเดียว (ประหยัด space แต่ผู้อ่านต้องใช้เวลากวาดตาหาข้อมูลที่ต้องการเอง) หรือ <strong>Grand Tour</strong> ที่แปลง SPLOM ทั้งตาราง (กินพื้นที่มาก) ให้กลายเป็น animation ทีละคู่มิติ (กินพื้นที่น้อยลงมาก แต่ต้องรอดูจนครบ) ลองสังเกตทุกครั้งที่เจอเทคนิคใหม่ในบทนี้ ให้ถามตัวเองว่า "เทคนิคนี้เลือกประหยัด space หรือ time" เป็นกรอบคิดที่ใช้แยกแยะเทคนิคต่าง ๆ ได้ทั้งบท.</p>
+
+<h2>3. Dashboard: ยัดข้อมูลสำคัญไว้จอเดียว</h2>
+<p>นิยามที่ slide ยกมา: <em>"A dashboard is a visual display of the most important information needed to achieve one or more objectives, consolidated and arranged on a single screen so the information can be monitored at a glance."</em> — คำสำคัญคือ "single screen" และ "at a glance" (ไม่ต้อง scroll ไม่ต้องคิดนาน) หลักออกแบบที่ slide เน้น 2 เรื่อง: <strong>Hierarchy</strong> (ข้อมูลสำคัญที่สุดต้องเด่นที่สุด/อยู่ตำแหน่งที่สายตาเห็นก่อน) และ <strong>Layout</strong> (จัดวางชาร์ตให้เชื่อมโยงกันเป็นเรื่องเดียว ไม่ใช่แปะชาร์ตแยกกันสุ่ม ๆ).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Dashboard</span></div>
+  <div class="qtext">ตามนิยามที่ slide ยกมา อะไรคือคุณสมบัติที่ขาดไม่ได้ของ dashboard?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">แสดงข้อมูลสำคัญที่สุดในจอเดียว มองแล้วเข้าใจได้ทันที (at a glance)</button>
+    <button class="opt" data-correct="false">ต้องมีอย่างน้อย 10 ชาร์ตในหน้าเดียว</button>
+    <button class="opt" data-correct="false">ต้องอัปเดตข้อมูลแบบ real-time เท่านั้น</button>
+    <button class="opt" data-correct="false">ต้องใช้สีอย่างน้อย 5 สีขึ้นไป</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. Grand Tour: เอา SPLOM มาทำเป็น Animation</h2>
+<p>Grand Tour คือการแปลงข้อมูลหลายมิติให้เป็น animation ที่ไล่แสดงทีละคู่มิติ (หรือ interpolate ระหว่างมุมมอง) แทนที่จะกางเป็นตารางใหญ่แบบ SPLOM (Lecture 6):</p>
+
+<figure>
+<img src="../assets/slides/vis9-p54-grand-tour.png" alt="Iris SPLOM matrix with 6 scatterplot panels numbered 1 through 6, annotated to show the order the Grand Tour would step through them as an animation">
+<figcaption>Slide: Grand Tour — animating through a SPLOM one dimension pair at a time (vis-9-interactive.pdf, p.54)</figcaption>
+</figure>
+<p>ภาพนี้ใช้ SPLOM ของชุดข้อมูล iris ตัวเดียวกับที่เรียนใน Lecture 6-7 เป๊ะ (Sepal.Length, Sepal.Width, Petal.Length, Petal.Width) — แต่แทนที่จะดูทั้ง 6 ช่องพร้อมกัน (เหมือน SPLOM ปกติ) Grand Tour จะไล่แสดงทีละช่อง: เลขกำกับ 1-6 บนแต่ละ panel คือลำดับที่ animation จะเล่นผ่าน (โน้ตกำกับว่าช่วง 1-3 คือการเปลี่ยนแกน x และ 4-6 คือเปลี่ยนแกน y) — ข้อดีคือใช้พื้นที่จอแค่ 1 scatter plot แทนที่จะเป็น n² ช่อง แต่ผู้ดูต้องรอดูจนครบทั้ง 6 ท่าถึงจะเห็นภาพรวมความสัมพันธ์ทุกคู่ — ตัวอย่างที่ชัดเจนของ Space-Time Tradeoff จากหัวข้อ 2 โดยตรง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Grand Tour</span></div>
+  <div class="qtext">Grand Tour มีความสัมพันธ์กับ Scatterplot Matrix (SPLOM) อย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Grand Tour คือการแปลง SPLOM ทั้งตารางให้เป็น animation ไล่แสดงทีละคู่มิติแทน</button>
+    <button class="opt" data-correct="false">Grand Tour ใช้ได้กับข้อมูล nominal เท่านั้น ต่างจาก SPLOM ที่ใช้กับตัวเลข</button>
+    <button class="opt" data-correct="false">Grand Tour กับ SPLOM ไม่มีความเกี่ยวข้องกันเลย</button>
+    <button class="opt" data-correct="false">Grand Tour แสดงได้แค่ 2 มิติเท่านั้น ในขณะที่ SPLOM แสดงได้หลายมิติ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>5. Interaction Techniques: Taxonomy หลัก</h2>
+<p>Interaction ทุกแบบมีเป้าหมายเดียวกัน: เปลี่ยนพารามิเตอร์ของ data processing, visual mapping หรือ visual rendering เพื่อช่วยหา insight:</p>
+
+<figure>
+<img src="../assets/slides/vis9-p69-interaction-objective.png" alt="Slide listing the objective of interaction (changing parameters of data processing, visual mapping, visual rendering) and a list of core techniques: sort, details on demand, dynamic filtering, pan and zoom, link and brush">
+<figcaption>Slide: Interaction in Visualization — objective and technique list (vis-9-interactive.pdf, p.69)</figcaption>
+</figure>
+<p>รายการฝั่งขวาของภาพนี้ (Sort, Details on Demand, Dynamic Filtering, Pan and Zoom, Link and Brush) แทบจะตรงกับ "Visual Information-Seeking Mantra" ของ Ben Shneiderman คำต่อคำ (Overview first, zoom/filter, details-on-demand) — ไม่ใช่เรื่องบังเอิญ เพราะ paper ต้นฉบับเรื่อง Dynamic Queries ของ Shneiderman ถูกอ้างอิงในหน้าถัดไปของสไลด์ชุดนี้ด้วย ต่อไปนี้จะไล่ดูแต่ละเทคนิคด้วยตัวอย่างหน้าจอ Tableau จริง.</p>
+
+<h3>Details on Demand</h3>
+<figure>
+<img src="../assets/slides/vis9-p73-details-on-demand.png" alt="A real Tableau scatter plot with a tooltip box appearing on hover, showing Sub-Category: Bookcases, Profit: $7,498, Sales: $29,345">
+<figcaption>Slide: Details on Demand — hover tooltip in a real Tableau chart (vis-9-interactive.pdf, p.73)</figcaption>
+</figure>
+<p>ในภาพนี้ scatter plot มีจุดหลายพันจุดปนกัน (Profit แกน x, Sales แกน y) — ถ้าใส่ตัวเลขกำกับทุกจุดพร้อมกันจะรกจนอ่านไม่ออกเลย แต่พอ hover ที่จุดเดียว (วงกลมสีชมพู "1. Select/Hover") จะเผยกล่อง tooltip บอกรายละเอียดเฉพาะจุดนั้น (Sub-Category: Bookcases, Profit: $7,498, Sales: $29,345) — โน้ตกำกับว่า "detail หายไปถ้าไม่ได้ select" คือหลักการของ details-on-demand: ซ่อนรายละเอียดไว้ก่อน โชว์เฉพาะตอนผู้ใช้ร้องขอ (ผ่านการ select/hover) แทนที่จะยัดทุกอย่างลงจอตลอดเวลา.</p>
+
+<h3>Dynamic Filtering</h3>
+<figure>
+<img src="../assets/slides/vis9-p77-dynamic-filtering.png" alt="A Tableau map of the US with circle markers, and a Sales range slider in the top-right corner that filters which markers appear">
+<figcaption>Slide: Dynamic Filtering — a range slider controlling which map markers appear (vis-9-interactive.pdf, p.77)</figcaption>
+</figure>
+<p>มุมขวาบนของภาพมี slider ช่วง Sales ($18,676 – $89,061) — เลื่อน slider แล้วจุดบนแผนที่ที่ไม่อยู่ในช่วงนั้นจะหายไปทันที (หรือจางลง) โดยไม่ต้องโหลดหน้าใหม่หรือเขียน query เอง — นี่คือ "dynamic" ของ dynamic filtering: ผลลัพธ์เปลี่ยนทันทีขณะเลื่อน ไม่ต้องกด "submit" ทำให้ผู้ใช้ทดลองเปลี่ยนช่วงไปเรื่อย ๆ จนกว่าจะเจอ pattern ที่สนใจได้เร็วกว่าการกรองแบบ static มาก.</p>
+
+<h3>Link and Brush</h3>
+<figure>
+<img src="../assets/slides/vis9-p84-brush-and-link.png" alt="Two linked Tableau charts side by side: selecting (brushing) a bar in one chart highlights the corresponding points in a scatter plot in the other chart">
+<figcaption>Slide: Link and Brush — selecting in one view highlights related points in another (vis-9-interactive.pdf, p.84)</figcaption>
+</figure>
+<p>ภาพนี้มี 2 ชาร์ตวางเคียงกัน: bar chart จำนวนสินค้าตาม sub-category (ขวา) กับ scatter plot Profit/Sales (ซ้าย) — ถ้า "brush" (ลากเลือก) แท่ง "Office Machines" ในกราฟขวา จุดในกราฟซ้ายที่เป็นสินค้าประเภทนั้นจะถูกไฮไลต์ทันที (โน้ตกำกับว่า "Brush: การทำ Highlight เลือกมากกว่า 1 ได้, Link: ไปสู่ตารางอื่นแล้วผูกกับที่เรา Highlight ไว้") — เห็นความสัมพันธ์ข้ามชาร์ตแบบเรียลไทม์ โดยไม่ต้องเปิดตารางข้อมูลดิบมาเทียบเอง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Details on Demand</span></div>
+  <div class="qtext">หลักการของ "Details on Demand" คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ซ่อนรายละเอียดไว้ก่อน แสดงเฉพาะเมื่อผู้ใช้ select/hover เท่านั้น</button>
+    <button class="opt" data-correct="false">แสดงรายละเอียดของทุกจุดข้อมูลพร้อมกันตลอดเวลา</button>
+    <button class="opt" data-correct="false">ลบรายละเอียดออกจากข้อมูลถาวรเพื่อประหยัดพื้นที่</button>
+    <button class="opt" data-correct="false">แสดงเฉพาะค่าเฉลี่ยของข้อมูลทั้งหมดเท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Dynamic Filtering</span></div>
+  <div class="qtext">อะไรที่ทำให้ dynamic filtering ต่างจากการกรองข้อมูลแบบธรรมดา (static filter)?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ผลลัพธ์บนภาพเปลี่ยนทันทีขณะปรับค่า ไม่ต้องกด submit/โหลดใหม่</button>
+    <button class="opt" data-correct="false">ใช้ได้กับข้อมูล nominal เท่านั้น</button>
+    <button class="opt" data-correct="false">ต้องเขียนโค้ด SQL ทุกครั้งที่จะกรอง</button>
+    <button class="opt" data-correct="false">แสดงผลได้แค่ตารางตัวเลข ไม่แสดงเป็นภาพ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Link and Brush</span></div>
+  <div class="qtext">ในเทคนิค Link and Brush ขั้นตอน "Brush" หมายถึงอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การเลือก/ไฮไลต์ข้อมูลบางส่วนในชาร์ตหนึ่ง (เลือกได้มากกว่า 1 จุด)</button>
+    <button class="opt" data-correct="false">การเชื่อมโยงไปยังชาร์ตอื่นที่ผูกไว้</button>
+    <button class="opt" data-correct="false">การลบข้อมูลที่ไม่ต้องการออกถาวร</button>
+    <button class="opt" data-correct="false">การเปลี่ยนสีของทั้งชาร์ตแบบสุ่ม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. Focus + Context: บิดภาพโดยไม่ทิ้งบริบท</h2>
+<p>ต่างจาก Overview+Detail (ที่แยกมุมมองรวมกับมุมมองละเอียดออกเป็นคนละพื้นที่จอ) Focus+Context บิด/ขยายเฉพาะจุดสนใจ<em>ในภาพเดียวกัน</em> โดยส่วนที่เหลือยังมองเห็นเป็นบริบทอยู่ (แค่ถูกบีบเล็กลง) ตัวอย่างจากงานวิจัยจริงเรื่อง touch gesture:</p>
+
+<figure>
+<img src="../assets/slides/vis9-p94-focus-context.png" alt="Hand-drawn illustrations of multi-touch gestures on a stacked streamgraph: two-finger horizontal scaling to zoom into a region of interest while keeping the rest visible as context, and vertical pinch scaling">
+<figcaption>Slide: Focus+Context — multi-touch gestures on a stacked graph, from Baur, Lee & Carpendale, "Touchwave" (2012) (vis-9-interactive.pdf, p.94)</figcaption>
+</figure>
+<p>ภาพขวาบนแสดงท่าทาง "Horizontal scaling": ใช้ 2 นิ้วดึงขยายเฉพาะช่วงเวลาที่สนใจในกราฟ stacked streamgraph ให้กว้างขึ้น ในขณะที่ช่วงเวลาอื่นยังอยู่ในภาพ (แค่ถูกบีบแคบลง ไม่หายไปไหน) — โน้ตกำกับว่า "ต่างจาก zoom ปกติที่ตัด overview ทิ้งไปเลย (เลือกแค่ focus) แต่ F+C คือยังเห็นไว้ (แค่เล็กลง)" นี่คือหัวใจของ Focus+Context: ไม่ต้องเสีย overview ไปเพื่อแลกกับรายละเอียด เหมือน zoom ธรรมดา แต่บิดสัดส่วนพื้นที่แทน.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Focus + Context</span></div>
+  <div class="qtext">Focus+Context ต่างจากการ zoom แบบปกติอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Focus+Context ยังคงแสดงส่วนที่เหลือเป็นบริบทไว้ (แค่บีบเล็กลง) ไม่ตัดออกจากภาพเหมือน zoom ปกติ</button>
+    <button class="opt" data-correct="false">Focus+Context ใช้ได้กับข้อมูล nominal เท่านั้น</button>
+    <button class="opt" data-correct="false">Focus+Context ไม่สามารถใช้กับหน้าจอสัมผัสได้</button>
+    <button class="opt" data-correct="false">ทั้งสองแบบทำงานเหมือนกันทุกประการ ต่างกันแค่ชื่อเรียก</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>7. Direct Manipulation: โต้ตอบกับภาพโดยตรง</h2>
+<p>เปรียบเทียบ 2 วิธีโต้ตอบกับ scatter plot เดียวกัน:</p>
+
+<figure>
+<img src="../assets/slides/vis9-p111-direct-manipulation.png" alt="Two diagrams comparing indirect manipulation (a person adjusts separate slider widgets that then affect a scatter plot) versus direct manipulation (a person interacts with the scatter plot's points directly)">
+<figcaption>Slide: Direct Manipulation — interacting via proxy widgets vs interacting with the chart itself (vis-9-interactive.pdf, p.111)</figcaption>
+</figure>
+<p>ภาพซ้าย: คนโต้ตอบกับ slider 3 แท่งที่แยกอยู่ต่างหาก (ลูกศร 1,2 ชี้จากคนไปหา slider) แล้ว slider เหล่านั้นถึงจะไปมีผลต่อ scatter plot อีกที — นี่คือการโต้ตอบ<em>ทางอ้อม</em>ผ่าน widget ที่เป็นเหมือน "ตัวแทน" (proxy) ของสิ่งที่อยากเปลี่ยนจริง ๆ ภาพขวา: คนโต้ตอบกับจุดใน scatter plot<em>โดยตรง</em> (ลูกศรชี้จากคนตรงไปที่กราฟเลย ไม่ผ่าน widget ใด ๆ) — ตัวอย่างที่คุ้นเคย: การใช้ mouse cursor คลิก/ลากจุดบนกราฟตรง ๆ ก็ยังนับเป็น "proxy" อย่างหนึ่ง (เมาส์เป็นตัวกลาง) ในขณะที่การแตะหน้าจอสัมผัสที่ตัวจุดข้อมูลเลยคือ direct manipulation ที่แท้จริงที่สุด — ยิ่งลดระยะห่างระหว่าง "สิ่งที่ทำ" กับ "สิ่งที่เห็นผล" ยิ่งรู้สึกเป็นธรรมชาติมากขึ้น.</p>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 8</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: Direct Manipulation ต่างจากการโต้ตอบผ่าน widget (เช่น slider) อย่างไร และทำไมถึงสำคัญ?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">Direct Manipulation คือการโต้ตอบกับตัว visual mark ในภาพโดยตรง (เช่น ลาก/แตะจุดข้อมูลเอง) ในขณะที่การโต้ตอบผ่าน widget คือการปรับตัวกลาง (proxy) แยกต่างหาก เช่น slider หรือ dropdown ที่ค่อยไปมีผลต่อภาพอีกที ความสำคัญคือ direct manipulation ลดระยะห่างทางความคิดระหว่าง "สิ่งที่ผู้ใช้ทำ" กับ "ผลลัพธ์ที่เห็น" ทำให้รู้สึกเป็นธรรมชาติและเรียนรู้ได้เร็วกว่า ไม่ต้องเดาว่า widget แต่ละอันจะไปมีผลกับส่วนไหนของภาพ</div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรใช้กรอบ Space-Time Tradeoff อธิบายได้ว่าทำไม animation/small multiples/dashboard/grand tour ต้องแลกอะไรกับอะไร และแยกแยะเทคนิค interaction หลัก (details-on-demand, dynamic filtering, link&amp;brush, focus+context, direct manipulation) จากตัวอย่างหน้าจอจริงได้ — พร้อมอธิบายว่าเทคนิคไหนใช้แก้ปัญหาอะไรเมื่อ static chart เพียงอย่างเดียวไม่พอ.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (120 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-9-interactive.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง/งานวิจัยเชิงลึก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–16</td><td>Flow Map ต่อจาก Lesson 8 (Network+Map trade-off, edge bundling, เดโมคลองกรุงเทพฯ)</td><td>etc — ต่อยอดจาก Lesson 7-8 แล้ว ไม่ทำ quiz ซ้ำ</td></tr>
+<tr><td>17</td><td>เกริ่นนำ Spatiotemporal Data</td><td>✓ ส่วนหนึ่งของหัวข้อ 1</td></tr>
+<tr><td>18</td><td>Spatiotemporal: Small Multiples vs Animation</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>19–23</td><td>ตัวอย่าง animation เพิ่มเติม (บาสเก็ตบอล NBA, Mariah Carey chart) + อ้างอิงงานสำรวจ animation</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>24–27</td><td>Space-Time Tradeoff (สไลด์คั่นหัวข้อ)</td><td>✓ หัวข้อ 2</td></tr>
+<tr><td>28–31</td><td>เกริ่นนำ Dashboard + นิยาม</td><td>✓ หัวข้อ 3</td></tr>
+<tr><td>32–37</td><td>ตัวอย่าง dashboard (ไอคอนชาร์ต, ตัวอย่างจริงปี 2024/2025)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>38–40</td><td>Dashboard layout/hierarchy หลักการ + ตัวอย่าง Washington Post</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>41–45</td><td>อ้างอิง Ben Jones "Avoiding Data Pitfalls" + Wilke multi-panel figures</td><td>etc — อ้างอิงประกอบ</td></tr>
+<tr><td>46–52</td><td>Dashboard เครื่องมือ/งานวิจัยช่วยออกแบบอัตโนมัติ (Draco, MEDLEY, DashBot, LADV)</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>53</td><td>Space-Time Tradeoff (สไลด์คั่นหัวข้อ)</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>54</td><td>Grand Tour: SPLOM เป็น animation</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>55–58</td><td>Grand Tour ต่อ + Trajectory Bundling for Animated Transitions</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>59–64</td><td>เครื่องมือ/งานวิจัย animated transitions (datagifmaker, vis-analogy — งานวิจัยอาจารย์เอง, ManimML)</td><td>etc — งานวิจัยเชิงลึก แต่ควรรู้ว่าอาจารย์มีงานวิจัยเรื่องนี้โดยตรง</td></tr>
+<tr><td>65–67</td><td>Space-Time Tradeoff (สไลด์คั่นหัวข้อ)</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>68</td><td>หัวข้อใหญ่ "Interaction in Visualization"</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>69</td><td>Interaction: Objective + รายชื่อเทคนิคหลัก</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>70–72</td><td>เกริ่นนำ Interaction + Sort</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>73–75</td><td>Details on Demand (tooltip ตัวอย่าง Tableau + NYTimes)</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>76</td><td>เกริ่นนำ Filtering</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>77</td><td>Dynamic Filtering ตัวอย่าง Tableau</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>78–79</td><td>อ้างอิง Shneiderman "Dynamic Queries" (ต้นตอของ mantra ที่ใช้ในหัวข้อ 5)</td><td>✓ หัวข้อ 5 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>80–82</td><td>Pan and Zoom + ตัวอย่าง (senate votelog)</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>83</td><td>เกริ่นนำ Brush and Link</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>84–87</td><td>Brush and Link ตัวอย่าง Tableau</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>88–93</td><td>Overview + Detail เกริ่นนำ + ตัวอย่าง (beeswarm plot, on-broadway.nyc)</td><td>✓ ส่วนหนึ่งของหัวข้อ 6 (อธิบายแนวคิดแล้วในบทนำหัวข้อ 6)</td></tr>
+<tr><td>94</td><td>Focus + Context: Touchwave gesture ตัวอย่าง</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>95–110</td><td>Focus+Context เพิ่มเติม (fisheye, route maps, metro maps, time-series) + งานวิจัยเชิงลึก</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก แนวคิดหลักอธิบายแล้ว</td></tr>
+<tr><td>111</td><td>Direct Manipulation: proxy vs โต้ตอบตรง</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>112–120</td><td>Direct Manipulation เพิ่มเติม + งานวิจัยอาจารย์เอง (sketchpad-nd) + งานวิจัย AI-assisted interaction</td><td>etc — งานวิจัยเชิงลึก แต่ควรรู้ว่าอาจารย์มีงานวิจัยเรื่องนี้โดยตรง</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0008-spatial-geographical-data-visualization.html">← Lesson 8: Spatial &amp; Geographical Data Visualization</a></span>
+  <span><a href="0010-visual-analytics.html">Lesson 10: Visual Analytics →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Visualization Pipeline Cheat Sheet</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 3</p>
+<h1>Visualization Pipeline &amp; Bad Data Cheat Sheet</h1>
+
+<h2>Pipeline 3 ขั้นตอน</h2>
+<table>
+<tr><th>ขั้นตอน</th><th>ทำอะไร</th></tr>
+<tr><td><strong>Data Acquisition</strong></td><td>Self-tracking, Scraping, Download &amp; API</td></tr>
+<tr><td><strong>Data Preparation</strong></td><td>Cleaning, Transformation — verify สำคัญกว่า transform</td></tr>
+<tr><td><strong>Data Presentation</strong></td><td>Visual Mapping, Storytelling</td></tr>
+</table>
+
+<h2>โครงสร้างข้อมูล (Wide Table)</h2>
+<ul>
+<li><strong>Row</strong> = object/sample หนึ่งตัว</li>
+<li><strong>Column</strong> = property/dimension หนึ่งด้าน — ต้องระบุว่าแต่ละ column เป็น Nominal หรือ Ordinal ก่อนเลือก visual variable</li>
+</ul>
+
+<h2>Visualization Design (Mackinlay, 1986) — เติมเต็มกรอบคิด Lecture 1–2</h2>
+<p>Design = การเลือก visual encoding ที่ <strong>insightful &amp; functional</strong> ที่สุด จากความเป็นไปได้ทั้งหมด (n data dimensions × k visual variables):</p>
+<table>
+<tr><th>Lecture 1</th><th>Lecture 2</th><th>Lecture 3 (Mackinlay 1986)</th></tr>
+<tr><td>Effective</td><td>→ Functional</td><td>= Effective (วนกลับมานิยามตัวเอง)</td></tr>
+<tr><td>Convincing</td><td>→ Truthful</td><td>—</td></tr>
+<tr><td>Insightful</td><td>(ยังไม่ระบุ)</td><td>→ <strong>Expressive</strong></td></tr>
+</table>
+
+<h2>Bad Data — ใครควรแก้</h2>
+<table>
+<tr><th>ใครควรแก้</th><th>ตัวอย่างปัญหา</th></tr>
+<tr><td>Source ควรแก้เอง</td><td>ค่าหายไป, ใช้ 0 แทนค่าที่หายไป, ข้อมูลซ้ำ, สะกดไม่สม่ำเสมอ</td></tr>
+<tr><td>คุณควรแก้เอง</td><td>ข้อความ/บรรทัดขึ้นบรรทัดใหม่เพี้ยน, ข้อมูลอยู่ใน PDF, ข้อมูลละเอียดเกินไป</td></tr>
+<tr><td>โปรแกรมเมอร์ควรช่วยแก้</td><td>รวมกลุ่มผิดหมวด/ผิดพื้นที่, ข้อมูลอยู่ในเอกสารสแกน</td></tr>
+<tr><td>ผู้เชี่ยวชาญบุคคลที่สามควรช่วยแก้</td><td>ผู้เขียนข้อมูลไม่น่าเชื่อถือ, กระบวนการเก็บข้อมูลไม่โปร่งใส, ค่าผิดปกติที่อธิบายไม่ได้</td></tr>
+</table>
+<p><a href="https://github.com/Quartz/bad-data-guide" target="_blank" rel="noopener">ที่มา: Quartz Bad Data Guide</a></p>
+
+<h2>Pie Chart: อะไรคือ Visual Variable ที่คนอ่านจริง ๆ</h2>
+<p>งานวิจัยของ Robert Kosara ยังถกเถียงกันว่าคนอ่าน pie chart จาก <strong>มุม (angle)</strong>, <strong>ความยาวส่วนโค้ง (arc length)</strong> หรือ <strong>พื้นที่ (area)</strong> กันแน่ — ยังไม่มีข้อสรุปเดียว (Skau &amp; Kosara, EuroVis 2016; Kosara, CG&amp;A 2022; Kosara, VIS 2019).</p>
+
+<hr>
+<p><a href="../lessons/0003-visualization-pipeline.html">← กลับไป Lesson 3</a></p>
+
+</body>
+</html>

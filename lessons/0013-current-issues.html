@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 13: Current Issues in Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 13 / 13 · Current Issues in Visualization</span>
+  <span><a href="../reference/0013-current-issues-cheatsheet.html">Reference: Current Issues Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-13-etc.pdf</p>
+<h1>Current Issues in Visualization</h1>
+
+<p>บทสุดท้ายของคอร์ส — ครึ่งแรกของสไลด์ (หน้า 3–36) เป็นตัวอย่าง Concrete Scale เพิ่มเติมต่อจาก Lesson 12 (Ukraine/Gaza size comparison, ProPublica taxes, Apple trillion market cap ฯลฯ) ซึ่งเป็นแนวคิดเดียวกับที่อธิบายไปแล้ว ส่วนที่ใหม่จริง ๆ ของบทนี้เริ่มจากหน้า 37: ภาพรวมว่างานวิจัย visualization ทุกวันนี้กำลังสนใจเรื่องอะไรอยู่ — และปิดท้ายด้วยประเด็นที่สำคัญที่สุดข้อหนึ่งของทั้งวิชา: visualization ไม่เคยเป็นกลางร้อยเปอร์เซ็นต์.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Ha-Kyung Kong, Zhicheng Liu, Karrie Karahalios, <a href="https://idl.uw.edu/papers/frames-slants" target="_blank" rel="noopener">"Frames and Slants in Titles of Visualizations on Controversial Topics"</a>, CHI 2018 — ตัวอย่างที่ชัดที่สุดในบทนี้ว่าการออกแบบ (แค่หัวข้อ!) เปลี่ยนการตีความข้อมูลได้อย่างไรโดยไม่ต้องแตะตัวเลขเลย.
+</div>
+
+<h2>1. งานวิจัย Visualization วันนี้สนใจเรื่องอะไร</h2>
+<p>ก่อนปิดคอร์ส อาจารย์สรุปภาพรวมว่าสาขา visualization กำลังเดินหน้าไปทางไหน:</p>
+
+<figure>
+<img src="../assets/slides/vis13-p37-current-issues-outline.png" alt="Slide titled Current Issues in Visualization listing four bullet points: visualization validation with theoretical foundations as a sub-point, visual analytics systems especially of new domains and technologies with machine learning as both domain and technology as a sub-point, and politics and ethics of visualization">
+<figcaption>Slide: Current Issues in Visualization (vis-13-etc.pdf, p.37)</figcaption>
+</figure>
+<p>4 หัวข้อหลัก: <strong>Visualization validation</strong> (ต่อยอด Lesson 11 — ยิ่งระบบซับซ้อนขึ้น ยิ่งต้อง validate ยากขึ้น) <strong>Theoretical foundations of visualization</strong> (สาขานี้ยังไม่มีทฤษฎีพื้นฐานที่นิ่งสมบูรณ์แบบเหมือนคณิตศาสตร์/ฟิสิกส์ ยังถกเถียงกันอยู่) <strong>Visual analytics systems ในโดเมน/เทคโนโลยีใหม่</strong> โดยเฉพาะ Machine Learning ที่เป็นทั้ง "โดเมนที่ต้อง visualize" (เช่น XAI จาก Lesson 10) และ "เครื่องมือที่ช่วยสร้าง visualization" (เช่น LLM ช่วยเขียนโค้ด D3.js หรือช่วยสร้าง narrative อัตโนมัติจาก Lesson 12) และสุดท้าย <strong>Politics &amp; ethics of visualization</strong> ซึ่งเป็นหัวข้อที่เหลือของบทนี้จะเจาะลึก เพราะมันคือคำถามที่ตามหลอกหลอนทุกอย่างที่เรียนมาตลอดคอร์ส: "ถ้าข้อมูลถูกต้อง 100% แล้ว visualization จะมีอคติได้ไหม" คำตอบคือได้ — และ 3 งานวิจัยถัดไปพิสูจน์เรื่องนี้ด้วยตัวเลขจริง.</p>
+
+<h2>2. แค่เปลี่ยนหัวข้อ ก็เปลี่ยนสิ่งที่คนเชื่อได้</h2>
+<p>งานวิจัยนี้เอาชาร์ตข้อมูล<strong>ชุดเดียวกันเป๊ะ</strong> (งบประมาณกลาโหมสหรัฐฯ 50 ปี มี 2 เส้น: เส้นน้ำเงิน = % ของ GDP, เส้นส้ม = ดอลลาร์คงที่) ไปให้ผู้เข้าร่วม 2 กลุ่มดู เปลี่ยนแค่หัวข้อด้านบนเท่านั้น:</p>
+
+<figure>
+<img src="../assets/slides/vis13-p43-defense-budget-decrease-frame.png" alt="A chart with two lines showing US defense budget from 1948 to 2019: the blue line is defense budget as a percentage of GDP trending downward, the orange line is defense budget in constant 2015 dollars with several bumps, titled Defense budget on a steady decrease as a percentage of GDP over the past 50 years, with the word decrease circled by hand">
+<figcaption>Slide: กลุ่มที่ 1 เห็นหัวข้อ "Defense budget on a steady decrease" (vis-13-etc.pdf, p.43)</figcaption>
+</figure>
+
+<figure>
+<img src="../assets/slides/vis13-p44-defense-budget-increase-frame.png" alt="The identical chart with the same two lines, but titled Defense budget on an increase in constant dollars heading towards 500 billion dollars by 2019, with the word increase circled by hand and a Thai handwritten note about how two groups of viewers each align with their given title regardless of which line they actually look at">
+<figcaption>Slide: กลุ่มที่ 2 เห็นหัวข้อ "Defense budget on an increase" (vis-13-etc.pdf, p.44)</figcaption>
+</figure>
+<p>ทั้งสองภาพคือชาร์ตเดียวกันทุกพิกเซล ไม่มีตัวเลขไหนถูกแก้เลยแม้แต่จุดเดียว — สิ่งเดียวที่เปลี่ยนคือหัวข้อด้านบน กลุ่มแรกเห็นหัวข้อ "decrease" (พุ่งความสนใจไปที่เส้นน้ำเงิน %GDP ที่ลดลงจริงตั้งแต่ยุคสงครามเกาหลี) กลุ่มที่สองเห็นหัวข้อ "increase" (พุ่งความสนใจไปที่เส้นส้มดอลลาร์คงที่ที่เพิ่มขึ้นจริงในช่วงสงครามอัฟกานิสถาน/อิรัก) — โน้ตกำกับในสไลด์บอกตรง ๆ ว่าคนสองกลุ่มมองชาร์ตเดียวกัน แต่ลงเอยด้วยความเชื่อที่<strong>สอดคล้องกับหัวข้อที่ตัวเองได้รับ</strong> ไม่ว่าจะโฟกัสไปที่เส้นไหน — ทั้งสองหัวข้อ "ไม่ได้โกหก" เลยด้วยซ้ำ (ทั้งสองเส้นเป็นข้อมูลจริงทั้งคู่) แต่การเลือกว่าจะ<strong>ไฮไลต์เส้นไหนในหัวข้อ</strong> ก็เพียงพอที่จะชักจูงให้คนเชื่อไปคนละทางได้แล้ว.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Title Framing Bias</span></div>
+  <div class="qtext">ในงานวิจัย Frames and Slants (Kong et al. 2018) สิ่งที่ทำให้ผู้ชมสองกลุ่มเชื่อสรุปผลต่างกันคืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">หัวข้อ (title) ของชาร์ตที่ต่างกัน แม้ตัวข้อมูล/เส้นกราฟจะเหมือนกันทุกประการ</button>
+    <button class="opt" data-correct="false">ข้อมูลตัวเลขที่ถูกแก้ไขให้ต่างกันระหว่างสองกลุ่ม</button>
+    <button class="opt" data-correct="false">สีของเส้นกราฟที่ถูกสลับกันระหว่างสองกลุ่ม</button>
+    <button class="opt" data-correct="false">ขนาดตัวอักษรของแกน x และแกน y</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. ความเชื่อเดิมบิดเบือนการอ่านค่า Correlation</h2>
+<p>ปัญหาไม่ได้จำกัดแค่หัวข้อ — แม้ scatter plot เดียวกันเป๊ะ (ground truth data เดียวกัน) ความเชื่อที่ผู้ดูมีอยู่ก่อนแล้วก็บิดเบือนการประเมินความสัมพันธ์ได้เช่นกัน:</p>
+
+<figure>
+<img src="../assets/slides/vis13-p46-belief-bias-correlation.png" alt="Two scenarios from the same ground truth scatterplot data: on the left, a viewer who does not believe two unlabeled variables are correlated draws a loose ellipse counting the outliers, estimating a weaker correlation; on the right, a viewer who strongly believes Air Quality is correlated with number of Environmental Regulations draws a tight ellipse ignoring the same outliers, estimating a stronger correlation">
+<figcaption>Slide: Cindy Xiong et al., "Seeing What You Believe or Believing What You See? Belief Biases Correlation Estimation", TVCG 2022 (vis-13-etc.pdf, p.46)</figcaption>
+</figure>
+<p>ข้อมูลตั้งต้น (ground truth data) เป็น scatter plot ชุดเดียวกันทั้งสองสถานการณ์ ต่างกันแค่ "คำถามที่ผูกกับข้อมูลนั้น" — สถานการณ์ซ้าย: ผู้ดูไม่เชื่อว่าตัวแปร X กับ Y (ไม่ระบุชื่อ ไม่มีความหมายเฉพาะ) น่าจะสัมพันธ์กัน เขาจึง "นับ" จุด outlier ที่กระจายออกนอกแนวเป็นหลักฐานคัดค้าน ทำให้วง ellipse ที่ลากในใจกว้างและหลวม (ประเมิน correlation อ่อนกว่าความจริง) สถานการณ์ขวา: ข้อมูลจุดเดียวกันเป๊ะ แต่ติดป้ายว่าเป็น "Air Quality" กับ "# of Environmental Regulations" ซึ่งผู้ดูเชื่ออยู่ก่อนแล้วว่าต้องสัมพันธ์กันแน่ ๆ (ยิ่งกฎเยอะ อากาศยิ่งดี) เขาจึง "มองข้าม" จุด outlier ตัวเดียวกันนั้นไปเลย ทำให้วง ellipse แคบและชัน (ประเมิน correlation แรงกว่าความจริง) — โน้ตกำกับชี้เฉพาะจุดว่านี่คือ outlier ชุดเดียวกันในทั้งสองภาพ พิสูจน์ว่าตัวข้อมูลไม่ได้เปลี่ยนเลย เปลี่ยนแค่ "ป้ายกำกับที่จุดชนวนความเชื่อเดิม" ของผู้ดูเท่านั้น.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Belief Bias in Correlation</span></div>
+  <div class="qtext">จากตัวอย่าง "Air Quality" กับ "# of Environmental Regulations" ทำไมผู้ดูถึงประเมินความสัมพันธ์ (correlation) แรงกว่าความเป็นจริง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เพราะเขาเชื่ออยู่ก่อนแล้วว่าตัวแปรสองตัวนี้ต้องสัมพันธ์กัน จึงมองข้ามจุด outlier ที่ขัดแย้งไป</button>
+    <button class="opt" data-correct="false">เพราะข้อมูลจริงในสถานการณ์นี้มีความสัมพันธ์แรงกว่าสถานการณ์ซ้ายจริง ๆ</button>
+    <button class="opt" data-correct="false">เพราะแกน x และแกน y ถูกสลับตำแหน่งกัน</button>
+    <button class="opt" data-correct="false">เพราะจำนวนจุดข้อมูลในสถานการณ์นี้มากกว่า</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. การจัดกลุ่มจุดข้อมูล ก็ทำให้สังคมดูแตกแยกกว่าจริงได้</h2>
+<p>ตัวอย่างสุดท้าย — และหนักแน่นที่สุด — แสดงว่าการออกแบบ visualization โพลการเมืองมีผลจริงต่อการรับรู้ระดับความแตกแยกในสังคม ไม่ใช่แค่ทฤษฎี:</p>
+
+<figure>
+<img src="../assets/slides/vis13-p49-polarizing-political-polls.png" alt="Left: two jitter plot designs of the same estate-tax opinion survey, one splitting respondents into separate red Republican and blue Democrat dot clouds averaging 28 and 79, another combining everyone into one grey cloud averaging 54. Right: three density curve pairs showing the perceived inter-party gap after viewing each design: partisan jitter plot 31.8 points, consensus jitter plot 19.0 points, and a no-chart control at 18.9 points">
+<figcaption>Slide: Eli Holder &amp; Cindy Xiong Bearfield, "Polarizing Political Polls: How Visualization Design Choices Can Shape Public Opinion and Increase Political Polarization", TVCG 2023 (vis-13-etc.pdf, p.49)</figcaption>
+</figure>
+<p>คำถามสำรวจเดียวกันเป๊ะ ("Increasing the federal estate tax on inheritances" — ผู้ตอบให้คะแนน 0-100 ว่าเห็นด้วยแค่ไหน) แต่แสดงผลได้ 2 แบบ: <strong>Partisan jitter plot</strong> แยกจุดของผู้ตอบเป็นก้อนสีน้ำเงิน (Democrat, ค่าเฉลี่ย 79) กับก้อนสีแดง (Republican, ค่าเฉลี่ย 28) คนละกลุ่มชัดเจน เทียบกับ <strong>Consensus jitter plot</strong> ที่รวมทุกคนเป็นก้อนสีเทาเดียว ไม่แยกสี ไม่แยกพรรค (ค่าเฉลี่ยรวม 54) — งานวิจัยวัดผลจริงว่า หลังดูแต่ละแบบแล้ว ผู้เข้าร่วมประเมิน "ช่องว่างความเห็นระหว่างสองพรรค" เท่าไหร่: กลุ่มที่ดู partisan jitter plot ประเมินช่องว่างสูงถึง <strong>31.8 คะแนน</strong> กลุ่มที่ดู consensus jitter plot ประเมินแค่ <strong>19.0 คะแนน</strong> และกลุ่มควบคุมที่ไม่เห็นชาร์ตเลย (ตอบจากความรู้สึกเดิม) ประเมินไว้ที่ <strong>18.9 คะแนน</strong> — สังเกตว่า consensus jitter plot กับกลุ่มควบคุมแทบไม่ต่างกันเลย (19.0 vs 18.9) แต่ partisan jitter plot ดันตัวเลขสูงขึ้นไปเกือบเท่าตัว (31.8) ทั้งที่เป็นข้อมูลสำรวจชุดเดียวกันทุกประการ — โน้ตกำกับตั้งคำถามแดกดันไว้ตรง ๆ ว่า "เราแค่แสดงข้อมูลเท่านั้นแหละ จะทำให้เกิด bias มั้ย" คำตอบจากตัวเลขจริงคือ: ได้แน่นอน แค่การตัดสินใจว่าจะ<strong>จัดกลุ่มและใส่สีตามพรรคการเมืองหรือไม่</strong> ก็เพียงพอที่จะทำให้ผู้ดูรู้สึกว่าสังคมแตกแยกมากกว่าที่ตัวเลขจริงบอกไว้เกือบสองเท่า.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Polarizing Political Polls</span></div>
+  <div class="qtext">จากงานวิจัย Polarizing Political Polls ผลการทดลองพบว่าอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การแยกจุดข้อมูลเป็นก้อนสีตามพรรคการเมือง (partisan jitter plot) ทำให้ผู้ดูประเมินช่องว่างระหว่างพรรคสูงกว่าความจริงมาก เทียบกับการแสดงแบบไม่แยกสี</button>
+    <button class="opt" data-correct="false">วิธีแสดงผลแบบไหนก็ไม่มีผลต่อการประเมินช่องว่างระหว่างพรรคเลย</button>
+    <button class="opt" data-correct="false">Consensus jitter plot ทำให้ผู้ดูประเมินช่องว่างสูงกว่า partisan jitter plot</button>
+    <button class="opt" data-correct="false">กลุ่มควบคุมที่ไม่เห็นชาร์ตเลยประเมินช่องว่างสูงที่สุดในบรรดาทั้งสามกลุ่ม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 4</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">ทั้ง 3 งานวิจัยในบทนี้ (title framing, belief bias, polarizing polls) มีข้อสรุปร่วมกันอย่างไรเกี่ยวกับความ "เป็นกลาง" ของ visualization?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ทั้งสามงานวิจัยแสดงว่า visualization ไม่เคยเป็นกลางร้อยเปอร์เซ็นต์ แม้ตัวข้อมูลดิบจะถูกต้องไม่ได้ถูกแก้ไขเลยก็ตาม เพียงแค่เปลี่ยนหัวข้อ เปลี่ยนป้ายกำกับที่จุดชนวนความเชื่อเดิม หรือเปลี่ยนวิธีจัดกลุ่ม/ใส่สีจุดข้อมูล ก็เพียงพอที่จะเปลี่ยนสิ่งที่ผู้ดูเชื่อไปคนละทางได้ ดังนั้นทุกการตัดสินใจออกแบบ (ไม่ใช่แค่ตัวเลข) มีน้ำหนักทางจริยธรรมเสมอ ผู้ออกแบบต้องตระหนักว่าตัวเองกำลังชี้นำการตีความอยู่ตลอดเวลา แม้จะไม่ได้ตั้งใจก็ตาม</div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้ — และของทั้งคอร์ส</div>
+คุณควรอธิบายได้ว่าทำไมการเปลี่ยนหัวข้อ ป้ายกำกับ หรือวิธีจัดกลุ่มจุดข้อมูล ถึงเปลี่ยนความเชื่อของผู้ดูได้โดยไม่ต้องแตะตัวเลขเลยแม้แต่ตัวเดียว และเชื่อมโยงข้อคิดนี้กลับไปที่กรอบ Truthful/Functional/Insightful จาก Lesson 1 ได้: การเป็น "Truthful" ไม่ได้จบแค่ที่ตัวเลขถูกต้อง แต่ต้องรับผิดชอบต่อสิ่งที่การออกแบบชี้นำให้คนเชื่อด้วย — นี่คือข้อคิดปิดท้ายที่ครอบคลุมทั้ง 13 บทเรียนที่ผ่านมา.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (49 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-13-etc.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์สื่อจริง/งานวิจัยเชิงลึก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–36</td><td>ต่อยอด Contextualization/Concrete Scales จาก Lesson 12 (Ukraine/Gaza size, Thai cave rescue, ProPublica taxes, moon explainer, Reuters plastic, Uber Bangkok, Apple trillion market cap, WSJ hotel chains, SCMP leaders height, Olympic races near you, VR data visceralization) จบด้วย "End of Contextualization"</td><td>etc — เนื้อหาเดียวกับหัวข้อ 8 ของ Lesson 12 (Unitization/Anchoring/Analogies) ไม่ทำซ้ำที่นี่ ดูรายละเอียดที่ Lesson 12</td></tr>
+<tr><td>37</td><td>Current Issues in Visualization: 4 หัวข้อหลัก</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>38–40</td><td>งานวิจัยล่าสุดเรื่อง LLM/genAI/Vision-Language Models กับ visualization</td><td>etc — ตัวอย่างงานวิจัยใหม่ล่าสุด นอกขอบเขต quiz หลัก แต่เป็นส่วนขยายของหัวข้อ 1</td></tr>
+<tr><td>41</td><td>The Curse of Knowledge in Visual Data Communication</td><td>etc — เกริ่นนำหัวข้อ ethics ก่อนเข้าเคสตัวอย่างจริง</td></tr>
+<tr><td>42</td><td>เกริ่นนำ Frames and Slants (title bias)</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>43–44</td><td>Frames and Slants: Defense budget decrease vs increase framing</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>45</td><td>Regression by Eye: Estimating Trends in Bivariate Visualizations</td><td>etc — งานวิจัยเสริมเรื่องการประเมิน trend ด้วยสายตา เชื่อมกับหัวข้อ 3</td></tr>
+<tr><td>46</td><td>Belief Biases Correlation Estimation</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>47</td><td>Motivated Attention in Climate Change Perception</td><td>etc — ตัวอย่างเสริมเรื่อง motivated reasoning นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>48</td><td>Data is Personal: Attitudes in Rural Pennsylvania</td><td>etc — งานวิจัยเสริมเรื่องมุมมองต่อข้อมูลตามบริบทวัฒนธรรม/พื้นที่</td></tr>
+<tr><td>49</td><td>Polarizing Political Polls</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ ขอบคุณที่เรียนมาจนจบทั้ง 13 บท — พร้อมสำหรับ comprehensive exam แล้ว.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0012-storytelling-narrative-visualization.html">← Lesson 12: Storytelling &amp; Narrative Visualization</a></span>
+  <span><a href="../MISSION.md">กลับสู่ MISSION →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

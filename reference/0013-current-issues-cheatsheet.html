@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Current Issues in Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 13</p>
+<h1>Current Issues in Visualization Cheat Sheet</h1>
+
+<h2>4 หัวข้อวิจัยปัจจุบัน</h2>
+<table>
+<tr><th>หัวข้อ</th><th>ตัวอย่างประเด็น</th></tr>
+<tr><td>Visualization validation</td><td>ต่อยอด Lecture 11 — validate ระบบใหม่ ๆ ที่ซับซ้อนขึ้นเรื่อย ๆ</td></tr>
+<tr><td>Theoretical foundations</td><td>ทฤษฎีพื้นฐานของ visualization เอง (ยังไม่นิ่งเท่าศาสตร์อื่น)</td></tr>
+<tr><td>Visual analytics systems ในโดเมน/เทคโนโลยีใหม่</td><td>รวมถึง Machine Learning ทั้งในฐานะโดเมนที่ต้อง visualize และเครื่องมือที่ช่วยสร้าง visualization (genAI, LLM, Vision-Language Models)</td></tr>
+<tr><td>Politics &amp; ethics of visualization</td><td>การออกแบบ (โดยตั้งใจหรือไม่ตั้งใจ) มีผลต่อความเชื่อ/อคติของผู้ดูเสมอ</td></tr>
+</table>
+
+<h2>Title Framing Bias (Kong et al. 2018)</h2>
+<p>ชาร์ตข้อมูลชุดเดียวกันเป๊ะ (defense budget) เปลี่ยนแค่ <strong>หัวข้อ (title)</strong> จาก "on a steady decrease" เป็น "on an increase" — ผู้ชมกลุ่มที่เห็นหัวข้อต่างกัน จะโฟกัสไปที่เส้นข้อมูลคนละเส้นในชาร์ตเดียวกัน (เส้น %GDP ที่ลดลง vs เส้น constant dollars ที่เพิ่มขึ้น) แล้วสรุปผลตรงกับหัวข้อที่ตัวเองเห็น — หัวข้อไม่ใช่แค่คำอธิบาย แต่ชี้นำการอ่านข้อมูลได้</p>
+
+<h2>Belief Bias in Correlation Estimation (Xiong et al. 2022)</h2>
+<p>Scatter plot ข้อมูลชุดเดียวกัน (ground truth) แต่ผู้ดูประเมินความสัมพันธ์ (correlation) แรง/อ่อนต่างกัน ขึ้นอยู่กับว่าพวกเขา<strong>เชื่อไปก่อนแล้ว</strong>หรือไม่ว่าตัวแปรสองตัวนั้นสัมพันธ์กัน — เชื่อว่าไม่สัมพันธ์ → นับ outlier เป็นหลักฐานค้าน (ประเมิน correlation อ่อนกว่าจริง) เชื่อว่าสัมพันธ์อยู่แล้ว → มองข้าม outlier เดิม (ประเมิน correlation แรงกว่าจริง)</p>
+
+<h2>Polarizing Political Polls (Holder &amp; Xiong Bearfield 2023)</h2>
+<p>สำรวจความเห็นชุดเดียวกัน แสดงผลต่างกัน 2 แบบ: <strong>Partisan jitter plot</strong> (แยกกลุ่ม Dem/Rep เป็นก้อนสีแดง-น้ำเงินคนละก้อน) vs <strong>Consensus jitter plot</strong> (รวมทุกคนเป็นก้อนสีเทาเดียว) — หลังดู partisan jitter plot ผู้เข้าร่วมประเมินช่องว่างความเห็นระหว่างพรรคสูงถึง 31.8 คะแนน เทียบกับ consensus jitter plot ที่ 19.0 คะแนน และกลุ่มควบคุม (ไม่เห็นชาร์ตเลย) ที่ 18.9 คะแนน — แค่เลือกวิธีจัดกลุ่มจุดข้อมูล (ไม่ได้เปลี่ยนตัวเลขจริงเลย) ก็ทำให้คนรู้สึกว่าสังคมแตกแยกมากกว่าความเป็นจริงได้</p>
+
+<h2>ข้อคิดรวบยอดของทั้งวิชา</h2>
+<p>Visualization ไม่เคยเป็นกลาง (neutral) 100% — ทุกการตัดสินใจออกแบบ (การจัดกลุ่ม สี ชื่อหัวข้อ สเกลแกน) มีผลต่อสิ่งที่ผู้ดูจะเชื่อ ผู้ออกแบบจึงมีความรับผิดชอบทางจริยธรรมเสมอ แม้ตัวข้อมูลดิบจะถูกต้อง 100% ก็ตาม</p>
+
+<hr>
+<p><a href="../lessons/0013-current-issues.html">← กลับไป Lesson 13</a></p>
+
+</body>
+</html>

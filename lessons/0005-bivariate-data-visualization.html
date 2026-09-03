@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 5: Bivariate Data Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 5 / 13 · Bivariate</span>
+  <span><a href="../reference/0005-bivariate-chart-selector.html">Reference: Chart Selector →</a></span>
+</nav>
+
+<p class="kicker">vis-5-bivariate.pdf</p>
+<h1>Bivariate Data Visualization</h1>
+
+<p>บทเรียนที่หนักที่สุดในครึ่งแรกของวิชา — ครอบคลุมชาร์ตหลักที่ใช้เปรียบเทียบ<strong>ข้อมูล 2 ตัวแปร</strong> (heatmap, bar chart, line chart, scatter plot) พร้อมงานวิจัยที่ชี้กับดักการรับรู้ของแต่ละชนิด ซึ่งเป็นเนื้อหาที่ข้อสอบแบบ "วิเคราะห์ visualization ที่ให้มา" ชอบถามมากที่สุด.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Claus O. Wilke, <a href="https://clauswilke.com/dataviz/visualizing-associations.html" target="_blank" rel="noopener">Fundamentals of Data Visualization — ch. 10 Visualizing Associations</a> ครอบคลุม scatter plot, correlation, และ <a href="https://clauswilke.com/dataviz/overlapping-points.html" target="_blank" rel="noopener">ch. 18 Handling Overlapping Points</a> (shuffling/binning/sampling) ตรงกับเนื้อหาวันนี้.
+</div>
+
+<h2>1. Bivariate Data คืออะไร + Chart Selection Matrix</h2>
+<p>Bivariate = แต่ละ sample มี <strong>2 attribute</strong> (เช่น Name &amp; Nickname, Country &amp; GDP, Height &amp; Weight) Slide ให้สูตรจับคู่ชาร์ตกับประเภทข้อมูลตรง ๆ:</p>
+<table>
+<tr><th></th><th>Nominal</th><th>Ordinal</th></tr>
+<tr><td><strong>Nominal</strong></td><td>Heatmap</td><td>Bar chart (Line chart)</td></tr>
+<tr><td><strong>Ordinal</strong></td><td>Bar chart (Line chart)</td><td>Scatter plot (Line chart)</td></tr>
+</table>
+
+<figure>
+<img src="../assets/slides/vis5-p19-chart-selection-matrix.png" alt="Bivariate Data Visualization matrix: Nominal x Nominal = Heatmap, Nominal x Ordinal = Bar chart (Line chart), Ordinal x Ordinal = Scatterplot (Line chart)">
+<figcaption>Slide: Bivariate Data Visualization chart-selection matrix (vis-5-bivariate.pdf, p.19)</figcaption>
+</figure>
+<p>ลองใช้ matrix นี้กับข้อมูลจริง 3 คู่: "แผนก × เพศ" (nominal ทั้งคู่) ต้องใช้ Heatmap เพราะไม่มีแกนไหนไล่ลำดับได้ ใช้แค่สีเข้ม-อ่อนบอกจำนวนคนในแต่ละช่องแผนก×เพศ — "แผนก × เงินเดือน" (nominal×ordinal) ใช้ Bar chart ได้เลย แกนหนึ่งเป็นหมวดหมู่แผนก อีกแกนเป็นตัวเลขเงินเดือน — "อายุงาน × เงินเดือน" (ordinal×ordinal ทั้งคู่) ใช้ Scatter plot เพื่อดูว่าอายุงานเยอะขึ้นเงินเดือนสูงขึ้นตามไหม สังเกตว่า matrix นี้ตอบคำถาม "จะเลือกชาร์ตอะไร" ได้จากแค่ดูว่าแต่ละคอลัมน์เป็น nominal หรือ ordinal เท่านั้น ไม่ต้องเดา.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Chart Selection</span></div>
+  <div class="qtext">ข้อมูลคู่ "แผนก (nominal) × เพศ (nominal)" ของพนักงาน ควรใช้ชาร์ตประเภทใดตาม matrix ของ slide?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Heatmap</button>
+    <button class="opt" data-correct="false">Scatter plot</button>
+    <button class="opt" data-correct="false">Line chart</button>
+    <button class="opt" data-correct="false">Bar chart เรียงตามตัวอักษร</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Chart Selection</span></div>
+  <div class="qtext">ข้อมูลคู่ "ส่วนสูง (ordinal/quantitative) × น้ำหนัก (ordinal/quantitative)" เหมาะกับชาร์ตใดที่สุด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Scatter plot</button>
+    <button class="opt" data-correct="false">Heatmap</button>
+    <button class="opt" data-correct="false">Bar chart</button>
+    <button class="opt" data-correct="false">ไม่มีชาร์ตที่เหมาะสม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>2. Heatmap: การจัดเรียงเผยรูปแบบที่ซ่อนอยู่</h2>
+<p>Jacques Bertin เสนอ "reorderable matrices" — heatmap ข้อมูลชุดเดียวกัน แต่สลับลำดับแถว/คอลัมน์ สามารถเผย block pattern/cluster ที่มองไม่เห็นเลยถ้าเรียงตามตัวอักษรเฉย ๆ (slide สาธิตด้วยตารางเดียวกันที่เรียงคนละแบบ ให้ผลการมองต่างกันมาก).</p>
+
+<figure>
+<img src="../assets/slides/vis5-p28-heatmap-reordered.png" alt="Heatmap with rows and columns reordered (C D A B E / V W X Y U Z) revealing a clearer block pattern">
+<figcaption>Slide: the same heatmap data, reordered — a pattern emerges (vis-5-bivariate.pdf, p.28)</figcaption>
+</figure>
+<p>ลองนึกภาพ heatmap เดิมที่เรียงแถว/คอลัมน์ตามตัวอักษร A-B-C-D-E: ช่องเข้มที่จริงแล้วอยู่ติดกันเป็นกลุ่ม (เช่น A กับ D มักเข้มพร้อมกัน) จะถูกเรียงห่างกันคนละที่ในตาราง มองไม่ออกว่ามันเป็นกลุ่มเดียวกัน แต่พอสลับลำดับคอลัมน์ใหม่ให้ A, D มาอยู่ติดกัน (ไม่สนใจตัวอักษร สนใจแค่ว่าค่าคล้ายกันไหม) ช่องเข้มที่เคยกระจัดกระจายจะรวมตัวกันเป็นแถบทแยงชัดเจนทันที — นี่คือเหตุผลว่าทำไม heatmap แบบ default (เรียง A-Z) ถึงมักดู "รก ไม่มี pattern" ทั้งที่ pattern มีอยู่จริง แค่ถูกลำดับตัวอักษรบังไว้ ก่อนสรุปว่า "ข้อมูลชุดนี้ไม่มี pattern" ต้องลองสลับลำดับดูก่อนเสมอ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Heatmap Reordering</span></div>
+  <div class="qtext">ทำไมการจัดเรียง (reorder) แถว/คอลัมน์ของ heatmap ถึงสำคัญ ตาม Bertin's reorderable matrices?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การเรียงที่เหมาะสมเผยให้เห็น cluster/pattern ที่การเรียงตามตัวอักษรซ่อนไว้</button>
+    <button class="opt" data-correct="false">การเรียงมีผลต่อความเร็วในการโหลดข้อมูลเท่านั้น</button>
+    <button class="opt" data-correct="false">การเรียงเปลี่ยนค่าตัวเลขในข้อมูลจริง</button>
+    <button class="opt" data-correct="false">การเรียงจำเป็นเฉพาะเมื่อข้อมูลเป็น ordinal เท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. Bar Chart: กับดักที่ข้อสอบชอบถาม</h2>
+<ul>
+<li><strong>Y-axis ไม่เริ่มที่ 0 / broken axis</strong> — ขยายผลต่างระหว่างแท่งเกินจริง (Correll, Bertini &amp; Franconeri, "Truncating the Y-Axis: Threat or Menace?", CHI 2020)</li>
+<li><strong>Aspect ratio บิดเบือนความจำตำแหน่ง</strong> — สัดส่วนกว้าง/สูงของชาร์ตทั้งภาพมีผลต่อการจำค่าที่อ่านมา (Ceja et al., "Truth or Square", TVCG 2021)</li>
+<li><strong>Bar-Tip Limit error</strong> — คนอ่านมักตีความปลายแท่ง (bar tip) ผิดพลาดอย่างเป็นระบบเมื่อ bar graph แสดงค่าเฉลี่ย (Kerns &amp; Wilmer, JOV 2021)</li>
+</ul>
+
+<figure>
+<img src="../assets/slides/vis5-p40-bar-truncated-axis.png" alt="Two versions of the same bar chart side by side, one with y-axis starting at 0 and one truncated, making differences look larger">
+<figcaption>Slide: bar chart with vs without a truncated y-axis (vis-5-bivariate.pdf, p.40)</figcaption>
+</figure>
+<p>ลองคำนวณตัวเลขจริงในสไลด์: ค่า C=37 กับ D=74 ต่างกันแค่ 2 เท่าพอดี (74÷37=2) ถ้าแกน y เริ่มที่ 0 ตามปกติ แท่ง D ก็ควรสูงเป็น 2 เท่าของแท่ง C พอดีเหมือนตัวเลข — แต่ถ้าแกน y เริ่มที่ 30 แทน ความสูงที่วาดจริงของ C จะเหลือแค่ 37-30=7 หน่วย ส่วน D จะเหลือ 74-30=44 หน่วย นั่นคือแท่ง D จะดูสูงกว่าแท่ง C ถึง 44÷7 ≈ 6.3 เท่า ทั้งที่ตัวเลขจริงต่างกันแค่ 2 เท่า — นี่คือคณิตศาสตร์เบื้องหลังคำเตือน "ต้องเริ่มแกน y ที่ 0" ไม่ใช่แค่กฎลอย ๆ แต่เพราะการตัดฐานออกทำให้อัตราส่วนความสูงที่ตาเห็นบิดเบือนไปจากอัตราส่วนตัวเลขจริงเสมอ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Bar Chart Pitfalls</span></div>
+  <div class="qtext">งานวิจัย "Truncating the Y-Axis: Threat or Menace?" (CHI 2020) ศึกษาผลกระทบของอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การไม่เริ่มแกน y ที่ 0 ใน bar chart</button>
+    <button class="opt" data-correct="false">การใช้สีมากเกินไปใน bar chart</button>
+    <button class="opt" data-correct="false">จำนวนแท่งที่มากเกินไปในหนึ่งชาร์ต</button>
+    <button class="opt" data-correct="false">การเรียงลำดับแท่งตามตัวอักษร</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Bar Chart Pitfalls</span></div>
+  <div class="qtext">"Aspect ratio บิดเบือนความจำตำแหน่ง" (Truth or Square, TVCG 2021) หมายความว่าอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สัดส่วนกว้าง/สูงของชาร์ตมีผลต่อความแม่นยำที่คนจำค่าที่อ่านได้</button>
+    <button class="opt" data-correct="false">ชาร์ตสี่เหลี่ยมจัตุรัสอ่านง่ายกว่าชาร์ตทุกรูปแบบเสมอ</button>
+    <button class="opt" data-correct="false">แท่งที่มีความกว้างต่างกันจะแสดงค่าไม่ตรงกัน</button>
+    <button class="opt" data-correct="false">อัตราส่วนภาพไม่มีผลต่อการรับรู้ใด ๆ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p>กับดักที่สามคือ <strong>Bar-Tip Limit error</strong> — คนอ่านมักเข้าใจผิดว่าปลายแท่ง (bar tip) คือขอบเขตสูงสุดที่ข้อมูลจะไปถึงได้ ทั้งที่จริง ๆ แท่งอาจแสดงแค่ค่าเฉลี่ย:</p>
+
+<figure>
+<img src="../assets/slides/vis5-p52-bar-tip-limit-error.png" alt="Two bar charts both with bar height 10 and value axis up to 18: the left chart labeled Stack shows individual orange dots stacked neatly up to but never exceeding the bar's tip, while the right chart labeled Aggregate shows the same bar height representing a mean, with individual orange data points scattered both above (up to about 15) and below the bar tip">
+<figcaption>Slide: Sarah Kerns &amp; Jeremy Wilmer, "Two graphs walk into a bar: ... the Bar-Tip Limit error", JOV 2021 (vis-5-bivariate.pdf, p.52)</figcaption>
+</figure>
+<p>ทั้งสองแท่งสูงเท่ากันเป๊ะที่ค่า 10 แต่ความหมายต่างกันโดยสิ้นเชิง: แผงซ้าย "Stack" คือ bar chart ที่แท่งแสดงผลรวม/สูงสุดจริง จุดข้อมูลย่อยทุกจุด (วงกลมส้ม) จึงถูกวางซ้อนกันอยู่<strong>ใต้ปลายแท่งพอดี ไม่มีจุดไหนเกินไปกว่านั้น</strong> — แผงขวา "Aggregate" คือ bar chart ที่แท่งแสดงแค่<strong>ค่าเฉลี่ย</strong> (mean=10) ของกลุ่มข้อมูล จุดข้อมูลจริงแต่ละจุดกลับกระจายทั้งเหนือแท่ง (สูงถึง ~15) และใต้แท่ง (ต่ำถึง ~7) เพราะค่าเฉลี่ยไม่ใช่ค่าสูงสุด — ปัญหาคือคนอ่านทั่วไปมักตีความทั้งสองแบบเหมือนกันหมด คือคิดว่า "ปลายแท่งคือขีดสุดที่ข้อมูลไปถึง" (แบบซ้าย) ทั้งที่แผงขวาจริง ๆ แล้วมีข้อมูลเกินปลายแท่งไปเยอะ — ถ้า bar chart แสดงค่าเฉลี่ย/มัธยฐาน (aggregate) โดยไม่บอกไว้ชัดเจนหรือไม่มี error bar กำกับ ผู้อ่านจะเข้าใจผิดคิดว่านั่นคือขอบเขตบนของข้อมูลทั้งหมดโดยอัตโนมัติ — บทเรียนคือ bar chart ที่แสดงค่าเฉลี่ยควรมี error bar หรือจุดข้อมูลจริงกำกับไว้เสมอ ไม่งั้นผู้อ่านจะตีความผิดอย่างเป็นระบบ.</p>
+
+<p>ปัญหา "แท่งยาวเกินจะวาดพอดี" ไม่ใช่เรื่องใหม่ — ย้อนไปถึงยุค 1900 นักสังคมวิทยา W.E.B. Du Bois ก็เจอปัญหาเดียวกันตอนวาดข้อมูลด้วยมือ:</p>
+
+<figure>
+<img src="../assets/slides/vis5-p50-dubois-data-portraits.png" alt="Hand-drawn charts by W.E.B. Du Bois from around 1900: on the left, a bar chart of Negro students by course of study where the longest bar (Industrial) is too long for the page so it curls back on itself in a spiral loop instead of running off the edge; center, a horizontal bar chart of occupations of Georgia Negroes from 1890; right, a Du Bois chart on religion mixing bars and a looping rectangular shape">
+<figcaption>Slide: "W. E. B. Du Bois's Data Portraits: Visualizing Black America", 2018 (vis-5-bivariate.pdf, p.50)</figcaption>
+</figure>
+<p>สังเกตแผงซ้าย — bar chart แสดงจำนวนนักเรียนผิวดำที่เรียนแต่ละสาขาวิชาในโรงเรียนรัฐจอร์เจีย แท่ง "Industrial" ยาวกว่าทุกแท่งมากจนวาดตรง ๆ ไม่พอหน้ากระดาษ Du Bois จึงแก้ปัญหาด้วยการให้แท่งนั้น<strong>โค้งม้วนกลับเป็นวงสปริง</strong>แทนที่จะตัดขอบทิ้งหรือย่อสเกลทั้งชาร์ต — นี่คือต้นแบบของเทคนิคที่สไลด์อ้างถึงในชื่อ "Du Bois Wrapped Bar Chart" (Karduni et al., CHI 2020) ซึ่งงานวิจัยยุคปัจจุบันนำแนวคิดนี้กลับมาทำให้เป็นระบบ สำหรับข้อมูลที่มีบางค่า "สูงผิดปกติ" (disproportionate) จนทำให้แท่งอื่นที่เหลือแบนจนอ่านไม่ออกถ้าใช้สเกลเดียวกันตรง ๆ — บทเรียนคือปัญหา "ค่าที่สูง/ต่ำผิดปกติบิดเบือนสเกลของทั้งชาร์ต" ไม่ใช่ปัญหาใหม่จากยุคดิจิทัล แต่เป็นปัญหาคลาสสิกที่มีทางแก้สร้างสรรค์มาตั้งแต่ 100 กว่าปีก่อนแล้ว.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Bar-Tip Limit Error</span></div>
+  <div class="qtext">"Bar-Tip Limit error" คือความเข้าใจผิดแบบใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เข้าใจผิดว่าปลายแท่ง (bar tip) คือขอบเขตสูงสุดของข้อมูลเสมอ ทั้งที่บางครั้งแท่งแสดงแค่ค่าเฉลี่ย ซึ่งข้อมูลจริงอาจเกินปลายแท่งไปได้</button>
+    <button class="opt" data-correct="false">เข้าใจผิดว่าแท่งสีเข้มมีค่ามากกว่าแท่งสีอ่อนเสมอ</button>
+    <button class="opt" data-correct="false">เข้าใจผิดว่าความกว้างของแท่งสื่อถึงค่าข้อมูล</button>
+    <button class="opt" data-correct="false">เข้าใจผิดว่าต้องมีแท่งอย่างน้อย 5 แท่งในหนึ่งชาร์ต</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 7</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">Du Bois แก้ปัญหาแท่ง "Industrial" ที่ยาวเกินหน้ากระดาษอย่างไร และเทคนิคนี้มีชื่อเรียกในงานวิจัยยุคปัจจุบันว่าอะไร?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">Du Bois ให้แท่งที่ยาวเกินไปโค้งม้วนกลับเป็นวงสปริงแทนที่จะตัดขอบทิ้งหรือย่อสเกลทั้งชาร์ต เทคนิคนี้ถูกนำกลับมาศึกษาอย่างเป็นระบบในงานวิจัยยุคปัจจุบันในชื่อ "Du Bois Wrapped Bar Chart" (Karduni et al., CHI 2020) ใช้กับข้อมูลที่มีค่าบางตัวสูงผิดปกติ (disproportionate) จนบิดเบือนสเกลของทั้งชาร์ต</div>
+</div>
+
+<h2>4. Line Chart: บอกเป็นนัยว่า "ต่อเนื่อง"</h2>
+<p>Line chart <strong>บอกเป็นนัยว่าข้อมูลต่อเนื่องและมีค่าสัมบูรณ์ (continuous and absolute)</strong> — ห้ามใช้พร่ำเพรื่อกับข้อมูล categorical ที่ไม่มีลำดับต่อเนื่องจริง (เช่นลากเส้นเชื่อมหมวดหมู่ A-B-C-D-E ที่ไม่มีความต่อเนื่องเชิงปริมาณ). เทคนิคจัดการที่สำคัญ:</p>
+
+<figure>
+<img src="../assets/slides/vis5-p54-line-chart-ordinal-nominal.png" alt="Line chart example labeled Ordinal + Nominal with categories A through G on the x-axis">
+<figcaption>Slide: Line Chart — Ordinal + Nominal (vis-5-bivariate.pdf, p.54)</figcaption>
+</figure>
+<p>ลองเทียบ 2 กรณี: เส้นกราฟยอดขายรายเดือน (ม.ค.-ธ.ค.) ลากเส้นเชื่อมได้ถูกต้อง เพราะเดือนมีลำดับต่อเนื่องจริง เส้นที่ลาดขึ้นระหว่างสองเดือนสื่อความหมายว่า "ค่ากำลังโตขึ้นระหว่างทาง" ได้จริง แต่ถ้าเอาข้อมูล "ยอดขายแยกตามสาขา" (สาขา A, B, C, D ไม่มีลำดับ) มาลากเส้นเชื่อมแบบเดียวกัน เส้นที่ลาดขึ้นระหว่างสาขา A กับ B จะดูเหมือนสื่อว่า "มีค่ากึ่งกลางระหว่างทาง" ทั้งที่ไม่มีความหมายอะไรเลย (ไม่มี "สาขา A.5" อยู่ระหว่าง A กับ B) — และถ้าสลับลำดับสาขาบนแกน x ใหม่ (เช่น B-D-A-C) รูปร่างเส้นทั้งเส้นจะเปลี่ยนไปคนละแบบทันที ต่างจาก bar chart ที่สลับลำดับแท่งแล้วความหมายรวมยังเหมือนเดิม.</p>
+
+<ul>
+<li><strong>Banking to 45°</strong> (William Cleveland 1993; Heer &amp; Agrawala TVCG 2006) — ปรับ aspect ratio ของชาร์ตให้ความชันเฉลี่ยของเส้นอยู่ราว 45° ช่วยให้อ่านแนวโน้ม (trend) ได้แม่นยำที่สุด</li>
+<li><strong>Dual-axis อันตราย</strong> — การใช้แกน y สองแกน (ซ้าย/ขวา) ที่ scale ต่างกัน สามารถ "สร้าง" ความสัมพันธ์ปลอมระหว่างสองเส้นที่ไม่เกี่ยวข้องกันจริงได้ ควรหลีกเลี่ยง</li>
+<li><strong>Connected scatter plot</strong> (Haroz, Kosara &amp; Franconeri, TVCG 2016) — ผสาน scatter+line เพื่อแสดง paired time series โดยมี "pigtail" (จุดเริ่ม/จบวนกลับ) เป็นตัวช่วยอ่านทิศทางเวลา</li>
+</ul>
+
+<figure>
+<img src="../assets/slides/vis5-p79-banking-45-degrees.png" alt="Two versions of the same line chart with different aspect ratios, one banked so slopes read near 45 degrees">
+<figcaption>Slide: Line Chart — Banking to 45 Degrees (vis-5-bivariate.pdf, p.79)</figcaption>
+</figure>
+<p>ข้อมูลตัวเลขในทั้งสองเวอร์ชันนี้เหมือนกันเป๊ะ ต่างกันแค่สัดส่วนกรอบที่วาด — ในเวอร์ชันกรอบเตี้ยกว้าง ช่วงที่เส้นน้ำเงินตัดกับเส้นเขียว 2 ครั้งจะดูคลุมเครือว่าจุดตัดอยู่ตรงไหนกันแน่ แต่พอยืดกรอบให้สูงขึ้น (banking to 45°) จุดตัดเดิมกลับมองเห็นชัดเจนและแยกช่วงขึ้น-ลงของแต่ละเส้นได้ทันที — ทั้งที่ไม่ได้แก้ตัวเลขสักตัว นี่คือเหตุผลที่ Cleveland เสนอกฎ "ปรับกรอบจนความชันเฉลี่ยรวมของทุกเส้นอยู่ที่ราว 45 องศา" เป็นจุดที่ตาคนแยกความชันต่างระดับได้แม่นที่สุด เอาไว้ใช้ตรวจว่า line chart ที่เจอมีสัดส่วนกรอบเหมาะสมหรือแบน/สูงเกินไปจนแนวโน้มดูผิดเพี้ยน.</p>
+
+<figure>
+<img src="../assets/slides/vis5-p98-dual-axis-danger.png" alt="Dual-axis line chart diagram with independently scaled left and right y-axes">
+<figcaption>Slide: dual-axis scaling can visually fabricate a relationship between two lines (vis-5-bivariate.pdf, p.98)</figcaption>
+</figure>
+<p>ตัวอย่างจริงในสไลด์: เส้น "Global GDP" ใช้แกนซ้าย (40-80 ล้านล้านดอลลาร์) เส้น "German GDP" ใช้แกนขวา (2.5-4.0 ล้านล้านดอลลาร์) — คนออกแบบเลือกช่วงตัวเลขของทั้งสองแกนให้เส้นทั้งคู่ "บังเอิญ" ทาบกันพอดีบนภาพ ทั้งที่ถ้าลองขยับแกนขวาให้เริ่มที่ 0-10 ล้านล้านแทน (แทนที่จะเป็น 2.5-4.0) เส้นสีส้มจะแบนราบจนแทบมองไม่เห็นความเคลื่อนไหวเลย — ลองคิดกลับด้าน: ด้วยแกนที่ independent กันแบบนี้ คนออกแบบสามารถเลือกช่วงตัวเลขแกนขวาให้เส้นสีส้ม "ขึ้นพร้อมกัน" หรือ "สวนทางกัน" กับเส้นสีน้ำเงินก็ได้ตามใจ นี่คือเหตุผลที่ dual-axis อันตราย: ความสัมพันธ์ที่เห็นบนภาพถูกกำหนดโดยคนเลือกสเกล ไม่ใช่โดยข้อมูลจริง.</p>
+
+<figure>
+<img src="../assets/slides/vis5-p106-connected-scatterplot.png" alt="Connected scatterplot with a pigtail loop marking where the time series starts and ends">
+<figcaption>Slide: Connected Scatterplot with a "pigtail" (Haroz, Kosara & Franconeri, TVCG 2016) (vis-5-bivariate.pdf, p.106)</figcaption>
+</figure>
+<p>ลองเทียบวิธีตอบคำถาม "ตัวแปร X กับ Y สัมพันธ์กันยังไงเมื่อเวลาผ่านไป" ด้วย 2 วิธี: แผงซ้าย (line chart ปกติ) ต้องแยกวาด 2 เส้นคนละแกน แล้วให้คนดูเทียบเองในใจว่าตอน X ขึ้น Y ทำอะไร — ทำได้แต่ต้องอาศัยความจำช่วย แผงขวา (connected scatterplot) เอาค่า X,Y ของแต่ละเวลามาเป็นจุดเดียวบนระนาบเดียวกันเลย แล้วลากเส้นบอกทิศทาง A→B→C→D ทำให้เห็น "รูปร่างความสัมพันธ์" ได้ในภาพเดียว แต่ก็มีต้นทุน: เพราะแกนเวลาไม่ได้โผล่มาตรง ๆ (ซ่อนอยู่ในทิศทางลูกศร) เส้นทางจาก A ไป D อาจวกกลับไปกลับมา (ผ่านจุดที่เคยผ่านแล้วในทิศทางใกล้เคียงเดิม) ทำให้ดูเหมือนเส้นพันกันเอง ทั้งที่จริง ๆ คือเวลาเดินหน้าไปเรื่อย ๆ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Line Chart</span></div>
+  <div class="qtext">Line chart สื่อความหมายโดยนัยว่าข้อมูลเป็นแบบใด — ทำให้ใช้ผิดกับข้อมูล categorical ไม่ได้?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ต่อเนื่องและมีค่าสัมบูรณ์ (continuous and absolute)</button>
+    <button class="opt" data-correct="false">ไม่มีลำดับ (nominal)</button>
+    <button class="opt" data-correct="false">เป็นสัดส่วนเท่านั้น (proportional only)</button>
+    <button class="opt" data-correct="false">เป็นข้อมูลเชิงพื้นที่เสมอ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Dual-axis</span></div>
+  <div class="qtext">ทำไม dual-axis line chart (แกน y ซ้าย/ขวา scale ต่างกัน) ถึงเป็นอันตราย?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สามารถสร้างภาพความสัมพันธ์ระหว่างสองเส้นที่ไม่มีอยู่จริงได้</button>
+    <button class="opt" data-correct="false">โปรแกรมส่วนใหญ่วาด dual-axis ไม่ได้อยู่แล้ว</button>
+    <button class="opt" data-correct="false">ทำให้ไฟล์ชาร์ตมีขนาดใหญ่ขึ้นมาก</button>
+    <button class="opt" data-correct="false">ใช้ได้กับข้อมูล nominal เท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 10</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: "Banking to 45 degrees" ช่วยแก้ปัญหาอะไรใน line chart?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ช่วยเลือก aspect ratio (สัดส่วนกว้าง/สูง) ของชาร์ตที่เหมาะสม เพื่อให้ความชันเฉลี่ยของเส้นทั้งหมดในชาร์ตอยู่ที่ประมาณ 45 องศา ซึ่งเป็นมุมที่มนุษย์รับรู้และเปรียบเทียบความชัน (แนวโน้มขึ้น/ลง) ได้แม่นยำที่สุด — ถ้าชาร์ตแบนหรือสูงเกินไป ความชันจริงจะดูเกินจริงหรือน้อยเกินจริง</div>
+</div>
+
+<h2>5. Scatter Plot: Correlation ที่ตา "โกหก" ได้</h2>
+<p>Cleveland, Diaconis &amp; McGill (1982) พบว่า <strong>ยิ่งบีบสเกลแกนให้จุดกระจายชันขึ้น ยิ่งทำให้คนมองว่าข้อมูลมี correlation สูงขึ้น</strong> ทั้งที่ตัวเลขสหสัมพันธ์จริงไม่เปลี่ยนเลย — aspect ratio ของ scatter plot จึงไม่ใช่แค่เรื่องความสวยงาม แต่กระทบการตีความ correlation โดยตรง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 11</span><span>Scatter Plot Correlation</span></div>
+  <div class="qtext">Cleveland, Diaconis &amp; McGill (1982) พบว่าอะไรเกี่ยวกับการรับรู้ correlation ใน scatter plot?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การบีบสเกลแกนให้ชันขึ้นทำให้ดูเหมือนมี correlation สูงขึ้น ทั้งที่ค่าจริงเท่าเดิม</button>
+    <button class="opt" data-correct="false">Correlation ที่แสดงในภาพตรงกับค่าตัวเลขเสมอไม่ว่าสเกลจะเป็นอย่างไร</button>
+    <button class="opt" data-correct="false">Scatter plot ไม่สามารถใช้แสดง correlation ได้เลย</button>
+    <button class="opt" data-correct="false">จำนวนจุดข้อมูลเท่านั้นที่มีผลต่อการรับรู้ correlation</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. Overplotting: เมื่อจุดทับกันจนอ่านไม่ออก</h2>
+<p>เมื่อ scatter plot มีจุดข้อมูลเยอะมากจนทับซ้อนกัน (overplotting) มี 3 เทคนิคหลักในการแก้:</p>
+<ul>
+<li><strong>Shuffling</strong> — สลับลำดับการวาดจุด ป้องกันไม่ให้กลุ่มที่วาดทีหลังบังกลุ่มที่วาดก่อนอย่างเป็นระบบ</li>
+<li><strong>Binning</strong> — รวมจุดที่อยู่ใกล้กันเป็นกลุ่ม/ตาราง (เช่น hexbin) แล้วใช้สีแทนความหนาแน่น</li>
+<li><strong>Sampling</strong> — สุ่มจุดมาแสดงบางส่วน (random, density-based, blue-noise sampling) แทนที่จะวาดทุกจุด</li>
+</ul>
+
+<figure>
+<img src="../assets/slides/vis5-p131-sampling-comparison.png" alt="MNIST data scatterplot compared across random sampling, outlier-biased density-based sampling, and blue noise sampling">
+<figcaption>Slide: comparing sampling strategies for overplotting (vis-5-bivariate.pdf, p.131)</figcaption>
+</figure>
+<p>ลองสมมติว่ามีข้อมูล 60,000 จุดที่ทับกันจนกลายเป็นก้อนทึบ (แผง MNIST เต็ม) — ถ้าสุ่มทิ้งแบบ Random sampling ธรรมดา จุดที่อยู่ "ขอบ" ของแต่ละกลุ่ม (ซึ่งมีน้อยกว่าจุดตรงกลางกลุ่มอยู่แล้ว) มีโอกาสถูกสุ่มทิ้งไปเยอะกว่าสัดส่วน ทำให้ขอบเขตกลุ่มเบลอ แยกกลุ่มที่อยู่ติดกันได้ยากขึ้น — Outlier-biased sampling แก้ปัญหานี้ตรง ๆ ด้วยการ "จงใจเก็บจุดขอบไว้ให้มากกว่า" จุดตรงกลางที่ซ้ำซ้อนกันอยู่แล้วตัดทิ้งได้โดยไม่เสียข้อมูล ผลคือขอบเขตกลุ่มยังคมชัดทั้งที่จุดรวมลดลงเท่ากับ Random sampling — บทเรียนคือ "สุ่มทิ้งเท่ากัน" ไม่ได้แปลว่า "รักษาข้อมูลได้เท่ากัน" วิธีเลือกว่าจะทิ้งจุดไหนสำคัญพอ ๆ กับจะทิ้งกี่จุด.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 12</span><span>Overplotting</span></div>
+  <div class="qtext">เทคนิคใดแก้ปัญหา overplotting ด้วยการ "รวมจุดที่อยู่ใกล้กันเป็นกลุ่มแล้วใช้สีแทนความหนาแน่น"?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Binning</button>
+    <button class="opt" data-correct="false">Shuffling</button>
+    <button class="opt" data-correct="false">Banking to 45 degrees</button>
+    <button class="opt" data-correct="false">Dual-axis scaling</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>7. D3.js Scales (สั้น ๆ)</h2>
+<p><code>d3.scaleLinear().domain([0, max]).range([0, pixelWidth])</code> คือการสร้าง "ฟังก์ชัน" ที่แปลงค่าข้อมูลจริง (domain) เป็นตำแหน่งพิกเซล (range) โดยอัตโนมัติ — เป็นกลไกเดียวกับที่ทำให้แกนของชาร์ตทุกชนิด "ตรง" กับข้อมูลจริง (เชื่อมกับ Truthful ที่เรียนมาตั้งแต่ Lesson 2).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 13</span><span>D3 Scales</span></div>
+  <div class="qtext"><code>d3.scaleLinear().domain([0, 100]).range([0, 400])</code> ทำหน้าที่อะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">แปลงค่าข้อมูล 0-100 ให้เป็นตำแหน่งพิกเซล 0-400 แบบเป็นสัดส่วน</button>
+    <button class="opt" data-correct="false">กรองข้อมูลที่มีค่าเกิน 100 ออกจากชุดข้อมูล</button>
+    <button class="opt" data-correct="false">เปลี่ยนสีของ visual mark ตามค่าข้อมูล</button>
+    <button class="opt" data-correct="false">โหลดข้อมูลจากไฟล์ CSV ขนาด 400 แถว</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรเลือกชาร์ตจากคู่ประเภทข้อมูล (nominal/ordinal) ได้ทันทีด้วย matrix เดียว และชี้กับดักการรับรู้ของ bar/line/scatter ได้แต่ละแบบ พร้อมอ้างงานวิจัยรองรับ — ครบสำหรับข้อสอบทั้งแบบวิเคราะห์ visualization ที่ให้มา และแบบออกแบบจาก dataset ที่มี 2 ตัวแปร.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (132 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-5-bivariate.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–17</td><td>โค้ด D3/Altair ทำ bar chart ต่อจาก Lesson 4 (scaleLinear, scaleBand, helper functions, แกน x/y แบบ vertical/horizontal, D3: AXIS)</td><td>✓ หัวข้อ 7 (สรุปแนวคิด scale แล้ว รายละเอียดโค้ดเต็มไม่ทำ quiz แยก)</td></tr>
+<tr><td>18</td><td>นิยาม Bivariate Data (2 attribute ต่อ sample)</td><td>✓ หัวข้อ 1</td></tr>
+<tr><td>19</td><td>Chart Selection Matrix (Nominal/Ordinal × Nominal/Ordinal)</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>20–24</td><td>Heatmap เกริ่นนำ + ตัวอย่างจริง (ชื่อคนอเมริกันยอดนิยม, xkcd 2420)</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>25–28</td><td>Heatmap จัดเรียงหลายแบบเปรียบเทียบกัน</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>29–31</td><td>อ้างอิง Bertin's reorderable matrices + ตัวอย่างเสริม (forecast correlation, spotify data)</td><td>✓ หัวข้อ 2 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>32–39</td><td>Bar chart ตัวอย่างจัดเรียงหลายแบบ + เครื่องมือตรวจ misleading axes</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>40</td><td>Bar chart แกน y เริ่ม 0 เทียบกับ truncated</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>41–46</td><td>ตัวอย่าง/อ้างอิง truncated axis เพิ่มเติม (Correll, Bertini &amp; Franconeri 2020)</td><td>✓ หัวข้อ 3 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>47–49</td><td>ตัวอย่าง CO2 dataset สองสเกล + อ้างอิงประวัติศาสตร์ Felix Auerbach 1914</td><td>etc — ตัวอย่างประกอบเรื่องสเกลกราฟ นอกขอบเขต quiz</td></tr>
+<tr><td>50</td><td>W. E. B. Du Bois's Data Portraits: Visualizing Black America</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>51</td><td>อ้างอิง Du Bois Wrapped Bar Chart (Karduni et al., CHI 2020)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>52</td><td>Bar-Tip Limit error: Stack vs Aggregate (Kerns &amp; Wilmer, JOV 2021)</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>53</td><td>อ้างอิงเพิ่มเติม: What's really wrong with bar graphs of mean values</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>54–55</td><td>Line Chart: Ordinal + Nominal ตัวอย่าง</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>56–63</td><td>Line chart กับข้อมูลที่ดูต่อเนื่อง (อุณหภูมิ, ราคา) + อ้างอิง Hollands &amp; Spence 1992</td><td>✓ หัวข้อ 4 (สรุปแนวคิด "implies continuous and absolute" แล้ว)</td></tr>
+<tr><td>64–69</td><td>ตัวอย่าง/อ้างอิงเพิ่มเติม (Musk audience, Line Graph or Scatter Plot?, LineSmooth)</td><td>etc — งานวิจัยเชิงลึกเรื่อง line chart นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>70–73</td><td>ตัวอย่าง bar chart เปรียบเทียบ visual variable + กราฟ "High school graduation rates" ของ Cairo (แกน y ไม่เริ่มที่ 0%)</td><td>etc — ตัวอย่างเสริมแนวคิดเดียวกับหัวข้อ 3</td></tr>
+<tr><td>74–75</td><td>อ้างอิง Surfacing Visualization Mirages + ตัวอย่าง overview chart</td><td>etc — อ้างอิงล่วงหน้า (ใช้จริงใน <a href="0006-multivariate-data-visualization.html">Lesson 6</a> เรื่อง radar chart)</td></tr>
+<tr><td>76–78</td><td>เกริ่นนำ Banking to 45 Degrees (Cleveland 1993)</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>79–80</td><td>Banking to 45 Degrees ไดอะแกรมเปรียบเทียบ</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>81–82</td><td>ตัวอย่าง Streamgraph</td><td>etc — เทคนิคเสริม ไม่ได้อธิบายในเนื้อหา (คล้าย stacked area chart)</td></tr>
+<tr><td>83–97</td><td>ตัวอย่าง/อ้างอิงเสริมเรื่อง time series (Franconeri et al., forecast, "one set of data many stories", military expenditure)</td><td>etc — ตัวอย่างประกอบ นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>98</td><td>Dual-axis อันตราย</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>99–104</td><td>ตัวอย่าง dual-axis เพิ่มเติม (Datawrapper, Economist "mistakes we've drawn", Axios)</td><td>✓ หัวข้อ 4 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>105–107</td><td>Connected Scatter Plot พร้อม pigtail</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>108–113</td><td>ตัวอย่างเพิ่มเติม (nytimes/washington post gas prices, Sizing the Horizon citation)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>114</td><td>Line Chart: สรุปประเด็นสำคัญ (แนวนอน, ต่อเนื่อง, ไวต่อ noise, ไม่ต้องเริ่ม 0 แต่เลี่ยง dual-axis)</td><td>✓ สรุปรวมหัวข้อ 4 ทั้งหมด</td></tr>
+<tr><td>115–121</td><td>Scatter plot ตัวอย่าง + ลิงก์ประกอบ (FT election game, V-Dem, WEF Future of Jobs)</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>122</td><td>Scatter Plot: Correlation examples (Wikipedia)</td><td>✓ หัวข้อ 5</td></tr>
+<tr><td>123–126</td><td>guessthecorrelation.com + อ้างอิง Cleveland, Diaconis &amp; McGill 1982</td><td>✓ หัวข้อ 5 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>127</td><td>Shuffling</td><td>✓ หัวข้อ 6</td></tr>
+<tr><td>128–129</td><td>Binning</td><td>✓ หัวข้อ 6</td></tr>
+<tr><td>130–132</td><td>Sampling (Random/Density-based/Blue-noise/Stippling)</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0004-univariate-data-visualization.html">← Lesson 4: Univariate Data Visualization</a></span>
+  <span><a href="0006-multivariate-data-visualization.html">Lesson 6: Multivariate Data Visualization →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

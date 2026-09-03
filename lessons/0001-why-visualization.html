@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 1: ทำไมต้อง Visualization?</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 1 / 13 · Introduction</span>
+  <span><a href="../reference/0001-visual-computing-taxonomy.html">Reference: Visual Computing Taxonomy →</a></span>
+</nav>
+
+<p class="kicker">vis-1-introduction.pdf</p>
+<h1>ทำไมต้อง Visualization?</h1>
+
+<p>บทเรียนนี้ตอบคำถามเดียว: <strong>ทำไมเราต้องแปลงข้อมูลเป็นภาพ ทั้งที่มีสถิติสรุปอยู่แล้ว</strong> — และให้กรอบคิด 3 คำ (Effective / Convincing / Insightful) ที่วิชานี้ใช้ตลอดเทอม ในการตอบคำถามข้อสอบแบบ "วิเคราะห์ visualization ที่ให้มา" อาจารย์ยกตัวอย่างจริงมาเยอะมากในบทนี้ — ตั้งแต่โฆษณาการเมืองไทยสองพรรค ไปจนถึงเกมตัวเลขและเลขโรมัน — เนื้อหาข้างล่างนี้แนบภาพสไลด์จริงทุกภาพพร้อมอธิบาย ไม่ใช่แค่สรุปด้วยคำพูด.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Claus O. Wilke, <a href="https://clauswilke.com/dataviz/introduction.html" target="_blank" rel="noopener">Fundamentals of Data Visualization — ch. 1 Introduction</a> (ฟรี อ่านออนไลน์) — ใช้เวลา ~10 นาที ให้ภาพรวมว่า "การออกแบบ visualization ที่ดี" หมายถึงอะไร ก่อนลงลึกกรอบคิดของวิชานี้.
+</div>
+
+<h2>1. Visual Computing: Visualization อยู่ตรงไหน</h2>
+<p>วิชานี้วาง Visualization ไว้เป็นสาขาย่อยของ Visual Computing คู่กับ Computer Graphics, Image Processing, Computer Vision — สรุปละเอียดไว้ใน <a href="../reference/0001-visual-computing-taxonomy.html">Reference: Visual Computing Taxonomy</a>. อ่านสั้น ๆ ก่อนทำ quiz ข้อ 1–2 ด้านล่าง.</p>
+
+<figure>
+<img src="../assets/slides/vis1-p10-visual-computing.png" alt="Visual Computing diagram: Non-Visual Computing, Computer Graphics, Image Processing, Computer Vision, and Visualization arranged around Data/Image">
+<figcaption>Slide: Visual Computing (vis-1-introduction.pdf, p.10)</figcaption>
+</figure>
+<p>วิธีจำแนกสาขาง่ายที่สุดคือถามว่า "input กับ output เป็น data หรือ image?" แล้วดูทิศทางการแปลง: กล้องถ่ายรูป (data ตำแหน่งแสง → image) จัดเป็น Computer Graphics ไม่ใช่ Visualization เพราะเน้นความสมจริง ในขณะที่ตัวกรอง Instagram (image → image ที่ถูกปรับสี/เบลอ) คือ Image Processing ส่วนระบบสแกนใบหน้าปลดล็อกมือถือ (image → data ว่าใช่เจ้าของเครื่องไหม) คือ Computer Vision — พอเข้าใจ 3 ทิศทางนี้แล้ว จะเห็นว่า Visualization เดินทิศทางเดียวกับ Computer Graphics (data → image) ต่างกันแค่เป้าหมาย: Computer Graphics อยากให้ภาพสมจริงที่สุด ส่วน Visualization อยากให้ภาพสื่อความหมายของข้อมูลชัดที่สุด แม้จะไม่สมจริงเลยก็ตาม (เช่น bar chart ไม่ได้พยายามเลียนแบบอะไรในโลกจริง).</p>
+
+<h2>2. ทำไม "การแสดงผล" ถึงเปลี่ยนความยากง่ายของการคิด</h2>
+<p>ก่อนจะบอกว่า visualization ดีอย่างไร อาจารย์ให้ดูตัวอย่างที่ไม่เกี่ยวกับข้อมูลเลยก่อน — เพื่อพิสูจน์หลักการที่ลึกกว่านั้น: <strong>รูปแบบการแสดงผล (representation) กำหนดว่าปัญหาเดียวกันจะคิดง่ายหรือยาก</strong> แม้เนื้อหาข้างในจะเหมือนกันทุกประการ.</p>
+
+<figure>
+<img src="../assets/slides/vis1-p31-game-of-15.png" alt="Slide titled Game of 15 (in Thai) showing digits 1 through 9 in a row, with rules: two players, take turns picking a digit 1-9, a digit already picked cannot be picked again, first player whose three picked digits sum to 15 wins">
+<figcaption>Slide: เกมรวม 15 (vis-1-introduction.pdf, p.31)</figcaption>
+</figure>
+<p>กติกาเกมนี้ดูเรียบง่ายมาก: ผู้เล่นสองคนผลัดกันเลือกตัวเลข 1-9 (เลือกไปแล้วเลือกซ้ำไม่ได้) ใครมีตัวเลขสามตัวที่รวมกันได้ 15 ก่อน ชนะ ลองเล่นในหัวดูจริง ๆ — จะรู้สึกว่าต้องคิดหนักมาก ต้องคอยคำนวณผลรวมของทุกชุดที่เป็นไปได้ตลอดเวลา ทั้งที่กติกาไม่มีอะไรซับซ้อนเลย นี่คือ "เกมเดียวกัน" กับเกม OX (tic-tac-toe) ที่ทุกคนเล่นตั้งแต่เด็กได้แบบไม่ต้องคิดเลย — ถ้าเอาตัวเลข 1-9 ไปจัดเรียงเป็นตาราง 3×3 แบบ "magic square" (แถว/คอลัมน์/แนวทแยงรวมกันได้ 15 ทุกเส้น) การเลือกเลขสามตัวรวมกันเป็น 15 จะเทียบเท่ากับการเรียงหมากสามตัวเป็นเส้นตรงในตาราง — พอเปลี่ยนจาก "ตัวเลขในหัว" เป็น "ตำแหน่งบนตาราง" สมองมนุษย์ก็มองเห็นคำตอบได้แทบจะทันที นี่คือหลักฐานตัวที่หนึ่ง: ปัญหาเดียวกันเป๊ะ เปลี่ยนแค่การแสดงผล ความยากก็เปลี่ยนจากหน้ามือเป็นหลังมือ.</p>
+
+<p>อาจารย์ยกตัวอย่างที่สองย้ำหลักการเดียวกันจากประวัติศาสตร์คณิตศาสตร์:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p32-de-arithmetica-proof.png" alt="A page from a 16th-century Latin arithmetic textbook De Arithmetica, dense with prose describing a cubic equation problem in words, next to the same equation written compactly in modern notation as x cubed plus 9x equals 6x squared plus 4">
+<figcaption>Slide: Philip Ording, "99 Variations on a Proof", 2019 (vis-1-introduction.pdf, p.32)</figcaption>
+</figure>
+<p>หน้าตำราคณิตศาสตร์ภาษาละตินยุคศตวรรษที่ 16 นี้ใช้ข้อความยาวเป็นย่อหน้าเพื่ออธิบายสมการกำลังสามข้อเดียว (สังเกตคำอย่าง "cubus", "quadratis", "res" ที่แทนค่า x³, x², x) เทียบกับสมการเดียวกันที่เขียนด้วยสัญกรณ์สมัยใหม่: x³ + 9x = 6x² + 4 — บรรทัดเดียวจบ ในขณะที่ต้นฉบับใช้พื้นที่เกือบเต็มหน้ากระดาษ นี่ไม่ใช่แค่เรื่อง "เขียนสั้นกว่า" — สัญกรณ์พีชคณิตสมัยใหม่ทำให้มนุษย์สามารถ<em>จัดการ</em>สมการ (ย้ายข้าง บวกลบคูณหาร) ได้ง่ายกว่าการอ่านประโยคยาว ๆ มาก การค้นพบทางคณิตศาสตร์หลายอย่างในยุคหลังเกิดขึ้นได้เพราะสัญกรณ์ดีขึ้น ไม่ใช่เพราะมนุษย์ฉลาดขึ้น.</p>
+
+<p>ตัวอย่างที่สามพิสูจน์เรื่องเดียวกันด้วยตัวเลขที่จับต้องได้ที่สุด:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p34-roman-numerals.png" alt="Two equations comparing Roman and Arabic numerals: CCXXXI plus XII equals CCXXXXIII (231 plus 12 equals 243, simple concatenation), versus CCXXXI times XII equals MMDCCLXXII (231 times 12 equals 2772, requiring the awkward decomposition 2310 plus 462 with no simple symbol trick)">
+<figcaption>Slide: การบวก vs การคูณด้วยเลขโรมัน (vis-1-introduction.pdf, p.34)</figcaption>
+</figure>
+<p>CCXXXI + XII = CCXXXXIII คือ 231 + 12 = 243 — การบวกด้วยเลขโรมันทำได้ง่าย แค่เอาสัญลักษณ์มาต่อกัน (concatenate) ไม่ต้องคิดเยอะ แต่พอเป็นการคูณ CCXXXI × XII = MMDCCLXXII คือ 231 × 12 = 2772 กลับไม่มีทริกง่าย ๆ แบบนั้นเลย ต้องแตกเป็น 2310 + 462 ก่อนแล้วค่อยบวก (ตัวเลขสีชมพูในภาพ) ซึ่งเป็นขั้นตอนที่เลขโรมันไม่มีสัญลักษณ์ช่วยให้ทำเลย ต่างจากเลขอารบิกที่มีวิธีคูณแนวตั้งที่ทำตามขั้นตอนได้เป็นกลไก (algorithm) — เหตุผลที่อารยธรรมที่ใช้เลขโรมันไม่พัฒนาคณิตศาสตร์ขั้นสูงได้เร็วเท่าที่ควร ส่วนหนึ่งเป็นเพราะ<strong>ตัวแทน (representation) ของตัวเลขเอง</strong>ไม่เอื้อให้คิดคำนวณซับซ้อนได้ — เชื่อมกลับมาที่ visualization: ถ้าการเลือก "สัญกรณ์ตัวเลข" ที่ถูกต้องเปลี่ยนสิ่งที่มนุษยชาติคิดได้ไปทั้งอารยธรรม การเลือก "ภาพ" ที่ถูกต้องมาแทนข้อมูลก็มีน้ำหนักไม่ต่างกันเลย.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Representation</span></div>
+  <div class="qtext">ตัวอย่างเกมรวม 15 (Game of 15) ต้องการสื่อหลักการอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ปัญหาเดียวกันทุกประการ อาจคิดง่ายหรือยากต่างกันมาก ขึ้นอยู่กับรูปแบบการแสดงผลที่ใช้</button>
+    <button class="opt" data-correct="false">เกมตัวเลขเล่นยากกว่าเกม OX เสมอไม่ว่าจะแสดงผลแบบไหน</button>
+    <button class="opt" data-correct="false">มนุษย์คิดเลขเก่งกว่าคิดเชิงพื้นที่เสมอ</button>
+    <button class="opt" data-correct="false">เกมทั้งสองแบบไม่เกี่ยวข้องกันเลย เป็นคนละเกม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Representation</span></div>
+  <div class="qtext">จากตัวอย่างเลขโรมัน เหตุใดการคูณจึงยากกว่าการบวกมากเป็นพิเศษ?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เลขโรมันไม่มีสัญกรณ์/กลไกที่ช่วยให้คูณได้เป็นขั้นตอนตรงไปตรงมาแบบการบวก (ต่อสัญลักษณ์กัน)</button>
+    <button class="opt" data-correct="false">เลขโรมันไม่มีสัญลักษณ์แทนตัวเลขที่มากพอ</button>
+    <button class="opt" data-correct="false">การคูณเลขโรมันผิดกฎหมายในยุคนั้น</button>
+    <button class="opt" data-correct="false">เลขโรมันใช้ได้กับจำนวนเต็มบวกเท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. กรอบคิด: ทำไมต้อง Visualization?</h2>
+<p>Slide เสนอ 3 เหตุผลที่ visualization มีค่าเหนือกว่าตัวเลขดิบ:</p>
+
+<table>
+<tr><th>เหตุผล</th><th>กลไก</th><th>เป้าหมาย</th><th>รูปแบบผลลัพธ์</th></tr>
+<tr><td><strong>Effective</strong></td><td>อธิบายสิ่งที่ไม่ชัดเจนให้เห็นชัด</td><td>to explain</td><td>—</td></tr>
+<tr><td><strong>Convincing</strong></td><td>Visual evidence</td><td>to explain</td><td>Narrative Visualization</td></tr>
+<tr><td><strong>Insightful</strong></td><td>Visual reasoning</td><td>to explore</td><td>Visual Analytics</td></tr>
+</table>
+
+<p>สังเกตแกนสำคัญ: <em class="term">to explain</em> (สื่อสารสิ่งที่รู้อยู่แล้วให้คนอื่นเข้าใจ) กับ <em class="term">to explore</em> (ค้นหาสิ่งที่ยังไม่รู้) เป็นสองปลายของ spectrum เดียวกัน — Narrative Visualization อยู่ฝั่ง explain, Visual Analytics อยู่ฝั่ง explore. Data science process ทั้งหมด (data exploration → data analysis → data presentation → data storytelling) วิ่งอยู่ระหว่างสองปลายนี้.</p>
+
+<figure>
+<img src="../assets/slides/vis1-p38-why-visualization-framework.png" alt="Why Visualization framework: Effective to explain, Convincing via Visual evidence to Narrative Visualization, Insightful via Visual reasoning to explore to Visual Analytics">
+<figcaption>Slide: Why Visualization? (vis-1-introduction.pdf, p.38)</figcaption>
+</figure>
+<p>ลองใช้กรอบนี้แยกของจริง 2 แบบ: อินโฟกราฟิกข่าวที่สรุปว่า "ปีนี้ยอดขายรถ EV โตกว่าปีก่อน 3 เท่า" พร้อมกราฟแท่งประกอบ — คนทำรู้ข้อสรุปอยู่แล้ว แค่ต้องการภาพมา "ยืนยัน" ให้คนอ่านเชื่อ นี่คือฝั่ง Convincing → Visual evidence → Narrative Visualization เทียบกับ dashboard ที่นักวิเคราะห์นั่งไล่ filter กราฟไปเรื่อย ๆ เพื่อหาว่าทำไมยอดขายเดือนนี้ตก — ไม่มีใครรู้คำตอบล่วงหน้า ต้องอาศัยการมองกราฟหลายมุมเพื่อ "คิด" หาคำตอบ นี่คือฝั่ง Insightful → Visual reasoning → Visual Analytics ทั้งสองตัวอย่างต่างกันตรงที่อันแรก "รู้คำตอบแล้วเล่าให้ฟัง" (to explain) ส่วนอันหลัง "ยังไม่รู้คำตอบ ต้องหา" (to explore).</p>
+
+<figure>
+<img src="../assets/slides/vis1-p39-viz-taxonomy-diagram.png" alt="Diagram placing Visualization between Visual analytics and Narrative visualization, inside the Data science process">
+<figcaption>Slide: Visualization sits between Visual Analytics and Narrative Visualization within the data science process (vis-1-introduction.pdf, p.39)</figcaption>
+</figure>
+<p>ประเด็นที่ diagram นี้เตือนไว้คือ: อย่าใช้คำว่า "visualization" กับ "data science" แทนกันเฉย ๆ — visualization เป็นแค่ขั้นตอนย่อยหนึ่งในกระบวนการทั้งหมด (data exploration → analysis → presentation → storytelling) ตัวอย่างเช่น การทำความสะอาดข้อมูล (data cleaning) หรือการรัน regression หาความสัมพันธ์ ก็เป็นส่วนหนึ่งของ data science แต่ไม่ใช่ visualization เลย เพราะยังไม่มีการแปลงเป็นภาพ — visualization เข้ามาเกี่ยวก็ต่อเมื่อถึงขั้น "presentation" (เล่าผลด้วยภาพ = narrative) หรือใช้ภาพช่วย "explore/analyze" ระหว่างทาง (= visual analytics) เท่านั้น.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Visual Computing</span></div>
+  <div class="qtext">งานแปลงภาพถ่ายเป็นข้อมูล (เช่น สกัดวัตถุจากรูปภาพ) จัดอยู่ในสาขาใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Computer Vision</button>
+    <button class="opt" data-correct="false">Computer Graphics</button>
+    <button class="opt" data-correct="false">Image Processing</button>
+    <button class="opt" data-correct="false">Visual Analytics</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Visual Computing</span></div>
+  <div class="qtext">ข้อมูลยอดขายรายเดือน (ไม่มีมิติเชิงพื้นที่โดยธรรมชาติ) เหมาะกับ visualization ประเภทใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Information visualization</button>
+    <button class="opt" data-correct="false">Scientific visualization</button>
+    <button class="opt" data-correct="false">Image processing เท่านั้น</button>
+    <button class="opt" data-correct="false">Computer vision เท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>ทำไมต้อง Visualization</span></div>
+  <div class="qtext">Visualization ต่างจาก Computer Graphics ทั่วไปอย่างไร ตามกรอบของวิชานี้?</div>
+  <div class="options">
+    <button class="opt" data-correct="true" data-note="ถูก. Visualization ยอมเสียความสมจริงเพื่อสื่อความหมายข้อมูลให้ชัด">เน้นสื่อความหมายข้อมูลมากกว่าความสมจริง</button>
+    <button class="opt" data-correct="false">เน้นความสมจริงของภาพมากกว่าความหมาย</button>
+    <button class="opt" data-correct="false">เน้นความเร็วในการเรนเดอร์ภาพเท่านั้น</button>
+    <button class="opt" data-correct="false">เน้นการบีบอัดไฟล์ภาพให้เล็กลง</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>ทำไมต้อง Visualization</span></div>
+  <div class="qtext">"Insightful" ในกรอบของวิชานี้ เชื่อมโยงกับคู่ใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true" data-note="ถูก. Insightful → Visual reasoning → to explore → Visual analytics">Visual reasoning และ Visual analytics</button>
+    <button class="opt" data-correct="false">Visual evidence และ Narrative visualization</button>
+    <button class="opt" data-correct="false">Visual memory และ Scientific visualization</button>
+    <button class="opt" data-correct="false">Visual encoding และ Information visualization</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>ทำไมต้อง Visualization</span></div>
+  <div class="qtext">"Convincing" ในกรอบของวิชานี้ เชื่อมโยงกับคู่ใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true" data-note="ถูก. Convincing → Visual evidence → to explain → Narrative visualization">Visual evidence และ Narrative visualization</button>
+    <button class="opt" data-correct="false">Visual reasoning และ Visual analytics</button>
+    <button class="opt" data-correct="false">Visual memory และ Data storytelling</button>
+    <button class="opt" data-correct="false">Visual encoding และ Data exploration</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. Pre-attentive Attributes: มองปุ๊บเข้าใจปั๊บ (พร้อมตัวอย่างสงครามกราฟการเมืองไทย)</h2>
+<p>Slide แนะนำคำนี้ก่อนลงลึกใน Lecture 2: คุณสมบัติภาพบางอย่าง (สี ความเข้ม ทิศทาง ขนาด) สมองมนุษย์ประมวลผล<strong>ได้เร็วมากโดยไม่ต้องตั้งใจค้นหาทีละจุด</strong> — นี่คือกลไกที่ทำให้ visualization ที่ออกแบบดี "เห็นแล้วเข้าใจทันที" ตัวอย่างที่ทรงพลังที่สุดในสไลด์นี้ไม่ใช่ตัวอย่างวิชาการ แต่เป็นโฆษณาการเมืองไทยจริงจากปี พ.ศ. 2543-2544 ที่สองพรรคใหญ่ใช้กราฟห่ำหั่นกันในหน้าหนังสือพิมพ์:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p16-thairakthai-decline-ads.png" alt="A real Thai political newspaper advertisement from the Thai Rak Thai party using multiple sharply downward-pointing red-tinted line charts with bold arrows to visually shout that the economy has collapsed, next to a Thai headline reading the economy has been destroyed">
+<figcaption>Slide: Pracha Suveeranont, "Design + Culture 3" — โฆษณาพรรคไทยรักไทย (vis-1-introduction.pdf, p.16)</figcaption>
+</figure>
+<p>โฆษณานี้ไม่มีคำอธิบายตัวเลขละเอียดให้อ่านเลย มีแค่กราฟเส้นตัวเล็ก ๆ 8 อันที่ทุกเส้นดิ่งลงแรงพร้อมลูกศรสีแดงเข้มปลายแหลมชี้ลง ล้อมด้วยข้อความ "เศรษฐกิจ...ถูกทำลาย" — สมองมนุษย์ประมวลผล "ทิศทางลูกศรชี้ลง + สีแดง" ได้เร็วกว่าอ่านตัวเลขในกราฟทุกตัวมาก แค่กวาดตาผ่าน ก็รู้สึกว่า "ทุกอย่างกำลังพัง" ได้ทันทีโดยไม่ต้องอ่านแม้แต่คำเดียว — นี่คือ pre-attentive attribute (ทิศทางของเส้น, สี) ถูกใช้เพื่อโน้มน้าว (Convincing) ไม่ใช่เพื่ออธิบายข้อมูลตรง ๆ.</p>
+
+<figure>
+<img src="../assets/slides/vis1-p17-democrat-rebuttal-ads.png" alt="The rival Democrat Party's real rebuttal advertisement using the exact same visual trick but with sharply upward-pointing red arrow line charts instead, to argue the economy is actually improving under their policies">
+<figcaption>Slide: Pracha Suveeranont, "Design + Culture 3" — โฆษณาโต้ตอบพรรคประชาธิปัตย์ (vis-1-introduction.pdf, p.17)</figcaption>
+</figure>
+<p>นี่คือคำตอบโต้จากอีกพรรคหนึ่ง (ประชาธิปัตย์) — ใช้กลเม็ดภาพแบบเดียวกันเป๊ะ (กราฟเส้นเล็ก ๆ พร้อมลูกศรสีแดงหนา) แต่คราวนี้ลูกศรเกือบทุกอันชี้<strong>ขึ้น</strong>แทน เพื่อเถียงว่านโยบายของพรรคตัวเองทำให้เศรษฐกิจกำลังฟื้น — สังเกตว่าทั้งสองฝ่ายไม่ได้เถียงกันด้วยตัวเลขละเอียดหรือแหล่งอ้างอิงที่ตรวจสอบง่าย แต่เถียงกันด้วย "ภาษาภาพ" ชุดเดียวกัน (เส้นกราฟ + ลูกศร + สี) เปลี่ยนแค่ทิศทางลูกศร — นี่คือตัวอย่างที่ชัดเจนที่สุดว่า pre-attentive attributes ทรงพลังแค่ไหนในการโน้มน้าวความเชื่อ และเป็นตัวอย่างเดียวกับที่ Lesson 13 (Current Issues) จะกลับมาเจาะลึกอีกครั้งในหัวข้อจริยธรรมของ visualization.</p>
+
+<p>ตัวอย่างที่ทำให้ pre-attentive attributes โด่งดังระดับโลกคือกราฟ COVID-19 นี้ ที่แทบทุกประเทศนำไปใช้สื่อสารพร้อมกันในปี 2020:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p19-flatten-the-curve.png" alt="The famous Flattening the Curve chart: a tall red peaked curve labeled without mitigation towering above a dashed line labeled healthcare capacity, next to a much lower, flatter gray curve that stays under the dashed line">
+<figcaption>Slide: "Flattening the curve" (vis-1-introduction.pdf, p.19)</figcaption>
+</figure>
+<p>เส้นสีแดงพุ่งสูงทะลุเส้นประ "healthcare capacity" ไปไกลมาก ในขณะที่เส้นสีเทาแบนราบอยู่ใต้เส้นประตลอด — ไม่ต้องอ่านแกน x/y เลยด้วยซ้ำ แค่เห็น "รูปทรงภูเขาสูงสีแดงพุ่งทะลุเส้น" กับ "เนินเตี้ย ๆ สีเทาที่อยู่ใต้เส้น" สมองก็ตัดสินได้ทันทีว่าอันไหน "อันตราย" อันไหน "ปลอดภัย" — สี (แดง vs เทา) และความสูง/รูปทรง (แหลมพุ่ง vs แบนกว้าง) คือ pre-attentive attributes สองตัวที่ทำงานร่วมกัน ทำให้กราฟนี้กลายเป็นภาพที่คนทั้งโลกเข้าใจตรงกันได้ในเสี้ยววินาที โดยไม่ต้องมีพื้นฐานสถิติเลย.</p>
+
+<h2>5. เหตุผลที่หนักแน่นที่สุด: ทำไม "ตาราง" ไม่พอ</h2>
+<p>อาจารย์เทียบให้เห็นตรง ๆ ว่าทำไมตารางตัวเลขถึงพ่ายให้กับภาพ แม้ข้อมูลจะเหมือนกันทุกตัว:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p26-table-vs-icon-grid.png" alt="Left: a data table of products A through D with sales numbers across four Thai regions (North, Isaan, Central, South). Right: the exact same numbers redrawn as a grid of small blue bars whose heights vary, letting the eye compare magnitudes instantly">
+<figcaption>Slide: ตารางข้อมูล เทียบกับกริดแท่งไอคอน (vis-1-introduction.pdf, p.26)</figcaption>
+</figure>
+<p>ตารางซ้ายมีข้อมูลยอดขายสินค้า A-D แยกตามภาค (เหนือ อีสาน กลาง ใต้) เช่น สินค้า A ขายภาคเหนือ 76 อีสาน 48 กลาง 22 ใต้ 51 — ถ้าอยากรู้ว่า "สินค้าไหนขายภาคกลางได้เยอะสุด" ต้องไล่<strong>อ่านตัวเลขทีละแถว</strong>ในคอลัมน์ "กลาง" แล้วเทียบในใจ (22, 87, 57, 25, ...) ซึ่งใช้เวลาและทำให้พลาดง่าย เทียบกับกริดขวาที่เอาตัวเลขชุดเดียวกันเป๊ะมาวาดเป็นแท่งสีน้ำเงินสูง-ต่ำตามค่า — แค่กวาดตาไปที่แถวเดียวกัน ตาก็เห็นได้ทันทีว่าแท่งไหนสูงกว่าโดยไม่ต้องอ่านตัวเลขเลยสักตัว นี่คือเหตุผลเชิงกลไกที่สุดว่าทำไมต้อง visualize: การอ่านตัวเลขเป็น process ที่ต้องทำทีละขั้น (sequential, ใช้ working memory) ส่วนการเทียบความสูงของแท่งเป็น pre-attentive (ขนาน, แทบไม่ใช้ working memory เลย).</p>
+
+<p>อีกตัวอย่างหนึ่งแสดงว่า visualization เผยรูปแบบที่ซ่อนอยู่ในข้อมูลจำนวนมหาศาลได้ ทั้งที่มองจากตัวอย่างเดี่ยว ๆ ไม่มีทางเห็นเลย:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p27-formafluens-numeral-8.png" alt="A density visualization overlaying thousands of handwritten digit 8 samples: East Asian countries (Japan, Thailand, Korea, Taiwan, India) form a clear snowman-shaped 8 drawn as two separate stacked circles, while the rest of the world forms a continuous bowtie/infinity-shaped 8 drawn in one stroke">
+<figcaption>Slide: formafluens.io — ลายมือเขียนเลข 8 ทั่วโลก (vis-1-introduction.pdf, p.27)</figcaption>
+</figure>
+<p>ภาพนี้เอาลายมือเขียนเลข "8" หลายพันตัวอย่างมาซ้อนทับกันเป็น density map แยกตามภูมิภาค — ฝั่งญี่ปุ่น (รวมถึงไทย เกาหลี ไต้หวัน อินเดีย) รูปร่างที่ปรากฏชัดคือ "ตุ๊กตาหิมะ" สองวงกลมซ้อนกันแยกจากกัน (คนกลุ่มนี้มักยกปากกาขึ้นระหว่างวาดวงบนกับวงล่าง) ส่วนฝั่งที่เหลือของโลก รูปร่างที่ปรากฏกลับเป็นเลข 8 ทรงโบว์ไท/เลขอนันต์ที่ลากเส้นต่อเนื่องไม่ยกปากกาเลย — ถ้าดูลายมือคนเดียวเขียนเลข 8 แค่ตัวเดียว จะไม่มีทางสังเกตความต่างเชิงวัฒนธรรมนี้ได้เลย ต้องอาศัยการซ้อนภาพนับพันตัวอย่างเข้าด้วยกันก่อน pattern ทางวัฒนธรรมนี้ถึงจะ "โผล่ขึ้นมา" ให้เห็นปุ๊บปั๊บด้วยตา — ตรงกับหลักการเดียวกับ Anscombe's Quartet ด้านล่าง: ข้อมูลดิบจำนวนมากซ่อน pattern ที่สรุปเป็นตัวเลขไม่ได้ ต้องมองเป็นภาพเท่านั้นถึงจะเห็น.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Pre-attentive</span></div>
+  <div class="qtext">Pre-attentive attribute คือคุณสมบัติภาพที่...</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สมองรับรู้ได้เร็วมากโดยไม่ต้องจดจ่อค้นหา</button>
+    <button class="opt" data-correct="false">สมองรับรู้ได้ช้ามากแม้ตั้งใจค้นหา</button>
+    <button class="opt" data-correct="false">ต้องอาศัยความจำระยะยาวจึงจะเข้าใจ</button>
+    <button class="opt" data-correct="false">เกิดขึ้นเฉพาะกับข้อมูลตัวเลขเท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>โฆษณาการเมืองไทย</span></div>
+  <div class="qtext">โฆษณาของทั้งสองพรรคการเมืองไทย (ไทยรักไทย vs ประชาธิปัตย์) ใช้กลเม็ดภาพแบบเดียวกันคืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">กราฟเส้นเล็ก ๆ พร้อมลูกศรสีแดงหนาชี้ทิศทาง เปลี่ยนแค่ทิศทาง (ขึ้น/ลง) ตามข้อความที่แต่ละฝ่ายต้องการสื่อ</button>
+    <button class="opt" data-correct="false">ทั้งสองฝ่ายใช้ pie chart แสดงสัดส่วนคะแนนเสียง</button>
+    <button class="opt" data-correct="false">ทั้งสองฝ่ายใช้ตารางตัวเลขละเอียดไม่มีกราฟเลย</button>
+    <button class="opt" data-correct="false">ทั้งสองฝ่ายใช้แผนที่ประเทศไทยแบ่งสีตามภาค</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 10</span><span>Table vs Icon Grid</span></div>
+  <div class="qtext">ทำไมกริดแท่งไอคอน (แสดงข้อมูลเดียวกับตาราง) ถึงหาค่าสูงสุดได้เร็วกว่าตารางตัวเลข?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การเทียบความสูงของแท่งเป็นกระบวนการ pre-attentive (ขนาน) ส่วนการอ่านตัวเลขทีละตัวเป็นกระบวนการที่ต้องทำทีละขั้น (sequential)</button>
+    <button class="opt" data-correct="false">เพราะแท่งไอคอนมีตัวเลขกำกับแม่นยำกว่าตาราง</button>
+    <button class="opt" data-correct="false">เพราะกริดไอคอนใช้ข้อมูลน้อยกว่าตารางจริง</button>
+    <button class="opt" data-correct="false">ไม่มีความต่างกันจริง เป็นแค่ความรู้สึก</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. เหตุผลที่หนักแน่นที่สุด: Anscombe's Quartet และ Datasaurus Dozen</h2>
+<p>Slide ยกตัวอย่างชุดข้อมูลหลายชุดที่มี <strong>X Mean, Y Mean, X SD, Y SD, และ Correlation เหมือนกันทุกตัว</strong> แต่เมื่อ plot ออกมา รูปร่างต่างกันโดยสิ้นเชิง — บางชุดเป็นเส้นตรง บางชุดเป็นวงกลม บางชุดเป็นรูปไดโนเสาร์ (<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/" target="_blank" rel="noopener">Datasaurus Dozen, Matejka & Fitzmaurice, CHI 2017</a>) นี่คือหลักฐานที่ชัดที่สุดว่า <strong>สถิติสรุป (summary statistics) ไม่พอ — ต้องมองกราฟด้วยเสมอ</strong>.</p>
+
+<figure>
+<img src="../assets/slides/vis1-p21-samestats-table.png" alt="Table showing two datasets X,Y with identical X Mean, Y Mean, X SD, Y SD, and Correlation despite being different data">
+<figcaption>Slide: identical summary statistics, different underlying data — the setup for the Datasaurus reveal (vis-1-introduction.pdf, p.21)</figcaption>
+</figure>
+<p>ลองสวมบทบาทเป็นคนที่เห็นแค่ตัวเลขสรุปนี้ก่อน: X Mean = 9.000, Y Mean = 7.500, X SD = 3.316, Y SD = 2.031, Correlation = 0.816 — ถ้ามีคนบอกว่านี่คือสรุปของ dataset A และ dataset B ที่ต่างกัน คุณน่าจะเดาว่าทั้งคู่ "หน้าตาคล้ายกัน" เพราะค่าสรุปเหมือนกันเป๊ะทุกตัว นี่คือกับดักที่ Datasaurus Dozen ตั้งใจสร้างขึ้น: dataset ในชุดนี้มีค่าสรุปทั้ง 5 ตัวเหมือนกันเป๊ะทุก dataset แต่พอ plot ออกมาจริง ๆ กลับได้รูปร่างต่างกันสุดขั้ว ตั้งแต่เส้นตรง วงกลม จนถึงรูปไดโนเสาร์ทั้งตัว — ข้อสอบที่ให้แค่ตารางสถิติสรุปมาแล้วถามว่า "อนุมานรูปแบบข้อมูลได้ไหม" คำตอบที่ถูกจากตัวอย่างนี้คือ "ไม่ได้" เสมอ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 11</span><span>Anscombe / Datasaurus</span></div>
+  <div class="qtext">เป้าหมายหลักของตัวอย่าง Anscombe's Quartet และ Datasaurus Dozen คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">แสดงว่าสถิติสรุปเหมือนกันได้แม้ข้อมูลต่างกันมาก</button>
+    <button class="opt" data-correct="false">แสดงว่าสถิติสรุปต่างกันได้แม้ข้อมูลเหมือนกันมาก</button>
+    <button class="opt" data-correct="false">แสดงว่ากราฟสวยกว่าตารางตัวเลขเสมอ</button>
+    <button class="opt" data-correct="false">แสดงว่าการเก็บข้อมูลต้องใช้ตัวอย่างมากพอ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 12</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ (1–2 ประโยค): ทำไม dataset ที่มีค่าเฉลี่ย ค่า SD และค่า correlation เหมือนกันทุกประการ ถึงยังจำเป็นต้อง "มอง" กราฟอยู่ดี?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">เพราะสถิติสรุปบีบอัดข้อมูลจนซ่อนรูปแบบ (pattern), ค่าผิดปกติ (outlier), หรือความสัมพันธ์แบบไม่เชิงเส้นไว้ได้ — ตัวเลขเท่ากันไม่ได้แปลว่าโครงสร้างข้อมูลเหมือนกัน กราฟเผยสิ่งที่ตัวเลขเพียงอย่างเดียวไม่บอก</div>
+</div>
+
+<h2>7. ตัวอย่างข้อมูลจริงที่ "ตัวเลขล้วน" ไม่พอ: โปสเตอร์ชานมไข่มุก</h2>
+<p>อาจารย์ยกตัวอย่างจริงที่แสดงปัญหาตรงข้าม — เมื่อคนออกแบบมีข้อมูลเยอะแต่ไม่ยอมใช้ pre-attentive attribute ช่วยเลย:</p>
+
+<figure>
+<img src="../assets/slides/vis1-p28-thai-milktea-dye-poster.png" alt="A real Thai infographic poster testing 15 milk tea brands for artificial food dye content, showing a photo of each cup alongside dense text boxes listing specific chemical names and mg/kg values for each brand, with no visual encoding that lets a reader compare brands at a glance">
+<figcaption>Slide: ผลทดสอบสีสังเคราะห์ในเครื่องดื่มชานมไทย (vis-1-introduction.pdf, p.28, ffcthailand.org)</figcaption>
+</figure>
+<p>โปสเตอร์นี้ทดสอบชานมไทย 15 ยี่ห้อ แต่ละยี่ห้อมีกล่องข้อความแยกบอกชื่อสารสี (เช่น Sunset yellow FCF, Tartrazine, Ponceau 4R) พร้อมค่า mg/kg กำกับเป็นตัวเลข — ถ้าอยากรู้ว่า "ยี่ห้อไหนมีปริมาณสีสังเคราะห์สูงสุด" ต้องไล่อ่านตัวเลขทีละกล่องทั้ง 15 กล่อง เปรียบเทียบเองในใจ ไม่มี pre-attentive attribute ตัวไหนช่วยเลย (ไม่มีแท่งสูง-ต่ำ ไม่มีสีไล่ระดับตามปริมาณ มีแต่ตัวเลขในกรอบสีเดียวกันหมด) นี่คือตัวอย่างตรงข้ามกับตาราง-vs-กริดไอคอนด้านบน: ข้อมูลชุดนี้<strong>ควร</strong>ถูกวาดเป็น bar chart เรียงจากมากไปน้อย (เหมือนกริดไอคอนที่เพิ่งเห็น) แต่กลับถูกนำเสนอเป็นโปสเตอร์ภาพถ่ายสวยงามที่ซ่อนตัวเลขไว้เป็นข้อความเล็ก ๆ แทน — ตัวอย่างแบบนี้คือสิ่งที่ข้อสอบ "วิเคราะห์ visualization" มักหยิบมาถาม: มีข้อมูลเปรียบเทียบได้ (comparable) แต่การออกแบบกลับไม่ช่วยให้เปรียบเทียบได้เลย.</p>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 13</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">โปสเตอร์ผลทดสอบสีสังเคราะห์ในชานมไทย (15 ยี่ห้อ) มีจุดอ่อนด้านการออกแบบอย่างไร และควรแก้อย่างไรตามหลัก pre-attentive attributes?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">จุดอ่อนคือข้อมูลปริมาณสารสี (ตัวเลข mg/kg) ถูกซ่อนไว้เป็นข้อความในกล่องแยกของแต่ละยี่ห้อ ไม่มี visual encoding (เช่น ความยาวแท่ง หรือความเข้มสี) ที่ทำให้เปรียบเทียบ 15 ยี่ห้อได้ในสายตาเดียว ผู้อ่านต้องอ่านตัวเลขทีละกล่องแล้วจำ/เทียบเอง ควรแก้โดยวาดเป็น bar chart เรียงยี่ห้อจากปริมาณสีมากไปน้อย ให้ความยาวแท่ง (pre-attentive) สื่อปริมาณแทนตัวเลขในกรอบข้อความ</div>
+</div>
+
+<h2>8. เชื่อมกับ Assignment และข้อสอบ</h2>
+<p>Slide เปิดโจทย์ assignment แรกไว้: <strong>"Find & Analyze a Visualization"</strong> — หา visualization มาหนึ่งชิ้น แล้ววิเคราะห์ว่าดีหรือไม่ดี ทำไม. นี่คือแบบฝึกหัดที่ตรงกับทักษะข้อสอบ comprehensive แบบแรกในสองแบบที่คุณบอกไว้: "ให้ visualization มาวิเคราะห์" โดยตรง.</p>
+
+<figure>
+<img src="../assets/slides/vis1-p41-assignment.png" alt="Slide: Assignment — Find & Analyze a Visualization">
+<figcaption>Slide: Assignment brief (vis-1-introduction.pdf, p.41)</figcaption>
+</figure>
+<p>สังเกตว่าโจทย์นี้ไม่มีเกณฑ์ตายตัวให้เช็คทีละข้อ มีแค่คำถามเปิดว่า "ดีหรือไม่ดี ทำไม" — ซึ่งบังคับให้ต้องใช้กรอบคิดที่เพิ่งเรียนมาทั้งบทมาตอบเอง ไม่ใช่ท่องคำตอบสำเร็จรูป ตัวอย่างเช่น ถ้าเจอ pie chart ในข่าวที่สัดส่วนรวมกันเกิน 100% ก็ต้องรู้จักหยิบคำว่า "Convincing/Truthful" มาอธิบายว่าทำไมมันหลอกตา หรือถ้าเจอ dashboard แบบโต้ตอบได้ ก็ต้องรู้จักโยงเข้ากับ "Insightful/Visual Analytics" ว่ามันช่วยให้คนสำรวจหาคำตอบเองได้อย่างไร หรือถ้าเจอโปสเตอร์แบบชานมไข่มุกข้างบน ก็ต้องรู้จักชี้ว่าข้อมูลที่เปรียบเทียบได้ถูกซ่อนไว้ในข้อความแทนที่จะใช้ pre-attentive attribute — ฝึกแบบฝึกหัดนี้เท่ากับฝึกตอบข้อสอบ comprehensive ข้อแรกไปในตัว.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 14</span><span>เชื่อมโยงข้อสอบ</span></div>
+  <div class="qtext">โจทย์ Assignment "Find &amp; Analyze a Visualization" ฝึกทักษะข้อสอบข้อใดโดยตรง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">วิเคราะห์ visualization ที่มีอยู่แล้วว่าดีหรือไม่</button>
+    <button class="opt" data-correct="false">ออกแบบ visualization ใหม่จากข้อมูลดิบ</button>
+    <button class="opt" data-correct="false">เขียนโค้ด D3.js สร้างกราฟแบบโต้ตอบ</button>
+    <button class="opt" data-correct="false">คำนวณค่าสถิติสรุปของชุดข้อมูล</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+ตอนนี้คุณควรอธิบายได้ว่า visualization อยู่ตรงไหนใน Visual Computing, อธิบายได้ว่าทำไม representation ถึงกำหนดความยากง่ายของการคิด (เกม 15, เลขโรมัน), ท่อง framework Effective/Convincing/Insightful → to explain/to explore → Narrative Visualization/Visual Analytics ได้โดยไม่ต้องเปิด slide, ยกตัวอย่างโฆษณาการเมืองไทยหรือ flatten-the-curve เป็นหลักฐานของ pre-attentive attributes ได้ และยกตัวอย่าง Anscombe/Datasaurus เป็นหลักฐานว่าทำไมสถิติสรุปไม่พอ.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (56 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ตารางนี้ไล่ทุกหน้าของ <code>vis-1-introduction.pdf</code> ตั้งแต่หน้า 1 ถึงหน้าสุดท้าย เพื่อยืนยันว่าไม่มีหน้าไหนถูกข้ามไปเฉย ๆ — หน้าที่มีเครื่องหมาย ✓ คือถูกนำมาอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ส่วนหน้าที่เหลือเป็นข้อมูลบริหารวิชา ตัวอย่างประกอบ หรือลิงก์อ้างอิงที่ไม่มีเนื้อหาเชิงทฤษฎีให้ทำ quiz เพิ่ม (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1</td><td>ปกเรื่อง Visualization Introduction</td><td>etc — ปก</td></tr>
+<tr><td>2–3</td><td>ผู้สอน/TA และช่องทางติดต่อ</td><td>etc — ข้อมูลบริหารวิชา</td></tr>
+<tr><td>4–8</td><td>เกณฑ์ให้คะแนน, mini project, การเข้าเรียน, จรรยาบรรณ</td><td>etc — ข้อมูลบริหารวิชา (ดู MISSION.md)</td></tr>
+<tr><td>9</td><td>ตารางเรียนทั้งเทอม (week 1–17)</td><td>etc — บริบทวิชา ไม่ใช่เนื้อหาสอบ</td></tr>
+<tr><td>10</td><td>Visual Computing diagram</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>11–13</td><td>Visual Computing รายละเอียด + สัญลักษณ์ Data vs Visualization</td><td>✓ ครอบคลุมแนวคิดในหัวข้อ 1 และ Reference: Visual Computing Taxonomy</td></tr>
+<tr><td>14</td><td>Pre-attentive Attributes หัวข้อเกริ่นนำ</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>15</td><td>ภาพประกอบ Flickr (pre-attentive เกริ่นนำ)</td><td>etc — ภาพประกอบ ไม่มีเนื้อหาทฤษฎีเพิ่ม</td></tr>
+<tr><td>16</td><td>โฆษณาพรรคไทยรักไทย (กราฟดิ่งลง)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>17</td><td>โฆษณาโต้ตอบพรรคประชาธิปัตย์ (กราฟพุ่งขึ้น)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>18</td><td>(เปลี่ยนหัวข้อ ไม่มีข้อความ)</td><td>etc</td></tr>
+<tr><td>19</td><td>Flatten the curve (COVID-19)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>20</td><td>Washington Post corona simulator (ลิงก์สาธิตสด)</td><td>etc — ตัวอย่างเสริมแบบ interactive เปิดสาธิตสดในคาบ ไม่มีภาพนิ่งให้ฝัง</td></tr>
+<tr><td>21</td><td>ตาราง X/Y Mean, SD, Correlation เหมือนกันทุกตัว</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>22–25</td><td>ตารางต่อ + อ้างอิง Autodesk "samestats" (Datasaurus)</td><td>✓ ส่วนหนึ่งของหัวข้อ 6 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>26</td><td>ตารางข้อมูล เทียบกับกริดแท่งไอคอน</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>27</td><td>formafluens.io ลายมือเลข 8 ทั่วโลก</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>28</td><td>โปสเตอร์ผลทดสอบสีสังเคราะห์ชานมไทย</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>29–30</td><td>(เปลี่ยนหัวข้อ ไม่มีข้อความ)</td><td>etc</td></tr>
+<tr><td>31</td><td>เกมรวม 15</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>32</td><td>Philip Ording, De Arithmetica (สมการยุคศตวรรษที่ 16)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>33</td><td>(เปลี่ยนหัวข้อ ไม่มีข้อความ)</td><td>etc</td></tr>
+<tr><td>34</td><td>เลขโรมัน: บวก vs คูณ</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>35–36</td><td>คำพูด Bret Victor เรื่อง representation + อ้างอิงงานวิจัย "Superpowers as Inspiration for Visualization"</td><td>✓ สรุปแนวคิดปิดท้ายหัวข้อ 2 แล้วในเนื้อหา</td></tr>
+<tr><td>37</td><td>Why Visualization? (ไอคอน Effective/Convincing/Insightful เบื้องต้น)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>38</td><td>กรอบคิด Why Visualization ฉบับเต็ม (to explain/to explore)</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>39</td><td>Diagram Visualization / Visual Analytics / Narrative Visualization</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>40</td><td>Data exploration / analysis / presentation / storytelling</td><td>✓ ส่วนหนึ่งของหัวข้อ 3 (อธิบายในเนื้อหาแล้ว)</td></tr>
+<tr><td>41</td><td>Assignment: Find &amp; Analyze a Visualization</td><td>✓ หัวข้อ 8 (มีรูป)</td></tr>
+<tr><td>42–54</td><td>ตัวอย่าง visualization จริงสำหรับทำ assignment (ลิงก์ social media, งานออกแบบ, ศิลปะ)</td><td>etc — ตัวอย่างประกอบสำหรับให้นักเรียนเลือกทำการบ้านเอง (ลิงก์อ้างอิงเท่านั้น ไม่มีทฤษฎีเพิ่ม)</td></tr>
+<tr><td>55</td><td>(ว่าง)</td><td>etc</td></tr>
+<tr><td>56</td><td>Further Readings</td><td>etc — ดูรายการอ่านเพิ่มเติมใน RESOURCES.md แทน</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span>← กลับ MISSION.md เพื่อดูภาพรวม</span>
+  <span><a href="0002-perception-and-visual-variables.html">Lesson 2: Visual Perception &amp; Visual Variables →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 8: Spatial &amp; Geographical Data Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 8 / 13 · Spatial &amp; Geographical</span>
+  <span><a href="../reference/0008-spatial-geographical-cheatsheet.html">Reference: Techniques Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-8-spatial-geographical.pdf</p>
+<h1>Spatial &amp; Geographical Data Visualization</h1>
+
+<p>Lesson 7 จบด้วยคำถามเปิด "Spatial &amp; Geographical Data Vis = Map?" — บทนี้ตอบคำถามนั้น: แผนที่เป็นแค่<em>ทางเลือกหนึ่ง</em>ในการแสดงข้อมูลเชิงพื้นที่ ไม่ใช่คำตอบเดียวเสมอไป และแม้จะใช้แผนที่จริง ก็มีวิธีเลือก visual variable ผิดได้หลายแบบ อาจารย์ใช้ตัวอย่างเลือกตั้งสหรัฐฯ 3 ครั้งซ้ำหลายรอบเพื่อเปรียบเทียบเทคนิคต่าง ๆ บนข้อมูลชุดเดียวกัน.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+<a href="https://blog.datawrapper.de/choroplethmaps/" target="_blank" rel="noopener">Datawrapper — How to choose a good choropleth map color scheme</a> และลองเล่น <a href="http://thetruesize.com/" target="_blank" rel="noopener">thetruesize.com</a> ด้วยตัวเอง (ลากประเทศไทยไปวางทาบทวีปต่าง ๆ) เพื่อรู้สึกถึงการบิดเบือนของ map projection ด้วยตัวเอง.
+</div>
+
+<h2>1. Spatial Data: Map ไม่ใช่คำตอบเดียว</h2>
+<p>ข้อมูลเชิงพื้นที่มักมีมากกว่า 3 มิติ (lat, long, + ตัวแปรอื่นอีกอย่างน้อย 1) — ถ้าเลือกทำเป็นแผนที่ 2 พิกัด (lat/long) จะใช้ position ไปกับ 2 มิตินั้นทันที เหลือแค่ visual variable อื่น (สี ขนาด) มาเข้ารหัสมิติที่เหลือ — บางครั้งการยุบรวม/aggregate ข้อมูลเชิงพื้นที่เป็นชาร์ตธรรมดา (เช่น bar chart ตามภาค) กลับสื่อสารได้ตรงกว่าการยัดทุกอย่างลงแผนที่จริง โดยเฉพาะเมื่อคำถามที่ต้องการตอบไม่ใช่ "ที่ไหน" แต่เป็น "เท่าไหร่".</p>
+
+<h2>2. Choropleth Map: กับดักเรื่องพื้นที่</h2>
+<p>Choropleth map ระบายสีทั้งพื้นที่ (จังหวัด/รัฐ/ประเทศ) ตามค่าข้อมูล — ตัวอย่างคลาสสิกที่อาจารย์ใช้ซ้ำหลายรอบตลอดบทคือผลเลือกตั้งสหรัฐฯ:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p17-choropleth-election-map.png" alt="US 2004 election results by county, red (Bush) dominating the map area even though the popular vote was close">
+<figcaption>Slide: Kerry vs. Bush (2004) — choropleth by county (vis-8-spatial-geographical.pdf, p.17)</figcaption>
+</figure>
+<p>ในการเลือกตั้งจริงปี 2004 คะแนนเสียง Kerry (น้ำเงิน) กับ Bush (แดง) สูสีกันมาก แต่แผนที่นี้ดู "แดงท่วมประเทศ" เพราะพื้นที่ชนบทที่ Bush ชนะกินพื้นที่ทางภูมิศาสตร์เยอะกว่ามาก ทั้งที่มีประชากร/คะแนนเสียงน้อยกว่าเมืองใหญ่ที่ Kerry ชนะมาก — โน้ตลายมือกำกับไว้ว่า "การนำเสนอแบบนี้ทำให้เข้าใจผิดว่าใครนำ (ดูได้แค่แพ้/ชนะ ไม่เห็นคะแนนจริง)" นี่คือกับดักที่เรียกกันว่า "land doesn't vote, people do" — พื้นที่สีบนแผนที่ไม่ได้แปรผันตามน้ำหนักที่ควรมีในการตัดสินใจเลย.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Choropleth Pitfalls</span></div>
+  <div class="qtext">ทำไม choropleth map ผลเลือกตั้งแบบระบายสีตามพื้นที่ (county) ถึงทำให้เข้าใจสถานการณ์ผิดได้ง่าย?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">พื้นที่ชนบทกินพื้นที่ภาพเยอะแต่มีประชากร/คะแนนเสียงน้อย ทำให้ดูเด่นเกินจริง</button>
+    <button class="opt" data-correct="false">โปรแกรมวาดแผนที่ส่วนใหญ่รองรับแค่ 2 สีเท่านั้น</button>
+    <button class="opt" data-correct="false">ข้อมูลการเลือกตั้งไม่สามารถแปลงเป็นแผนที่ได้เลย</button>
+    <button class="opt" data-correct="false">สีแดงกับสีน้ำเงินตาคนแยกไม่ออก</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. Choropleth Map Colors</h2>
+<p>กฎเลือกสี: hue สำหรับ nominal, lightness/saturation สำหรับ ordinal — และห้ามใช้ rainbow colormap:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p25-choropleth-colors.png" alt="A real Thai signature-count-by-province map using appropriate color, next to a European ranking map using a rainbow colormap flagged as bad practice">
+<figcaption>Slide: Choropleth Map Colors — real Thai signature map vs. rainbow colormap warning (vis-8-spatial-geographical.pdf, p.25)</figcaption>
+</figure>
+<p>แผนที่ยุโรปในภาพนี้ไล่สีแบบ rainbow (แดง→เหลือง→เขียว→ฟ้า→ม่วง) เพื่อจัดอันดับประเทศ — โน้ตลายมือกำกับไว้ตรง ๆ ว่า "ไม่ควรใช้ เพราะไม่รู้ว่าสีไหนมากกว่าสีไหน" ลองถามตัวเอง: ระหว่างสีเขียวกับสีม่วง สีไหน "อันดับสูงกว่า" — ตอบไม่ได้ทันทีเลยถ้าไม่กางดู legend เทียบกับแผนที่สถิติลายเซ็นของไทย (สีเดียวไล่เข้ม-อ่อน) ที่ตอบได้ในพริบตาว่าพื้นที่ไหนเข้มกว่า = ค่าสูงกว่า.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Choropleth Colors</span></div>
+  <div class="qtext">ทำไมไม่ควรใช้ rainbow colormap กับข้อมูล ordinal/quantitative บนแผนที่?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ไม่มีลำดับการรับรู้ตามธรรมชาติ บอกไม่ได้ว่าสีไหนมากกว่าสีไหนโดยไม่ดู legend</button>
+    <button class="opt" data-correct="false">Rainbow colormap แสดงผลบนหน้าจอ LCD ไม่ได้</button>
+    <button class="opt" data-correct="false">ใช้ได้เฉพาะกับข้อมูล nominal เท่านั้น ordinal ใช้ไม่ได้เลย</button>
+    <button class="opt" data-correct="false">Rainbow colormap ใช้หมึกพิมพ์มากกว่าสีทึบธรรมดา</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p>เมื่อเลือกจำนวนช่วงสี (bin) แล้ว ต้องกำหนด threshold ว่าตัดตรงไหน — วิธีหนึ่งที่ slide แนะนำคือ Jenks Natural Breaks:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p41-choropleth-thresholds.png" alt="A histogram with three natural clusters, showing Jenks natural breaks placed at the valleys between clusters">
+<figcaption>Slide: Choropleth Map Colors — finding thresholds with Jenks Natural Breaks (vis-8-spatial-geographical.pdf, p.41)</figcaption>
+</figure>
+<p>ลองนึกภาพ histogram ของค่าข้อมูล (เช่น รายได้เฉลี่ยแต่ละจังหวัด) ที่มี 3 กลุ่มก้อนแยกกันชัดเจน (โน้ตกำกับ "cluster 1, 2, 3") — ถ้าตัด threshold แบบ min/max ธรรมดา (แบ่งเท่า ๆ กันตามช่วงตัวเลข) เส้นแบ่งอาจตัดผ่ากลางก้อนใดก้อนหนึ่งพอดี ทำให้จังหวัดที่ค่าใกล้เคียงกันมากถูกจัดคนละสี Jenks Natural Breaks หาจุดตัดที่อยู่ตรง "หุบเขา" ระหว่างก้อน (จุดที่ในภาพมีเส้นตั้งลากผ่าน) ทำให้แต่ละกลุ่มสีมีความแปรปรวนภายในกลุ่มต่ำที่สุด และความต่างระหว่างกลุ่มสูงที่สุด.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Jenks Natural Breaks</span></div>
+  <div class="qtext">Jenks Natural Breaks เลือกจุดตัด (threshold) โดยใช้หลักการใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Minimize in-class variance และ maximize between-class variance</button>
+    <button class="opt" data-correct="false">แบ่งจำนวนจังหวัดในแต่ละกลุ่มให้เท่ากันเป๊ะเสมอ</button>
+    <button class="opt" data-correct="false">สุ่มจุดตัดแล้วเลือกจุดที่สีสวยที่สุด</button>
+    <button class="opt" data-correct="false">ใช้ค่าเฉลี่ยของทั้งชุดข้อมูลเป็นจุดตัดเดียว</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. MAUP: Modifiable Areal Unit Problem</h2>
+<p>ปัญหาที่ลึกกว่าการเลือกสี — ถ้า<strong>ขอบเขตพื้นที่เอง</strong>เปลี่ยนไป แผนที่ข้อมูลเดียวกันจะดูต่างไปโดยสิ้นเชิง:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p51-maup-bangkok-districts.png" alt="Two choropleth maps of Bangkok election data from 2007 and 2011 that look completely different in pattern, partly because the district boundaries themselves were redrawn between the two elections">
+<figcaption>Slide: MAUP — Bangkok election choropleth maps, 2550 (2007) vs 2554 (2011) (vis-8-spatial-geographical.pdf, p.51)</figcaption>
+</figure>
+<p>สองแผนที่นี้คือผลการเลือกตั้ง ส.ส. กรุงเทพฯ ปี 2550 และ 2554 — สังเกตว่ารูปทรง/จำนวนเขตในสองแผนที่<strong>ไม่เหมือนกัน</strong>เลย เพราะระหว่างสองปีนี้มีการแบ่งเขตเลือกตั้งใหม่ (เขตพื้นที่ที่ใช้นับคะแนนเปลี่ยนไป) ถ้าใครเอาสองแผนที่นี้มาเทียบกันตรง ๆ แล้วสรุปว่า "พื้นที่ตรงนี้เปลี่ยนขั้วทางการเมือง" อาจกำลังสรุปผิด เพราะส่วนหนึ่งของความต่างที่เห็นมาจาก<em>เส้นแบ่งเขตที่เปลี่ยน</em> ไม่ใช่พฤติกรรมผู้ลงคะแนนที่เปลี่ยนจริง — นี่คือแก่นของ MAUP: ผลลัพธ์ทางสถิติ/ภาพที่เห็นจาก choropleth ขึ้นอยู่กับว่า "หน่วยพื้นที่" ที่ใช้แบ่งคืออะไร เปลี่ยนหน่วยพื้นที่ ผลที่เห็นก็เปลี่ยนได้ทั้งที่ข้อมูลดิบเบื้องหลังไม่ได้เปลี่ยนเลย.</p>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 4</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: MAUP (Modifiable Areal Unit Problem) คืออะไร และทำไมตัวอย่างแผนที่กรุงเทพฯ 2550 vs 2554 ถึงเป็นตัวอย่างที่ดี?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">MAUP คือปัญหาที่ผลลัพธ์ทางสถิติ/ภาพของข้อมูลเชิงพื้นที่เปลี่ยนไปได้เพียงเพราะเปลี่ยนขอบเขต/หน่วยพื้นที่ที่ใช้แบ่งข้อมูล ทั้งที่ข้อมูลดิบเบื้องหลังไม่ได้เปลี่ยน ตัวอย่างกรุงเทพฯ ดีเพราะเขตเลือกตั้งถูกแบ่งใหม่ระหว่างปี 2550-2554 จริง ทำให้สองแผนที่ดูต่างกันมาก ซึ่งอาจถูกตีความผิดว่าเป็นการเปลี่ยนขั้วทางการเมือง ทั้งที่ส่วนหนึ่งเป็นผลจากเส้นแบ่งเขตที่เปลี่ยนไปเท่านั้น</div>
+</div>
+
+<h2>5. Map Projection: ไม่มีแผนที่ไหนไม่บิดเบือน</h2>
+<p>การแปลงพื้นผิวโลกทรงกลมเป็นภาพแบน (projection) ต้องแลกอย่างใดอย่างหนึ่งเสมอ — ระหว่างพื้นที่ ระยะทาง หรือรูปทรง ไม่มี projection ไหนรักษาได้ครบทั้ง 3 อย่าง:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p59-map-projections.png" alt="The outline of Thailand dragged over a standard web map, appearing surprisingly large next to the northeastern US and again next to the UK/Denmark region in Europe">
+<figcaption>Slide: Map Projections — Thailand's outline overlaid on North America and Europe (vis-8-spatial-geographical.pdf, p.59, via thetruesize.com)</figcaption>
+</figure>
+<p>ลองสังเกตภาพนี้: รูปทรงประเทศไทยที่ลากไปวางทาบ แถบตะวันออกเฉียงเหนือของสหรัฐฯ มีขนาดใหญ่พอ ๆ กับรัฐนิวยอร์กและรัฐใกล้เคียงรวมกัน และวางทาบยุโรปก็ใหญ่พอ ๆ กับสหราชอาณาจักรบวกเดนมาร์ก — ขนาดจริงของไทยที่หลายคน "รู้สึก" ว่าเล็ก แท้จริงใหญ่กว่าที่คิดมาก เพราะแผนที่เว็บทั่วไป (Mercator-style) บิดเบือนพื้นที่แถบใกล้เส้นศูนย์สูตรให้ดูเล็กกว่าจริงเทียบกับแถบขั้วโลก — นี่คือเหตุผลที่การเปรียบเทียบ "ขนาด" ประเทศจากแผนที่บนจอโดยไม่เช็ค projection อาจทำให้เข้าใจผิดได้ง่ายมาก.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Map Projection</span></div>
+  <div class="qtext">แผนที่เว็บทั่วไปแบบ Mercator-style มีแนวโน้มบิดเบือนพื้นที่อย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">พื้นที่แถบใกล้ขั้วโลกดูใหญ่เกินจริงเทียบกับแถบเส้นศูนย์สูตร</button>
+    <button class="opt" data-correct="false">พื้นที่ทุกแถบละติจูดถูกต้องเท่ากันหมด ไม่มีการบิดเบือนเลย</button>
+    <button class="opt" data-correct="false">พื้นที่แถบเส้นศูนย์สูตรดูใหญ่เกินจริงเทียบกับขั้วโลก</button>
+    <button class="opt" data-correct="false">บิดเบือนเฉพาะเส้นแบ่งประเทศ ไม่กระทบพื้นที่</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. Cartogram: แก้ปัญหา "Land Doesn't Vote"</h2>
+<p>Cartogram บิดขนาด/รูปทรงพื้นที่ให้เป็นสัดส่วนกับค่าข้อมูล (เช่น ประชากร) แทนที่จะรักษาพื้นที่ภูมิศาสตร์จริงไว้ — แก้ปัญหาเดียวกับที่ choropleth ในหัวข้อ 2 เจอตรง ๆ:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p68-cartogram-election.png" alt="A density-equalizing cartogram of the 2004 US election, where each county's area is warped to be proportional to its population rather than its actual land area">
+<figcaption>Slide: Cartogram — Kerry vs. Bush (2004), area warped by population (vis-8-spatial-geographical.pdf, p.68)</figcaption>
+</figure>
+<p>เทียบภาพนี้กับ choropleth ปกติในหัวข้อ 2: รัฐ/เขตชนบทที่เคยกินพื้นที่ภาพมหาศาลตอนนี้ถูกบีบให้เล็กลงมาก (เพราะประชากรน้อย) ส่วนเมืองใหญ่ (นิวยอร์ก แคลิฟอร์เนีย) ที่เคยดูเล็กในแผนที่ปกติ ตอนนี้พองใหญ่ขึ้นมาก — โน้ตลายมือกำกับว่า "แดง/น้ำเงินตามพื้นที่ประชากร" สัดส่วนสีแดง/น้ำเงินในภาพนี้ตอนนี้ใกล้เคียงกับสัดส่วนคะแนนเสียงจริงมากกว่า choropleth เวอร์ชันแรกมาก — ข้อแลกคือ รูปทรงรัฐบิดเบี้ยวจนจำไม่ได้ว่าเป็นรัฐไหน (ต้องอาศัยป้ายชื่อกำกับ) นี่คือ trade-off ของ cartogram: ถูกต้องเชิงสัดส่วนขึ้น แต่จำง่าย/เทียบตำแหน่งภูมิศาสตร์จริงยากขึ้น.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Cartogram</span></div>
+  <div class="qtext">Cartogram แก้ปัญหาอะไรของ choropleth map แบบดั้งเดิม?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">พื้นที่ภูมิศาสตร์ที่ใหญ่แต่ประชากรน้อยไม่เด่นเกินจริงอีกต่อไป เพราะพื้นที่ในภาพแปรผันตามข้อมูลแทน</button>
+    <button class="opt" data-correct="false">ทำให้ใช้สีได้หลากหลายมากขึ้น</button>
+    <button class="opt" data-correct="false">ทำให้แผนที่โหลดเร็วขึ้นบนเว็บ</button>
+    <button class="opt" data-correct="false">ทำให้ไม่ต้องใช้ legend อีกต่อไป</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>7. Tile Grid Map และ Symbol Map: ตัวอย่างจากงานของอาจารย์เอง</h2>
+<p>อาจารย์ผู้สอนมีเดโมของตัวเอง (<a href="http://puripant.github.io/geo2geo/" target="_blank" rel="noopener">geo2geo</a>) ที่เปรียบเทียบแผนที่ไทยแบบต่าง ๆ กับแผนที่จริงเคียงข้างกัน:</p>
+
+<figure>
+<img src="../assets/slides/vis8-p89-tile-grid-thailand.png" alt="Standard Thailand province map next to a hex tile grid version where every province is the same equal-sized hexagon">
+<figcaption>Slide: Tile Grid Map — Thailand provinces as equal-sized hexagons (vis-8-spatial-geographical.pdf, p.89, via geo2geo)</figcaption>
+</figure>
+<p>แผนที่ปกติทางซ้าย: จังหวัดใหญ่ (เช่น นครราชสีมา) ดูเด่นเพราะพื้นที่มาก จังหวัดเล็ก ๆ ในภาคกลางแทบมองไม่เห็น เวอร์ชัน tile grid ทางขวา: ทุกจังหวัดกลายเป็นหกเหลี่ยมขนาดเท่ากันหมด ไม่ว่าพื้นที่จริงจะใหญ่หรือเล็ก — โน้ตกำกับว่า "ดูสวยกว่า" แต่ที่สำคัญกว่าความสวยคือ<strong>ทุกจังหวัดมีน้ำหนักภาพเท่ากัน</strong> เหมาะมากเมื่อสิ่งที่อยากเปรียบเทียบคือค่าข้อมูลของแต่ละจังหวัด ไม่ใช่ขนาดพื้นที่ทางภูมิศาสตร์ของมัน (ตรงข้ามกับตอนที่ต้องการสื่อสารตำแหน่ง/ระยะทางจริง ซึ่ง tile grid ทำไม่ได้เลย).</p>
+
+<figure>
+<img src="../assets/slides/vis8-p104-symbol-map-thailand.png" alt="Standard Thailand province map next to a proportional symbol map version where circles of varying size are placed in roughly the same spatial arrangement as the provinces">
+<figcaption>Slide: Proportional Symbol Map — Thailand provinces as sized circles (vis-8-spatial-geographical.pdf, p.104, via geo2geo)</figcaption>
+</figure>
+<p>เดโมเดียวกัน คราวนี้เทียบกับ symbol map: แทนที่จะระบายสีทั้งจังหวัด ใช้วงกลมขนาดต่าง ๆ วางตามตำแหน่งจังหวัดแทน (คล้ายแผนที่ COVID-19 ใน Lecture 2 ทุกประการ) — โน้ตกำกับว่า "ทำให้ symbol ตามพื้นที่ภูมิภาคก่อน" คือวงกลมยังจัดเรียงตามตำแหน่งภูมิศาสตร์คร่าว ๆ (ภาคเหนือ/อีสาน/ใต้แยกกลุ่มกันชัด) แต่ขนาดวงกลมสื่อค่าข้อมูลแทนพื้นที่จริง — ต้องระวังเรื่องเดียวกับ Lecture 2 เป๊ะ ๆ: ต้อง scale รัศมีด้วยรากที่สองของค่าข้อมูล ไม่ใช่ค่าข้อมูลตรง ๆ ไม่งั้นพื้นที่วงกลมจะเกินจริง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Tile Grid vs Symbol Map</span></div>
+  <div class="qtext">ข้อแตกต่างหลักระหว่าง Tile Grid Map กับ (Proportional) Symbol Map คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Tile Grid ทำให้ทุกพื้นที่มีขนาดเท่ากันหมด (เสียตำแหน่ง/รูปทรงจริง) ส่วน Symbol Map ยังรักษาตำแหน่งภูมิศาสตร์คร่าว ๆ ไว้ผ่านตำแหน่งวงกลม</button>
+    <button class="opt" data-correct="false">ทั้งสองแบบให้ผลลัพธ์เหมือนกันทุกประการ</button>
+    <button class="opt" data-correct="false">Tile Grid ใช้ได้กับข้อมูล ordinal เท่านั้น</button>
+    <button class="opt" data-correct="false">Symbol Map ใช้สีแทนขนาดเสมอ ไม่มีการปรับขนาด mark</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>8. เทคนิคจัดการจุดซ้อนทับบนแผนที่</h2>
+<p>เมื่อ symbol map มีจุดเยอะจนซ้อนทับกัน (ปัญหาเดียวกับ overplotting ใน scatter plot, Lecture 5) มีทางเลือกหลายแบบ: <strong>Spike Map</strong> (ใช้แท่งพุ่งขึ้นแนวตั้งแทนวงกลม), <strong>Necklace Map</strong> (ดึง symbol ออกมาเรียงรอบขอบพื้นที่แทนวางทับตำแหน่งจริง), <strong>Voronoi Diagram</strong> (แบ่งพื้นที่ตามจุดใกล้สุดช่วยจัดวาง), และ <strong>Sampling/Stippling</strong> (สุ่มแสดงบางจุดแทนทั้งหมด) — ทั้งหมดคือการแก้ปัญหาเดิม (จุดทับกัน) ด้วยหลักการที่คุ้นเคยจากบทก่อน ๆ เพียงย้ายมาใช้บนแผนที่.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Overplotting บนแผนที่</span></div>
+  <div class="qtext">เทคนิคใดแก้ปัญหาจุดซ้อนทับบนแผนที่ด้วยการ "ดึง symbol ออกมาเรียงรอบขอบพื้นที่แทนวางทับตำแหน่งจริง"?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Necklace Map</button>
+    <button class="opt" data-correct="false">Spike Map</button>
+    <button class="opt" data-correct="false">Choropleth Map</button>
+    <button class="opt" data-correct="false">Tile Grid Map</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>9. Flow Map: ข้อมูล Relational บนแผนที่</h2>
+<p>Flow map (เรียนซ้ำจาก Lesson 7 เพราะเป็นสะพานเชื่อม 2 บท) วาดข้อมูล relational/hierarchical ทับบนตำแหน่งภูมิศาสตร์จริง — flow map ชิ้นแรกในประวัติศาสตร์ทำขึ้นปี 1837 แสดงการขนส่งผู้โดยสารในไอร์แลนด์ ตัวอย่างสมัยใหม่: แผนที่การระบาดของ COVID-19 (NYTimes), แผนที่คลองในกรุงเทพฯ, เครือข่ายการส่งบอลใน Premier League — ทุกตัวอย่างมีปัญหาเดียวกับ node-link diagram ที่หนาแน่นเกินไป: เส้นทับกันจนอ่านยาก (hairball เวอร์ชันแผนที่) ถ้าข้อมูลการไหลมีจุดต้นทาง-ปลายทางเยอะเกินไป.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Flow Map</span></div>
+  <div class="qtext">Flow map แรกในประวัติศาสตร์ (ปี 1837) แสดงข้อมูลอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การขนส่งผู้โดยสารในไอร์แลนด์</button>
+    <button class="opt" data-correct="false">การแพร่ระบาดของโรคในยุโรป</button>
+    <button class="opt" data-correct="false">เส้นทางการค้าทางทะเลของอังกฤษ</button>
+    <button class="opt" data-correct="false">การอพยพของประชากรอเมริกา</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรวิเคราะห์ choropleth map ที่ให้มาได้ว่าเลือกสีถูกหลักไหม (hue/lightness, ไม่ใช่ rainbow), ตรวจจับ MAUP ได้เมื่อเทียบแผนที่สองช่วงเวลาที่ขอบเขตพื้นที่เปลี่ยน, อธิบายได้ว่า cartogram/tile grid/symbol map แต่ละแบบแลกอะไรกับอะไร และรู้ว่าเมื่อไหร่ควรใช้แผนที่จริง เมื่อไหร่ควรยุบรวมเป็นชาร์ตธรรมดาแทน.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (142 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-8-spatial-geographical.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–6</td><td>Spatial Data เกริ่นนำ (มิติ &gt; 3, Map = position 2 มิติ + variable อื่น) + ตัวอย่าง aggregate</td><td>✓ หัวข้อ 1</td></tr>
+<tr><td>7</td><td>คำถามเปิด "Spatial &amp; Geographical Data Vis = Map?" (ซ้ำจาก Lesson 7)</td><td>✓ ส่วนหนึ่งของบทนำ</td></tr>
+<tr><td>8–15</td><td>ตัวอย่างเสริม (NBA shot analysis, COVID origins, heatmap ของสายตา, political spectrum) + xkcd 1138</td><td>etc — ตัวอย่างประกอบ นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>16</td><td>เกริ่นนำ Choropleth Map</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>17–22</td><td>Choropleth ตัวอย่างเลือกตั้งสหรัฐฯ (Kerry/Bush 2004, Clinton/Trump 2016, Biden/Trump 2020)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>23–24</td><td>ตัวอย่างสื่อไทยเสนอผลสำรวจ (Voice TV, Prachathai)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>25</td><td>Choropleth Map Colors: hue/lightness + คำเตือน rainbow colormap</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>26–32</td><td>ตัวอย่างเพิ่มเติมเรื่องสี (nominal/ordinal, diverging scale, วัคซีน COVID)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>33</td><td>อ้างอิง "Rainbow Colormaps Are Not All Bad" (Ware, Stone, Szafir 2023) — มุมมองแย้ง</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก แต่ควรรู้ว่ามีข้อถกเถียง</td></tr>
+<tr><td>34–40</td><td>อ้างอิง Monmonier "How to Lie With Maps" + ตัวอย่างเพิ่มเติม (Datawrapper guide)</td><td>etc — อ้างอิงประกอบ</td></tr>
+<tr><td>41</td><td>Choropleth thresholds: Jenks Natural Breaks</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>42–48</td><td>ตัวอย่างเพิ่มเติมเรื่อง threshold + อ้างอิง Cynthia Brewer 1994 (ColorBrewer)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>49–50</td><td>เกริ่นนำ MAUP</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>51–54</td><td>MAUP ตัวอย่างเขตเลือกตั้งกรุงเทพฯ 2550 vs 2554</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>55–58</td><td>เกริ่นนำ Map Projections + วิดีโอประกอบ</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>59</td><td>Map Projections: thetruesize.com เปรียบเทียบขนาดไทย</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>60–65</td><td>ตัวอย่าง projection เพิ่มเติม (same-scale, passport index)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>66–67</td><td>เกริ่นนำ Cartogram</td><td>✓ ส่วนหนึ่งของหัวข้อ 6</td></tr>
+<tr><td>68</td><td>Cartogram: Kerry vs Bush 2004 (density-equalizing)</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>69–82</td><td>Cartogram ตัวอย่าง/อ้างอิงเพิ่มเติม (Traffigram, RecMap, cartogram แบบต่าง ๆ, ไทย: ประชากร/GDP รายจังหวัด)</td><td>✓ ส่วนหนึ่งของหัวข้อ 6 (อ้างอิงแนวคิดแล้ว)</td></tr>
+<tr><td>83–88</td><td>เกริ่นนำ Tile Grid Map + ตัวอย่าง (gay marriage map, Olympic medals)</td><td>✓ ส่วนหนึ่งของหัวข้อ 7</td></tr>
+<tr><td>89</td><td>Tile Grid Map: geo2geo เปรียบเทียบแผนที่ไทย</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>90–97</td><td>ตัวอย่างเพิ่มเติม (wevis election report, abortion driving distance)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>98</td><td>Chernoff Face บนแผนที่ (ซ้ำแนวคิดจาก Lesson 6)</td><td>etc — ทบทวนแนวคิดเดิม ไม่ทำ quiz แยก</td></tr>
+<tr><td>99–100</td><td>Tile Grid Map ต่อ + Voronoi diagram เกริ่นนำ</td><td>✓ ส่วนหนึ่งของหัวข้อ 8</td></tr>
+<tr><td>101–103</td><td>เกริ่นนำ (Proportional) Symbol Map</td><td>✓ ส่วนหนึ่งของหัวข้อ 7</td></tr>
+<tr><td>104</td><td>Symbol Map: geo2geo เปรียบเทียบแผนที่ไทย</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>105–120</td><td>ตัวอย่าง symbol map เพิ่มเติม (football participation, spike map, necklace map, ad spending)</td><td>✓ ส่วนหนึ่งของหัวข้อ 8 (สรุปเทคนิคในตารางอ้างอิงแล้ว)</td></tr>
+<tr><td>121–128</td><td>Sampling/Stippling บนแผนที่ + อ้างอิง (xkcd 2399, ESRI blog)</td><td>✓ หัวข้อ 8</td></tr>
+<tr><td>129–136</td><td>Flow Map (ซ้ำจาก Lesson 7) + ตัวอย่าง (COVID spread, คลองกรุงเทพฯ, Premier League)</td><td>✓ หัวข้อ 9</td></tr>
+<tr><td>137–142</td><td>ปิดท้ายด้วยคำถามเปิดซ้ำ + เกริ่นนำเข้าสู่ Lesson 9 (Interactive Visualization)</td><td>etc — เกริ่นนำ Lesson 9 โดยตรง</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0007-relational-hierarchical-data-visualization.html">← Lesson 7: Relational &amp; Hierarchical Data Visualization</a></span>
+  <span><a href="0009-interactive-visualization.html">Lesson 9: Interactive Visualization →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

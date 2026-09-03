@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 12: Storytelling & Narrative Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 12 / 13 · Storytelling &amp; Narrative Visualization</span>
+  <span><a href="../reference/0012-storytelling-narrative-visualization-cheatsheet.html">Reference: Storytelling Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-12-storytelling.pdf</p>
+<h1>Storytelling &amp; Narrative Visualization</h1>
+
+<p>ตลอด 11 บทที่ผ่านมา เราสร้าง visualization เพื่อ "หา" insight (exploration/analysis) แต่พอเจอ insight แล้ว จะ "เล่า" มันให้คนอื่นเข้าใจอย่างไร? บทสุดท้ายก่อน Storytelling นี้ (ก่อนถึง etc-lecture) สอนว่าการนำเสนอข้อมูลก็มีหลักการยืมมาจากศาสตร์การเล่าเรื่อง (narrative) ได้ — และมีตัวอย่างจริงจากสื่อระดับโลกให้เห็นภาพตลอดทาง.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Edward Segel and Jeffrey Heer, <a href="https://idl.cs.washington.edu/papers/narrative-visualization" target="_blank" rel="noopener">"Narrative Visualization: Telling Stories with Data"</a>, TVCG 2010 — บทความต้นตำรับของทั้งบทนี้ นิยาม genre และ structure ของ narrative visualization ที่สไลด์อ้างอิงซ้ำหลายครั้ง.
+</div>
+
+<h2>1. สองบทบาทที่ต้องสวมคนละช่วง</h2>
+<p>ก่อนเข้าเทคนิค อาจารย์ตั้งภาพให้เห็นก่อนว่า "การทำงานกับข้อมูล" มีสองขั้วที่ต้องการทักษะคนละแบบโดยสิ้นเชิง:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p8-exploration-to-storytelling-spectrum.png" alt="A horizontal spectrum from a teacher and scientist emoji labeled Data exploration and Data analysis, through a graduate and astronaut, to an artist and painter and performer emoji labeled Data presentation and Data storytelling">
+<figcaption>Slide: จาก Data exploration/analysis สู่ Data presentation/storytelling (vis-12-storytelling.pdf, p.8)</figcaption>
+</figure>
+<p>ฝั่งซ้ายคือบทบาทนักวิทยาศาสตร์/นักวิจัย — งานคือค้นหาสิ่งที่ยังไม่รู้ ต้องสงสัย ตั้งสมมติฐาน ทดสอบซ้ำ ฝั่งขวาคือบทบาทศิลปิน/นักแสดง — งานคือสื่อสารสิ่งที่รู้แล้วให้คนอื่นเข้าใจและรู้สึกร่วม ทั้งสองฝั่งใช้ visualization เหมือนกัน แต่เป้าหมายตรงข้ามกัน: ฝั่งซ้ายอยากให้ผู้ดู "สงสัยเพิ่ม" (raise questions) ฝั่งขวาอยากให้ผู้ดู "เข้าใจชัดเจน" (deliver a message) — 11 บทที่ผ่านมาส่วนใหญ่อยู่ฝั่งซ้าย บทนี้คือการเรียนรู้ที่จะสวมบทบาทฝั่งขวา.</p>
+
+<h2>2. Dashboard สองแบบ: ตัวเลขดิบ vs เรื่องเล่า</h2>
+<p>บทบาทสองขั้วนี้เห็นชัดที่สุดในโลกของ dashboard เอง — dashboard ที่ทำเพื่อวัตถุประสงค์ต่างกัน หน้าตาต่างกันโดยสิ้นเชิง:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p13-dashboard-types.png" alt="Left: a dense internal Social Media Manager's Dashboard packed with many small charts and raw numbers. Right: a public-facing UNHCR Refugees Emergency Response dashboard with a headline number of 184,162 arrivals by sea in 2016 and 1,261 dead or missing, framed as a narrative about the Mediterranean crisis">
+<figcaption>Slide: Alper Sarikaya et al., "What Do We Talk About When We Talk About Dashboards?", TVCG 2019 (vis-12-storytelling.pdf, p.13)</figcaption>
+</figure>
+<p>Dashboard ซ้าย (Social Media Manager's Dashboard) ออกแบบมาเพื่อ<strong>ใช้งานภายใน</strong> — อัดตัวเลขดิบทุกอย่างที่มี (followers, engagement, retweets) ลงหน้าจอเดียว ไม่มีเรื่องเล่า เพราะคนดูรู้บริบทอยู่แล้วและต้องการแค่ตรวจสอบตัวเลขเร็ว ๆ Dashboard ขวา (UNHCR Refugees Emergency Response) ออกแบบมาเพื่อ<strong>สื่อสารสู่สาธารณะ</strong> — มีตัวเลขเด่นถูกเลือกมาเน้นแค่ไม่กี่ตัว (184,162 arrivals by sea in 2016, 1,261 dead/missing) พร้อมประโยคอธิบายบริบทกำกับ ("Increasing numbers of refugees and migrants take their chances aboard unseaworthy boats...") — ตัวเลขเดียวกันถ้าใส่ลงตารางดิบแบบซ้าย จะไม่มีน้ำหนักทางอารมณ์เท่าการเลือกเน้นและใส่บริบทแบบขวาเลย นี่คือหลักฐานว่า "storytelling" ไม่ใช่แค่การตกแต่งให้สวย แต่คือการ<strong>เลือก</strong>ว่าจะโชว์อะไรและใส่บริบทแบบไหน.</p>
+
+<h2>3. Data Comics: การ์ตูนช่องเล่าเรื่องด้วยข้อมูล</h2>
+<p>วิธีหนึ่งที่ชัดเจนที่สุดในการยืมโครงสร้างการเล่าเรื่องมาใช้กับข้อมูลคือ "data comics" — เล่าข้อมูลเป็นช่อง ๆ แบบการ์ตูน:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p50-wwi-graph-comics.png" alt="A comic-strip sequence of node-link network diagrams titled European Alliances before World War I, 1836 to 1914, with each panel showing the alliance network at a specific date and a caption box narrating what changed, culminating in a rapid sequence of panels from July 23 to August 6, 1914 showing the outbreak of war">
+<figcaption>Slide: Benjamin Bach et al., "Telling Stories about Dynamic Networks with Graph Comics", CHI 2016 (vis-12-storytelling.pdf, p.50)</figcaption>
+</figure>
+<p>แต่ละช่องคือ network diagram เดียวกัน (ประเทศเป็นโหนด พันธมิตรเป็นเส้นเชื่อม) แต่ถ่ายภาพ ณ ปีที่ต่างกัน: เริ่มที่ 1836 (ยังไม่มีพันธมิตรชัดเจน) ไปจนถึงปี 1914 ที่แบ่งเป็น Triple Entente (UK-France-Russia) กับ Triple Alliance (Germany-Austria-Italy) อย่างชัดเจน — จุดเด่นสุดคือช่วงท้าย (23 กรกฎาคม ถึง 6 สิงหาคม 1914) ที่แบ่งเป็นช่องย่อยรายวันแสดงเส้นสีแดงกระพริบ (declaration of war) ไล่จากออสเตรียประกาศคำขาดใส่เซอร์เบีย จนลามเป็นสงครามทั่วยุโรปภายในไม่กี่วัน — การ์ตูนช่องแบบนี้ทำสิ่งที่ static network diagram เดียวทำไม่ได้เลย: แสดง "การเปลี่ยนแปลงตามเวลา" (dynamic network) พร้อมคำบรรยายกำกับเหตุการณ์ในแต่ละช่วง ผู้อ่านตามลำดับเหตุการณ์ได้เหมือนอ่านการ์ตูนประวัติศาสตร์ ไม่ใช่วิเคราะห์กราฟนามธรรม.</p>
+
+<h2>4. Narrative Structure: ยืมโครงสร้างจากวรรณกรรม</h2>
+<p>ข้อมูลไม่มี "จุดไคลแม็กซ์" ของตัวเองอยู่แล้วโดยธรรมชาติ แต่เรายืมโครงสร้างการเล่าเรื่องที่มีอยู่ในวรรณกรรม/ภาพยนตร์มาจัดลำดับการนำเสนอได้:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p54-freytag-pyramid.png" alt="A triangular diagram labeled Freytag's Pyramid with five points: introduction at the bottom left, rising through rise, peaking at climax at the top, then descending through return or fall to catastrophe at the bottom right, with handwritten Thai notes about borrowing narrative sequence patterns for data">
+<figcaption>Slide: Narrative Structure — Freytag's Pyramid (vis-12-storytelling.pdf, p.54)</figcaption>
+</figure>
+<p>Freytag's Pyramid มาจากละครเวทีคลาสสิก: introduction (ปูพื้นสถานการณ์) → rise (ความตึงเครียดค่อย ๆ เพิ่ม) → climax (จุดสูงสุด) → return/fall (คลี่คลาย) → catastrophe (จบเรื่อง) — โน้ตกำกับข้างสไลด์บอกตรง ๆ ว่า "Data บ่งบอก pattern ไม่ได้ แต่เรายืมมาจากแนวคิดที่มีอยู่แล้ว" หมายความว่า เมื่อนำเสนอข้อมูล เราสามารถจงใจจัดลำดับให้ตัวเลขที่ "น่าตื่นเต้นที่สุด" มาอยู่ตรงกลาง/ท้ายเรื่อง (เหมือน climax) แทนที่จะโยนตัวเลขทั้งหมดออกมาพร้อมกันตั้งแต่ต้น — การจัดลำดับแบบนี้ไม่ได้เปลี่ยนข้อมูลเลยสักตัว เปลี่ยนแค่ "ลำดับการเปิดเผย" เท่านั้น.</p>
+
+<p>อีกโครงสร้างหนึ่งที่ใช้บ่อยในวารสารศาสตร์ข้อมูล (data journalism) คือ Diamond Structure — เริ่มและจบด้วยตัวอย่างที่จับต้องได้ (concrete) แต่ตรงกลางขยายไปเป็นภาพกว้าง (abstract):</p>
+
+<figure>
+<img src="../assets/slides/vis12-p55-diamond-structure.png" alt="A diamond shape diagram labeled Anecdote/Example at the narrow top point, widening to Insight/Trend in the broad middle, then narrowing back to Anecdote/Example at the bottom point">
+<figcaption>Slide: Narrative Structure — Diamond Structure (vis-12-storytelling.pdf, p.55)</figcaption>
+</figure>
+<p>โครงสร้างนี้เริ่มด้วย <strong>Anecdote/Example</strong> — เรื่องราวเฉพาะเจาะจงของคนคนเดียว/เหตุการณ์เดียวที่จับต้องได้ (เช่น "ครอบครัวหนึ่งในจังหวัด X ต้องย้ายบ้านเพราะน้ำท่วม") จากนั้นขยายกว้างขึ้นไปสู่ <strong>Insight/Trend</strong> ตรงกลาง — สถิติภาพรวมที่แสดงว่าเรื่องราวนั้นไม่ใช่กรณีเดียว แต่เป็นแนวโน้มระดับประเทศ (เช่น กราฟแสดงจำนวนผู้อพยพจากน้ำท่วมทั่วประเทศเพิ่มขึ้นทุกปี) แล้วปิดท้ายด้วย Anecdote/Example อีกครั้ง — วนกลับมาที่เรื่องราวเฉพาะเจาะจงเพื่อให้ผู้อ่านรู้สึกเชื่อมโยงทางอารมณ์อีกครั้งก่อนจบ รูปทรงเพชร (แคบ-กว้าง-แคบ) สะท้อนตรง ๆ ว่าการเล่าเรื่องด้วยข้อมูลที่ดี มักไม่ได้เริ่มด้วยสถิติแห้ง ๆ แต่เริ่มด้วยเรื่องคนคนเดียวก่อนค่อยขยายภาพ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Data Comics</span></div>
+  <div class="qtext">ตัวอย่าง Graph Comics เรื่อง European Alliances before WWI ใช้การ์ตูนช่องแสดงอะไรที่ network diagram แบบภาพเดียวแสดงไม่ได้?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">การเปลี่ยนแปลงของเครือข่ายพันธมิตรตามเวลา พร้อมคำบรรยายกำกับแต่ละช่วงเหตุการณ์</button>
+    <button class="opt" data-correct="false">จำนวนประเทศทั้งหมดในยุโรปช่วงนั้น</button>
+    <button class="opt" data-correct="false">ตำแหน่งทางภูมิศาสตร์ที่แม่นยำของแต่ละประเทศ</button>
+    <button class="opt" data-correct="false">สีธงชาติของแต่ละประเทศ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Diamond Structure</span></div>
+  <div class="qtext">Diamond Structure ในการเล่าเรื่องด้วยข้อมูล มีลำดับอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เริ่มด้วยตัวอย่างเฉพาะเจาะจง (Anecdote) ขยายไปสู่ภาพรวม (Insight/Trend) แล้วปิดท้ายด้วยตัวอย่างเฉพาะเจาะจงอีกครั้ง</button>
+    <button class="opt" data-correct="false">เริ่มด้วยสถิติภาพรวมทั้งหมด แล้วค่อย ๆ แคบลงจนจบด้วยตัวเลขเดียว</button>
+    <button class="opt" data-correct="false">แสดงทุกตัวเลขพร้อมกันตั้งแต่ต้นจนจบ ไม่มีลำดับ</button>
+    <button class="opt" data-correct="false">เรียงตามลำดับตัวอักษรของหัวข้อ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>5. Author-driven vs Reader-driven: ใครเป็นคนควบคุมลำดับ</h2>
+<p>อีกมิติสำคัญคือ "ใครเป็นคนกำหนดว่าจะดูอะไรก่อนหลัง" — ผู้เขียน หรือ ผู้อ่าน:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p90-author-vs-reader-driven.png" alt="Comparison diagram: author-driven shown as a straight linear chain of fixed steps with no branching, versus reader-driven shown as a branching network of interconnected nodes the viewer can navigate freely">
+<figcaption>Slide: Edward Segel and Jeffrey Heer, "Narrative Visualization: Telling Stories with Data", TVCG 2010 (vis-12-storytelling.pdf, p.90)</figcaption>
+</figure>
+<p><strong>Author-driven</strong> คือผู้เขียนกำหนดลำดับตายตัว (linear) เหมือนไดอะแกรมซ้ายที่เป็นเส้นตรงไม่มีทางแยก — ข้อดีคือเร็วและข้อความชัดเจน (ผู้เขียนควบคุมได้ว่าผู้อ่านจะเห็นอะไรก่อน-หลัง) ข้อเสียคือน่าเบื่อได้ถ้าผู้อ่านอยากสำรวจเอง <strong>Reader-driven</strong> คือผู้อ่านเลือกเส้นทางเอง (non-linear/interactive) เหมือนไดอะแกรมขวาที่เป็นโครงข่ายแตกกิ่งก้าน — ข้อดีคือผู้อ่านสำรวจตามความสนใจของตัวเองได้ (exploratory หรือแม้แต่ personal) ข้อเสียคืออาจพลาดประเด็นสำคัญที่ผู้เขียนตั้งใจสื่อ เพราะไม่มีใครบังคับลำดับ.</p>
+
+<p>ในทางปฏิบัติ นักออกแบบมักไม่เลือกสุดขั้วใดขั้วหนึ่ง แต่ผสมทั้งสองแบบเข้าด้วยกันในชิ้นเดียว — โครงสร้างยอดนิยมที่สุดคือ "Martini Glass":</p>
+
+<figure>
+<img src="../assets/slides/vis12-p94-martini-glass.png" alt="A martini glass shape diagram: the narrow stem is labeled author-driven for the first half and the wide bowl is labeled reader-driven for the second half, alongside two real interactive news pieces about drone strike deaths and US gun deaths with prominent headline numbers">
+<figcaption>Slide: "Martini Glass" Structure — first half author-driven, second half reader-driven (vis-12-storytelling.pdf, p.94)</figcaption>
+</figure>
+<p>รูปทรงแก้วมาร์ตินี่: ก้านแก้วที่แคบและตรง (ครึ่งแรก) คือช่วง<strong>author-driven</strong> — ผู้เขียนบังคับให้ผู้อ่านเดินตามลำดับที่กำหนดไว้ก่อน เพื่อปูพื้นบริบทและข้อความหลักให้ครบ จากนั้นเมื่อแก้วบานออกเป็นปากกว้าง (ครึ่งหลัง) คือช่วง<strong>reader-driven</strong> — เปิดให้ผู้อ่านสำรวจข้อมูลเองอย่างอิสระ (โน้ตกำกับว่าช่วงก้านแก้ว "ควบคุมไม่ได้" ต้องเดินตามทาง ส่วนช่วงปากแก้ว "เปิดให้ explore") ตัวอย่างจริงสองชิ้นด้านล่าง — drones.pitchinteractive.com ("Out of Sight, Out of Mind" แสดงยอดผู้เสียชีวิตจากโดรน 3,341 คน) และ guns.periscopic.com ("US Gun Deaths" แสดงยอดผู้เสียชีวิต 11,419 คน คิดเป็น "502,025 stolen years" ปีชีวิตที่ถูกพรากไป) — ทั้งสองชิ้นเปิดด้วยตัวเลขรวมและภาพรวมที่ผู้เขียนกำหนด (ก้านแก้ว) ก่อนปล่อยให้ผู้อ่านคลิกสำรวจเคสรายบุคคลเอง (ปากแก้ว).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Author-driven vs Reader-driven</span></div>
+  <div class="qtext">ข้อเสียหลักของโครงสร้างแบบ Author-driven (linear) คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">อาจน่าเบื่อสำหรับผู้อ่านที่อยากสำรวจข้อมูลด้วยตัวเอง เพราะลำดับถูกกำหนดตายตัว</button>
+    <button class="opt" data-correct="false">ผู้อ่านมักเข้าใจข้อความหลักผิดพลาดบ่อยกว่าแบบ reader-driven</button>
+    <button class="opt" data-correct="false">ใช้เวลานานกว่าแบบ reader-driven เสมอ</button>
+    <button class="opt" data-correct="false">ไม่สามารถทำเป็น interactive ได้เลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Martini Glass Structure</span></div>
+  <div class="qtext">โครงสร้าง "Martini Glass" ผสมสองรูปแบบการเล่าเรื่องอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ครึ่งแรก (ก้านแก้ว) เป็น author-driven บังคับลำดับ ครึ่งหลัง (ปากแก้ว) เป็น reader-driven เปิดให้สำรวจอิสระ</button>
+    <button class="opt" data-correct="false">ครึ่งแรกเป็น reader-driven ครึ่งหลังเป็น author-driven สลับกับที่กล่าวมา</button>
+    <button class="opt" data-correct="false">ทั้งชิ้นเป็น author-driven ทั้งหมด ไม่มีส่วนไหน interactive</button>
+    <button class="opt" data-correct="false">ใช้สลับกันไปมาแบบสุ่มไม่มีลำดับที่แน่นอน</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. เครื่องมือ: Story Points ใน Tableau</h2>
+<p>ในทางปฏิบัติ เครื่องมือ visualization หลายตัวมีฟีเจอร์สร้าง narrative แบบ author-driven ในตัวอยู่แล้ว ตัวอย่างที่เห็นชัดสุดคือ "Story Points" ของ Tableau:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p118-tableau-story-points.png" alt="A screenshot of Tableau's Story Points feature showing a sequence of tabs at the top, each a titled step such as Costs are fairly even worldwide, with the currently selected tab displaying a world map colored by average shipping cost">
+<figcaption>Slide: Tableau Story Points — ตัวอย่างเครื่องมือสร้าง narrative แบบ author-driven (vis-12-storytelling.pdf, p.118)</figcaption>
+</figure>
+<p>แต่ละแท็บด้านบน (เช่น "Costs are fairly even worldwide: is that true for all Categories?" "Shipping Costs are highest for Critical Priority orders") คือ "จุดหนึ่งของเรื่อง" (story point) — แต่ละจุดผูกกับ view/filter ของ dashboard ที่ต่างกัน เมื่อผู้อ่านกดถัดไปทีละแท็บ ก็เหมือนพลิกอ่านสไลด์ที่ผู้เขียนจัดลำดับไว้แล้ว (author-driven, linear) นี่คือหนึ่งในเครื่องมือ "many vis, many step, linear" — ต่างจาก Ellipsis ที่เป็น non-linear (ผู้อ่านเลือกลำดับได้เอง) หรือ GED Vis ที่มีแค่ one dataset one vis เท่านั้น เลือกเครื่องมือผิดประเภทจะทำให้ narrative ที่ตั้งใจออกแบบไว้ (เช่น Martini Glass) สร้างไม่ได้เลย.</p>
+
+<h2>7. ผสาน Visualization กับข้อความ: งานวิจัยของอาจารย์เอง</h2>
+<p>อาจารย์นำเสนองานวิจัยของตัวเองที่ผสาน visualization เข้ากับข้อความบรรยายอัตโนมัติ (auto-generated text) เพื่อเล่าเรื่องจากข้อมูลตารางเดียวกัน:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p125-automated-narrative-example.png" alt="Four-panel automated narrative about college selection: first panel shows a scatterplot of US News Score vs Tuition with narrative text introducing the goal, second panel highlights MIT with high academics and high US News Score, third panel highlights UC San Diego with low academics and low tuition, fourth panel is a parallel coordinates plot concluding there is a trade-off, citing Caltech and Arizona State as extreme examples">
+<figcaption>Slide: Puripant Ruchikachorn, "Integrating Visualizations into the Authoring of Narratives", 2016 (vis-12-storytelling.pdf, p.125)</figcaption>
+</figure>
+<p>เรื่องราวเริ่มจาก "Joe อยากหาโรงเรียนที่ดีที่สุด — ต้องการ US News Score สูง (สีเขียว) และ Tuition ต่ำ (สีน้ำเงิน)" จากนั้นระบบไล่แสดงคู่มิติทีละคู่พร้อมข้อความอธิบายที่สร้างขึ้นอัตโนมัติจากข้อมูลจริง: คู่แรก (Academics × US News Score) ชี้ไปที่ MIT ที่มี Academics สูงและ US News Score สูงพร้อมกัน คู่ที่สอง (Academics × Tuition) ชี้ไปที่ UC San Diego ที่มี Academics ต่ำและ Tuition ต่ำพร้อมกัน แผงสุดท้ายเป็น parallel coordinates สรุปว่า Academics กับ Tuition มีความสัมพันธ์แบบ trade-off โดยยกตัวอย่างสุดโต่งสองกรณี — Caltech (US News Score สูงแต่ Tuition ก็สูงตาม) กับ Arizona State (Tuition ต่ำแต่ US News Score ก็ต่ำตาม) — ข้อคิดสำคัญ: ข้อความอธิบายในแต่ละช่องไม่ได้เขียนด้วยมือ แต่ระบบสร้างขึ้นเองจากการวิเคราะห์ pattern ในข้อมูลจริง (ใครมีค่าสูง/ต่ำตรงไหน) แล้วเลือกชื่อโรงเรียนที่เป็นตัวอย่างเด่นที่สุดของแต่ละ pattern มาอ้างถึง — นี่คือ Diamond/Freytag Structure ที่ถูกนำมาใช้งานจริงโดยอัตโนมัติ: เริ่มจากปัญหา (ภาพรวม) ไล่แจกแจงทีละมิติ (รายละเอียด) แล้วสรุปเป็น insight ปิดท้าย.</p>
+
+<h2>8. ทำตัวเลขที่นามธรรมให้จับต้องได้: Concrete Scales</h2>
+<p>ปัญหาสุดท้ายของการเล่าเรื่องด้วยข้อมูลคือตัวเลขบางตัวใหญ่/เล็กเกินกว่าจะจินตนาการได้ (เช่น "มวลดาวเสาร์ 5.68×10²⁶ กก.") งานวิจัยนี้เสนอ 3 เทคนิคทำให้ตัวเลขนามธรรมกลายเป็นสิ่งที่จับต้องได้:</p>
+
+<figure>
+<img src="../assets/slides/vis12-p142-concrete-scales.png" alt="Three techniques illustrated: Unitization shows a balance scale weighing Saturn against a grid of many small Earth icons; Anchoring shows a tick insect next to a matchstick for size reference instead of millimeters; Analogies shows an atom's structure paired with a striped planet, and a mannequin head paired with planet Earth">
+<figcaption>Slide: Fanny Chevalier et al., "Using concrete scales: A practical framework for effective visual depiction of complex measures", IEEE TVCG 2013 (vis-12-storytelling.pdf, p.142)</figcaption>
+</figure>
+<p><strong>Unitization (a)</strong>: แทนที่จะบอกว่า "ดาวเสาร์หนักกว่าโลก 95 เท่า" ให้วาดตาชั่งที่ด้านหนึ่งมีดาวเสาร์ อีกด้านมีลูกโลกเล็ก ๆ เรียงกันเป็นตารางจนตาชั่งสมดุล — ผู้ดูนับเม็ดคร่าว ๆ ก็เข้าใจสัดส่วนได้ทันทีโดยไม่ต้องคิดเลข <strong>Anchoring (b)</strong>: แทนที่จะบอกขนาดเห็บเป็นหน่วยมิลลิเมตร ให้วางเห็บไว้ข้าง ๆ หัวไม้ขีดไฟที่ทุกคนคุ้นเคยขนาดอยู่แล้ว — สมองมนุษย์เทียบขนาดสองวัตถุที่เห็นพร้อมกันได้แม่นกว่าแปลงหน่วยตัวเลขในหัว <strong>Analogies (c)</strong>: เทียบโครงสร้างที่ไม่คุ้นเคยกับโครงสร้างที่คุ้นเคยกว่า เช่น โครงสร้างอะตอม (อิเล็กตรอนโคจรรอบนิวเคลียส) เทียบกับดาวเคราะห์ที่มีแถบโคจร หรือขนาดศีรษะคนเทียบกับขนาดโลก — ทั้ง 3 เทคนิคมีแก่นเดียวกัน: แปลงตัวเลขที่ "รู้แต่ไม่รู้สึก" ให้กลายเป็นภาพที่ "เห็นแล้วรู้สึกได้ทันที".</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Tableau Story Points</span></div>
+  <div class="qtext">Tableau Story Points จัดอยู่ในหมวดเครื่องมือประเภทใดตามตาราง Tools?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">many visualization, many step, linear (author-driven)</button>
+    <button class="opt" data-correct="false">one dataset, one visualization, linear</button>
+    <button class="opt" data-correct="false">many visualization, many step, non-linear</button>
+    <button class="opt" data-correct="false">ไม่จัดอยู่ในหมวดใดเลยเพราะไม่ใช่เครื่องมือ storytelling</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Automated Narrative Example</span></div>
+  <div class="qtext">ในตัวอย่างเรื่องราวการหาโรงเรียนของ Joe เหตุใด MIT ถึงถูกยกมาเป็นตัวอย่างในแผงที่สอง (Academics &amp; US News Score)?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เพราะ MIT มีทั้ง Academics สูงและ US News Score สูงพร้อมกัน แสดง pattern ที่แผงนั้นกำลังอธิบาย</button>
+    <button class="opt" data-correct="false">เพราะ MIT มี Tuition ต่ำที่สุดในบรรดาโรงเรียนทั้งหมด</button>
+    <button class="opt" data-correct="false">เพราะ MIT เป็นโรงเรียนที่ถูกเลือกแบบสุ่ม ไม่มีเหตุผลเชิงข้อมูล</button>
+    <button class="opt" data-correct="false">เพราะ MIT เป็นโรงเรียนเดียวที่มีข้อมูลครบทุกมิติ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Concrete Scales</span></div>
+  <div class="qtext">เทคนิค "Anchoring" ในการทำตัวเลขให้จับต้องได้ทำงานอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เทียบขนาด/ปริมาณที่ไม่คุ้นเคยกับวัตถุอ้างอิงที่คุ้นเคยอยู่แล้ว วางให้เห็นเทียบกันโดยตรง</button>
+    <button class="opt" data-correct="false">แปลงหน่วยวัดทั้งหมดให้เป็นหน่วยสากล (SI unit) เท่านั้น</button>
+    <button class="opt" data-correct="false">ใช้สีสันจัดจ้านเพื่อดึงดูดความสนใจ</button>
+    <button class="opt" data-correct="false">ลดจำนวนทศนิยมของตัวเลขให้สั้นลง</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 8</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ ว่าทำไม dashboard สำหรับใช้งานภายในองค์กร (เช่น Social Media Manager's Dashboard) ถึงไม่จำเป็นต้องมี "เรื่องเล่า" (narrative) เหมือน dashboard สำหรับสาธารณะ (เช่น UNHCR)?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">เพราะผู้ใช้ dashboard ภายในองค์กร (เช่น Social Media Manager) มีบริบทและความรู้พื้นฐานเกี่ยวกับข้อมูลอยู่แล้ว เขาต้องการแค่ตรวจสอบตัวเลขให้เร็วที่สุดเพื่อตัดสินใจ/ทำงานต่อ (functional, ใช้บ่อย) ไม่จำเป็นต้องมีเรื่องเล่าเพื่อสร้างความเข้าใจใหม่หรืออารมณ์ร่วม ตรงข้ามกับ dashboard สาธารณะที่ผู้ชมไม่มีบริบทมาก่อน และเป้าหมายคือสร้างความเข้าใจ/ความรู้สึกร่วมในครั้งเดียวที่เห็น จึงต้องเลือกตัวเลขเด่นและใส่บริบทให้ครบ</div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรแยกแยะได้ว่างานชิ้นหนึ่งกำลังอยู่ในโหมด exploration หรือ storytelling อธิบายโครงสร้าง Freytag's Pyramid, Diamond Structure และ Martini Glass ได้พร้อมยกตัวอย่างจริง แยก author-driven กับ reader-driven ได้ และประยุกต์เทคนิค Unitization/Anchoring/Analogies เพื่อทำตัวเลขนามธรรมให้จับต้องได้ในงานนำเสนอของตัวเองได้.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (171 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-12-storytelling.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์สื่อจริงที่เปิดสาธิตสด/งานวิจัยเชิงลึก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–7</td><td>ทวนจาก Lesson 11: chart type preference, memorability, artery diagnosis</td><td>etc — ทวนเนื้อหา Lesson 11 ไม่ทำ quiz ซ้ำ</td></tr>
+<tr><td>8</td><td>Spectrum: Data exploration/analysis → Data presentation/storytelling</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>9–11</td><td>"Given a picture/visualization, people make a (data) story"</td><td>✓ ส่วนหนึ่งของหัวข้อ 1 (เกริ่นนำแนวคิด)</td></tr>
+<tr><td>12</td><td>ตัวอย่าง Instagram post</td><td>etc — ตัวอย่างประกอบสั้น</td></tr>
+<tr><td>13–14</td><td>Dashboard types: Strategy/operation vs Communication/learning</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>15–16</td><td>บทความ/เว็บอ้างอิงเรื่อง data storytelling trend</td><td>etc — ลิงก์อ้างอิงสั้น</td></tr>
+<tr><td>17–49</td><td>ตัวอย่างสื่อจริงจำนวนมาก (NYT Upshot หลายชิ้น: rich-poor friendships, overdose deaths, election turnout, Oscars history, Facebook IPO) เปิดสาธิตสดในคาบ</td><td>etc — ตัวอย่างสาธิตสดจากลิงก์จริง ไม่มีเนื้อหาให้ render เป็นภาพนิ่งที่มีความหมายนอกบริบทเว็บ</td></tr>
+<tr><td>50–51</td><td>Data Comics: European Alliances before WWI + งานวิจัย Data Comics เพิ่มเติม</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>52–53</td><td>Segel &amp; Heer citation ซ้ำ + ภาพ WWI comics ซ้ำ</td><td>✓ อ้างอิงซ้ำจากหัวข้อ 3</td></tr>
+<tr><td>54</td><td>Narrative Structure: Freytag's Pyramid</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>55</td><td>Narrative Structure: Diamond Structure</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>56–57</td><td>PROP/SAMPLE: การจัดลำดับการเปิดเผยแถวข้อมูลตามหลัก narrative sequence</td><td>etc — แนวคิดเสริมเรื่องลำดับ ครอบคลุมแล้วโดย Freytag/Diamond</td></tr>
+<tr><td>58–88</td><td>ตัวอย่างสื่อจริงจำนวนมาก (Straits Times hawker prices, NYT Uvalde shootings, infrastructure breakdown, boonmeelab lottery/BKK viz ของคนไทย, India pollution, manga/food review sites)</td><td>etc — ตัวอย่างสาธิตสดจากลิงก์จริง</td></tr>
+<tr><td>89</td><td>Good News or Bad News First: Bias from Visualization Sequences (งานวิจัยอาจารย์)</td><td>etc — เชื่อมกับหัวข้อ 4 (ลำดับมีผลต่อการรับรู้) ไม่ลง quiz แยก</td></tr>
+<tr><td>90</td><td>Author-driven vs Reader-driven</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>91–93</td><td>ตัวอย่าง Reader-driven จริง (NYT paths to White House, electoral college)</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>94</td><td>Martini Glass Structure + ตัวอย่างจริง (drones, guns)</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>95–117</td><td>ตัวอย่างสื่อจริงจำนวนมาก (boonmeelab 7days, FiveThirtyEight gun deaths, The Pudding travel/wine, Morgenpost climate, NYT election precinct maps)</td><td>etc — ตัวอย่างสาธิตสดจากลิงก์จริง</td></tr>
+<tr><td>118</td><td>Tools: GED Vis / Story Points / Ellipsis / DIY + ตัวอย่าง Tableau Story Points</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>119–124</td><td>เครื่องมือ/งานวิจัยเสริม (lapis-story, inflect, SoccerStories, DataToon)</td><td>etc — ตัวอย่างเครื่องมือเสริม นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>125–127</td><td>Integrating Visualizations into the Authoring of Narratives (งานวิจัยอาจารย์)</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>128–133</td><td>เครื่องมือ AI/LLM ช่วยสร้าง narrative อัตโนมัติเพิ่มเติม (AutoClips, Roslingifier, DataTales, TaleBrush) + xkcd comic</td><td>etc — แนวโน้มเครื่องมือใหม่ นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>134</td><td>The Science of Visual Data Communication (บทความสรุปงานวิจัยกว้าง)</td><td>etc — บทความอ้างอิงกว้าง</td></tr>
+<tr><td>135–141</td><td>ตัวอย่างสื่อจริงเพิ่มเติม (Bloomberg/NYT China exports, US travel decline) + เกริ่นนำ Contextualization</td><td>etc — ตัวอย่างสาธิตสด + เกริ่นนำหัวข้อ 8</td></tr>
+<tr><td>142</td><td>Concrete Scales: Unitization/Anchoring/Analogies</td><td>✓ หัวข้อ 8 (มีรูป)</td></tr>
+<tr><td>143–171</td><td>ตัวอย่างสื่อจริงจำนวนมากที่ใช้ concrete scale/analogy (Ukraine size, Gaza comparison, ProPublica taxes, moon explainer, plastic pollution, Uber Bangkok, Apple trillion market cap, leaders' height, VR data visceralization)</td><td>etc — ตัวอย่างสาธิตสดประกอบหัวข้อ 8 จากลิงก์จริง</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0011-visualization-validation.html">← Lesson 11: Visualization Validation</a></span>
+  <span><a href="0013-current-issues.html">Lesson 13: Current Issues →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

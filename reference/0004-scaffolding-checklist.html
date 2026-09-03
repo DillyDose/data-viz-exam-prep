@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Scaffolding Checklist</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 4</p>
+<h1>Scaffolding &amp; Univariate Chart Checklist</h1>
+
+<h2>Complete Chart = Scaffolding + Content</h2>
+<p>(Alberto Cairo) <strong>Content</strong> คือรูปทรง/มาร์กที่เข้ารหัสข้อมูลจริง ส่วน <strong>Scaffolding</strong> คือทุกอย่างที่ช่วยให้ตีความ content ได้ถูกต้อง — ถ้าลอก scaffolding ออกจนหมด content จะกลายเป็นรูปทรงที่ตีความไม่ได้เลย.</p>
+<ul>
+<li>Title / description</li>
+<li>Axes</li>
+<li>Legends</li>
+<li>Annotations</li>
+</ul>
+
+<h2>กฎ Tick Marks (4 ข้อ)</h2>
+<table>
+<tr><th>หลักการ</th><th>ความหมาย</th></tr>
+<tr><td><strong>Simplicity</strong></td><td>ใช้ตัวคูณของ 2, 5, 10 …</td></tr>
+<tr><td><strong>Coverage</strong></td><td>ครอบคลุมข้อมูลทั้งหมด แต่ไม่เกินความจำเป็น</td></tr>
+<tr><td><strong>Density</strong></td><td>ไม่ถี่หรือห่างเกินไป</td></tr>
+<tr><td><strong>Legibility</strong></td><td>ตัวอักษรแนวนอนใหญ่พออ่านได้</td></tr>
+</table>
+
+<h2>กระบวนการออกแบบ Univariate Chart</h2>
+<ol>
+<li>Determine the data type (nominal/ordinal/quantitative)</li>
+<li>Pick one appropriate visual variable</li>
+<li>เติม scaffolding: title, axes, legends, annotations</li>
+</ol>
+
+<h2>Code Tools → เชื่อมกลับกรอบคิดหลัก</h2>
+<table>
+<tr><th>ข้อดีของเครื่องมือแบบ code (D3.js, Vega, Altair, R)</th><th>เชื่อมกับ</th></tr>
+<tr><td>Pixel precise</td><td>→ Truthful</td></tr>
+<tr><td>Reusable</td><td>—</td></tr>
+<tr><td>(Possibly) interactive</td><td>→ Insightful</td></tr>
+</table>
+
+<h2>Grammar Stack: Altair → Vega-Lite → Vega</h2>
+<p><code>Altair (Python spec)</code> → คอมไพล์เป็น <code>Vega-Lite spec (JSON)</code> → คอมไพล์เป็น <code>Vega spec (JSON)</code> → เรนเดอร์เป็น Visualization จริง</p>
+
+<h2>Data Type Suffix ใน Altair</h2>
+<table>
+<tr><th>Suffix</th><th>ความหมาย</th></tr>
+<tr><td><code>:Q</code></td><td>Quantitative</td></tr>
+<tr><td><code>:O</code></td><td>Ordinal</td></tr>
+<tr><td><code>:N</code></td><td>Nominal</td></tr>
+</table>
+<p>เช่น <code>encode(color='x:Q')</code> บอก Altair ว่าคอลัมน์ x เป็นข้อมูลเชิงปริมาณ ให้เลือกสเกลสีแบบไล่ระดับ (ไม่ใช่สีตามหมวดหมู่)</p>
+
+<hr>
+<p><a href="../lessons/0004-univariate-data-visualization.html">← กลับไป Lesson 4</a></p>
+
+</body>
+</html>

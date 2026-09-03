@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Visual Variables Cheat Sheet</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 2</p>
+<h1>Visual Variables (Channels) Cheat Sheet</h1>
+
+<h2>Marks vs Variables</h2>
+<ul>
+<li><strong>Visual Mark</strong> — รูปทรงพื้นฐานที่แทน 1 data point (จุด, เส้น, สี่เหลี่ยม, วงกลม)</li>
+<li><strong>Visual Variable / Channel</strong> — คุณสมบัติที่ใช้เข้ารหัส (encode) ค่าข้อมูลลงบน mark เช่น ความยาว พื้นที่ ความเข้มสี เฉดสี ตำแหน่ง มุม</li>
+</ul>
+
+<h2>จับคู่ Channel กับประเภทข้อมูล</h2>
+<table>
+<tr><th>ประเภทข้อมูล</th><th>นิยาม</th><th>Channel ที่เหมาะ</th></tr>
+<tr><td><strong>Ordinal / Quantitative</strong></td><td>มีลำดับ/สเกลต่อเนื่อง (x → x+a)</td><td>ตำแหน่ง (position), ความยาว (length), มุม (angle), ขนาด (size/area), ความเข้ม (darkness/brightness)</td></tr>
+<tr><td><strong>Nominal / Categorical</strong></td><td>ไม่มีลำดับโดยธรรมชาติ</td><td>เฉดสี (hue), รูปทรง (shape)</td></tr>
+</table>
+<p><em class="term">กับดัก:</em> เฉดสี (hue) ใช้กับข้อมูลเชิงปริมาณไม่ได้ดี เพราะสมองจัดลำดับสีไม่ได้ตามธรรมชาติ (แดงไม่ได้ "มากกว่า" น้ำเงิน) — ใช้ความเข้ม/ความสว่างของสีเดียวแทนสำหรับข้อมูลเชิงปริมาณ</p>
+
+<h2>อันดับความแม่นยำของการรับรู้ (Perceptual Accuracy Ranking)</h2>
+<p>จาก Cleveland &amp; McGill (1984) ที่ Heer &amp; Bostock (2010) ทดสอบซ้ำผ่าน crowdsourcing บน Mechanical Turk และ Tamara Munzner สรุปไว้ใน <em>Visualization Analysis and Design</em> (2014) — เรียงจาก error ต่ำสุด (แม่นสุด) ไปสูงสุด (แม่นน้อยสุด):</p>
+<ol>
+<li><strong>Position</strong> (ตำแหน่งบนแกนร่วม) — แม่นยำที่สุด</li>
+<li><strong>Angle</strong> (มุม เช่น pie chart)</li>
+<li><strong>Circular area</strong> (พื้นที่วงกลม เช่น bubble chart)</li>
+<li><strong>Rectangular area</strong> (พื้นที่สี่เหลี่ยม เช่น treemap) — แม่นยำน้อยที่สุด</li>
+</ol>
+<div class="box">
+<div class="label">นัยสำคัญต่อการเลือกชาร์ต</div>
+นี่คือเหตุผลเชิงวิทยาศาสตร์ว่าทำไม <strong>bar chart (position) แม่นยำกว่า pie chart (angle) และ bubble chart (area)</strong> เมื่อผู้อ่านต้องเปรียบเทียบค่าที่แม่นยำ — ไม่ใช่แค่ความชอบส่วนตัว
+</div>
+
+<h2>Good = Truthful + Functional (จาก Lecture 1's Effective/Convincing)</h2>
+<table>
+<tr><th>Lecture 1</th><th>Lecture 2</th></tr>
+<tr><td>Effective</td><td>→ Functional</td></tr>
+<tr><td>Convincing</td><td>→ Truthful</td></tr>
+<tr><td>Insightful</td><td>→ (ยังไม่ระบุใน slide — เปิดไว้)</td></tr>
+</table>
+
+<h2>3 กับดัก "ไม่ Truthful" ที่พบบ่อย (ตัวอย่างจาก slide)</h2>
+<ul>
+<li><strong>Pie chart ที่ผลรวม % เกิน 100%</strong> — เช่นตัวอย่าง Fox News 2012 GOP pie chart (70% + 63% + 60% = 193%) ทำให้สัดส่วนภาพไม่ตรงกับข้อมูลจริง</li>
+<li><strong>แกน bar chart ไม่เริ่มที่ 0</strong> — ทำให้ผลต่างระหว่างแท่งดูเกินจริง</li>
+<li><strong>Proportional symbol (วงกลมตามขนาดข้อมูล) ที่ scale ผิด</strong> — ถ้าใช้ "รัศมี" แทน "พื้นที่" ในการ scale ตามค่าข้อมูล จะทำให้ค่าที่มากดูใหญ่เกินจริงมาก (พื้นที่วงกลมโตเป็นกำลังสองของรัศมี)</li>
+</ul>
+
+<h2>Color Perception — ข้อจำกัดทางสรีรวิทยา</h2>
+<ul>
+<li><strong>Chromatic aberration / Chromostereopsis</strong> — เลนส์ตาโฟกัสสีแดงกับสีน้ำเงินพร้อมกันไม่ได้ ทำให้ตัวอักษรสีแดงบนพื้นน้ำเงิน (หรือกลับกัน) ดูเบลอ อ่านยาก</li>
+<li><strong>Color blindness</strong> — ~8% ของประชากรโลก (ส่วนใหญ่เพศชาย) มี deuteranopia (บกพร่องการแยกแดง/เขียว) — หลีกเลี่ยงการเข้ารหัสข้อมูลสำคัญด้วยคู่สีแดง-เขียวเพียงอย่างเดียว</li>
+</ul>
+
+<hr>
+<p><a href="../lessons/0002-perception-and-visual-variables.html">← กลับไป Lesson 2</a></p>
+
+</body>
+</html>

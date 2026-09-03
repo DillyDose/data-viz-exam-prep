@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 3: Visual Variables & Visualization Pipeline</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 3 / 13 · Pipeline</span>
+  <span><a href="../reference/0003-pipeline-and-bad-data-cheatsheet.html">Reference: Pipeline &amp; Bad Data →</a></span>
+</nav>
+
+<p class="kicker">vis-3-variable-pipeline.pdf</p>
+<h1>Visual Variables &amp; Visualization Pipeline</h1>
+
+<p>บทเรียนนี้ทำสองอย่าง: (1) เติมเต็มช่องว่างที่ Lesson 1–2 เปิดค้างไว้ — "Insightful" คืออะไรกันแน่ในกรอบการออกแบบ และ (2) แนะนำ "pipeline" 3 ขั้นตอนที่ visualization ทุกชิ้นต้องผ่าน ตั้งแต่หาข้อมูลดิบจนถึงนำเสนอ — ซึ่งเป็นขั้นตอนที่ mini project ของวิชานี้ให้คะแนนโดยตรง (Process/pipeline 40%).</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Claus O. Wilke, <a href="https://clauswilke.com/dataviz/directory-of-visualizations.html" target="_blank" rel="noopener">Fundamentals of Data Visualization — Directory of Visualizations</a> ใช้ทบทวนว่าข้อมูลแบบไหนควรใช้ mark/variable แบบไหน และ <a href="https://github.com/Quartz/bad-data-guide" target="_blank" rel="noopener">Quartz Bad Data Guide</a> (ฟรี อ่านสั้น ๆ ~10 นาที) — checklist ปัญหาข้อมูลสกปรกที่ใช้ได้จริง.
+</div>
+
+<h2>1. Insightful = Expressive: ปิดช่องว่างจาก Lesson 1–2</h2>
+<p>Jock Mackinlay (1986) นิยาม <strong>Design</strong> ว่าคือการเลือก visual encoding ที่ <strong>insightful &amp; functional</strong> ที่สุด จากความเป็นไปได้ทั้งหมด (n data dimensions × k visual variables) โดย:</p>
+<ul>
+<li><strong>Insightful = Expressive</strong> — encoding แสดงเฉพาะความสัมพันธ์ที่มีอยู่จริงในข้อมูล ไม่มากไปไม่น้อยไป</li>
+<li><strong>Functional = Effective</strong> — encoding ใช้ channel ที่ผู้อ่านรับรู้ได้แม่นยำ เหมาะกับสิ่งที่ต้องการสื่อ</li>
+</ul>
+<p>ตอนนี้กรอบคิด 3 lecture เชื่อมกันครบ: <strong>Effective→Functional→Effective</strong>, <strong>Convincing→Truthful</strong>, <strong>Insightful→Expressive</strong>.</p>
+
+<figure>
+<img src="../assets/slides/vis3-p42-mackinlay-design-definition.png" alt="Visualization Design slide: Design = Selecting the most insightful & functional visual encoding; Insightful = expressive, Functional = effective">
+<figcaption>Slide: Visualization Design (Jock Mackinlay, 1986) (vis-3-variable-pipeline.pdf, p.42)</figcaption>
+</figure>
+<p>ลองคำนวณตามสูตร n<sup>k</sup> ดู: ถ้ามีข้อมูล n=3 มิติ (เช่น ยอดขาย, ภูมิภาค, เดือน) และมี k=5 visual variable ให้เลือก (ตำแหน่ง, ความยาว, มุม, สี, ขนาด) จำนวนวิธีเข้ารหัสที่เป็นไปได้ทั้งหมดคือ 3<sup>5</sup> = 243 แบบ! นี่คือเหตุผลที่ Mackinlay บอกว่าต้องมี "heuristics/guideline" ช่วยกรอง เพราะไล่ลองทีละแบบไม่ไหว — งานของนักออกแบบคือเลือก 1 ใน 243 แบบนั้นที่ทั้ง expressive (ไม่มโนความสัมพันธ์ที่ไม่มีจริง เช่น ไม่เอาข้อมูล nominal ไปเรียงเป็นเส้นแนวโน้ม) และ effective (ใช้ channel ที่คนอ่านค่าได้แม่นตรงกับสิ่งที่อยากสื่อ เช่น ใช้ position แทน area เมื่อต้องเทียบค่าแม่น ๆ).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Mackinlay 1986</span></div>
+  <div class="qtext">ตามนิยามของ Mackinlay (1986) "Insightful" ในบริบทการออกแบบ visualization เทียบเท่ากับคำใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Expressive</button>
+    <button class="opt" data-correct="false">Effective</button>
+    <button class="opt" data-correct="false">Truthful</button>
+    <button class="opt" data-correct="false">Efficient</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>2. Visual Variable ที่ไม่ใช่แค่สีหรือขนาด</h2>
+<p>Slide ขยายขอบเขต visual variable ให้กว้างกว่ารูปทรงนิ่ง ๆ: <strong>density</strong> (ความหนาแน่นจุดในแผนที่ choropleth), <strong>speed</strong> (ความเร็วใน animation), และตั้งคำถามยั่วคิดว่า <strong>"เสียง (sound) เป็น visual variable ได้หรือไม่?"</strong> (data sonification — เข้ารหัสข้อมูลเป็นเสียงแทนภาพ).</p>
+
+<p>ตัวอย่างที่แสดงว่า visual variable สร้างขึ้นเองแบบสร้างสรรค์ได้ ไม่ต้องอิงกับ mark มาตรฐาน (แท่ง จุด เส้น) เลย:</p>
+
+<figure>
+<img src="../assets/slides/vis3-p28-tech-diversity-logos.png" alt="Three tech company logos each used as a custom chart mark: Apple's logo filled yellow from the bottom up to a line at 67 percent representing the male workforce share, with the remaining green leaf area representing 33 percent female; Google's letters similarly split by employee gender and non-binary percentages; Facebook's wordmark split at 63.1 percent male versus 36.9 percent female">
+<figcaption>Slide: โลโก้บริษัทเทคใหญ่แสดงสัดส่วนเพศพนักงาน (vis-3-variable-pipeline.pdf, p.28, fastcompany.com)</figcaption>
+</figure>
+<p>แทนที่จะวาด bar chart ธรรมดาเทียบสัดส่วนพนักงานชาย-หญิงของแต่ละบริษัท ภาพนี้เอา<strong>โลโก้ของบริษัทเอง</strong>มาทำหน้าที่เป็น mark แล้วใช้ "ความสูงที่ถูกเติมสี" เป็น visual variable แทน — โลโก้ Apple ถูกระบายสีเหลืองจากฐานขึ้นไปจนถึงเส้นแบ่งที่ 67% (สัดส่วนพนักงานชาย) ส่วนที่เหลือ (ใบไม้สีเขียวด้านบน) แทน 33% หญิง โลโก้ Google และ Facebook ก็ใช้หลักการเดียวกัน แบ่งตามสัดส่วนจริง (Google: 68.4% ชาย/31.6% หญิง/<1% non-binary, Facebook: 63.1% ชาย/36.9% หญิง) — ตัวอักษร "mark" ในที่นี้ไม่ใช่สี่เหลี่ยมหรือวงกลมมาตรฐานเลย แต่เป็นรูปทรงโลโก้ที่ทุกคนจำได้ทันที ในขณะที่ "variable" ยังคงเป็นหลักการเดิม (สัดส่วนความสูงที่ถูกเติม) — นี่คือตัวอย่างว่าความคิดสร้างสรรค์ในการเลือก mark ทำให้ข้อมูลที่น่าเบื่อ (สถิติ HR) กลายเป็นภาพที่น่าจดจำและสื่อความหมายเสียดสีได้ในตัว (บริษัทที่พูดเรื่อง diversity บ่อย แต่ตัวเลขจริงยังไม่ diverse).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Custom Mark</span></div>
+  <div class="qtext">ในภาพโลโก้บริษัทเทคที่แสดงสัดส่วนเพศพนักงาน อะไรทำหน้าที่เป็น "visual mark" และอะไรทำหน้าที่เป็น "visual variable"?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">โลโก้บริษัท (Apple/Google/Facebook) คือ mark ส่วนสัดส่วนความสูงที่ถูกเติมสีคือ variable</button>
+    <button class="opt" data-correct="false">สีของโลโก้คือ mark ส่วนชื่อบริษัทคือ variable</button>
+    <button class="opt" data-correct="false">ตัวเลขเปอร์เซ็นต์คือ mark ส่วนโลโก้คือ variable</button>
+    <button class="opt" data-correct="false">ไม่มีทั้ง mark และ variable ในภาพนี้</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Visual Variable ขยายขอบเขต</span></div>
+  <div class="qtext">"ความเร็วของการเคลื่อนไหวใน animation ใช้แทนค่าข้อมูล" ตัวอย่างนี้ใช้ visual variable ประเภทใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Speed</button>
+    <button class="opt" data-correct="false">Density</button>
+    <button class="opt" data-correct="false">Hue</button>
+    <button class="opt" data-correct="false">Position</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. Mark vs Variable ในทางปฏิบัติ: กรณี Pie Chart</h2>
+<p>Slide ยกตัวอย่างที่ถกเถียงกันจริงในวงการวิจัย: pie chart มี <em class="term">Mark = slice</em> (ชิ้นส่วน) แต่ <em class="term">Variable</em> ที่คนใช้ตัดสินขนาดจริง ๆ คือ<strong>อะไร</strong> — มุม (angle), ความยาวส่วนโค้ง (arc length), หรือพื้นที่ (area)? งานวิจัยของ Robert Kosara และคณะ (2016–2022) ยังไม่ฟันธงคำตอบเดียว — ทำให้ pie chart เป็นชาร์ตที่ "ตีความ variable ยาก" กว่าที่คิด.</p>
+
+<figure>
+<img src="../assets/slides/vis3-p15-pie-mark-variable.png" alt="Pie chart with handwritten labels: Visual Mark = Slice, Visual Variable = color/angle/proportion">
+<figcaption>Slide: Pie chart Mark vs Variable (vis-3-variable-pipeline.pdf, p.15)</figcaption>
+</figure>
+<p>ลองเทียบกับ bar chart: ใน bar chart ทุกคนรู้ตรงกันว่า channel ที่เข้ารหัสค่าคือ "ความสูงของแท่ง" ไม่มีทางตีความเป็นอย่างอื่น แต่ pie chart 5 ชิ้น (A-E) ในสไลด์นี้ไม่มีความชัดเจนแบบนั้น — คนอ่านคนหนึ่งอาจกะขนาดชิ้น A จาก "มุมที่กาง" (angle) อีกคนอาจกะจาก "ความยาวส่วนโค้งด้านนอก" (arc length) และอีกคนอาจกะจาก "พื้นที่ทั้งชิ้น" (area) — ทั้ง 3 วิธีให้คำตอบไม่ตรงกันเป๊ะเมื่อขนาดชิ้นใกล้เคียงกัน นี่คือเหตุผลที่ pie chart เปรียบเทียบค่าแม่น ๆ ยากกว่า bar chart อยู่แล้ว (สอดคล้องกับอันดับความแม่นยำที่เรียนใน Lesson 2 ว่า angle/area แม่นน้อยกว่า position) และยิ่งซ้ำเติมด้วยความไม่แน่ชัดว่าคนอ่านใช้ channel ไหนตัดสินใจจริง.</p>
+
+<p>ลองฝึกระบุ mark/variable กับชาร์ตข่าวจริงที่ซับซ้อนกว่า pie chart มาก — บทความ Harvard Business Review เรื่อง "การเมืองส่งผลต่อยี่ห้อเบียร์อย่างไร" (หลังกระแสแบน Bud Light ปี 2023):</p>
+
+<figure>
+<img src="../assets/slides/vis3-p18-beer-brands-political-chart.png" alt="A scatterplot of US beer brands where the x-axis is a political polarization index from more Democratic to more Republican, the y-axis is share of total beer sales, dot color separates Democratic-leaning brands like Corona and Heineken in blue from Republican-leaning brands like Bud Light and Busch Light in pink, and small arrows show how each brand moved from 2022 to 2023, next to a blank identification table with columns for Hue, Position x, Position y, and Size">
+<figcaption>Slide: การเมืองกับยี่ห้อเบียร์ในสหรัฐฯ (vis-3-variable-pipeline.pdf, p.18, hbr.org)</figcaption>
+</figure>
+<p>ชาร์ตนี้ใช้ 4 channel พร้อมกัน — ลองระบุทีละตัวตามตารางในสไลด์: <strong>Position: x</strong> = ดัชนีโพลาไรซ์ทางการเมือง (ยิ่งซ้ายยิ่ง Democratic ยิ่งขวายิ่ง Republican) <strong>Position: y</strong> = ส่วนแบ่งยอดขายเบียร์รวม <strong>Hue</strong> = หมวดหมู่ (ฟ้า = โน้มเอียง Democratic เช่น Corona, Heineken; ชมพู = โน้มเอียง Republican เช่น Bud Light, Busch Light) และมีลูกศรเล็ก ๆ เชื่อมจุดปี 2022 ไปปี 2023 แทน<strong>เวลา</strong> (เช่น Bud Light ขยับลงจาก ~12% เหลือ ~10% ส่วนแบ่งตลาด หลังกระแสแบนช่วงกลางปี 2023) — สังเกตว่าข้อมูลเดียวกันนี้ถ้าวาดเป็นตารางตัวเลขล้วนจะอ่านไม่ออกเลยว่าใครอยู่ฝั่งไหน แต่พอแยก 4 channel ให้ทำหน้าที่คนละมิติชัดเจน (ตำแหน่ง 2 แกน + สี + ทิศทางลูกศร) ก็เห็นเรื่องราวได้ทันที: ยี่ห้อที่โน้มเอียง Republican อย่าง Bud Light เสียส่วนแบ่งตลาดหลังกระแสคว่ำบาตร ในขณะที่ยี่ห้อโน้มเอียง Democratic อย่าง Modelo กลับเพิ่มขึ้น.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Pie Chart Mark/Variable</span></div>
+  <div class="qtext">งานวิจัยของ Kosara และคณะ เกี่ยวกับ pie chart สรุปว่าอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ยังไม่มีข้อสรุปเดียวว่าคนอ่านใช้ angle, arc length หรือ area</button>
+    <button class="opt" data-correct="false">คนอ่านใช้เฉพาะมุม (angle) เท่านั้นเสมอ</button>
+    <button class="opt" data-correct="false">คนอ่านใช้เฉพาะพื้นที่ (area) เท่านั้นเสมอ</button>
+    <button class="opt" data-correct="false">pie chart ไม่มี visual variable ที่ตีความได้เลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 5</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">จากชาร์ตการเมือง-ยี่ห้อเบียร์ ระบุว่า channel ทั้ง 4 ตัว (Position: x, Position: y, Hue, และลูกศรแทนเวลา) แต่ละตัวเข้ารหัสข้อมูลมิติใด?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">Position: x = ดัชนีโพลาไรซ์ทางการเมือง (Democratic ถึง Republican), Position: y = ส่วนแบ่งยอดขายเบียร์รวม, Hue = หมวดหมู่การเมืองของแต่ละยี่ห้อ (ฟ้า=Democratic, ชมพู=Republican), ลูกศรเชื่อมจุด = การเปลี่ยนแปลงตามเวลาจากปี 2022 ไปปี 2023</div>
+</div>
+
+<h2>4. Alberto Cairo: "How Charts Lie" — ไล่ทำชาร์ตให้ Truthful ทีละขั้น</h2>
+<p>Slide ยกตัวอย่างชาร์ตยอดขายเดียวกัน ("Our Company's Sales Have Soared!") ที่ถูกปรับทีละขั้นจากหลอกลวงไปสู่ตรงไปตรงมา:</p>
+<ol>
+<li><strong>เวอร์ชันแรก:</strong> 3D bar chart มุมเอียง ทำให้แท่งที่ควรเท่ากันดูต่างกัน — มี legend ปลอม (Competitor 1-4 vs Our Company วางเรียงให้บริษัทเราดูสูงเด่น)</li>
+<li><strong>เวอร์ชันกลาง:</strong> เปลี่ยนเป็น 2D bar chart ตรงไปตรงมา แสดง Market Share จริง</li>
+<li><strong>เวอร์ชันสุดท้าย:</strong> small multiples แยก 3 คำถามชัดเจน (2018 sales / Market share / Sales since 2011) แทนการยัดทุกอย่างในชาร์ตเดียว</li>
+</ol>
+
+<figure>
+<img src="../assets/slides/vis3-p30-3d-chart-deceptive.png" alt="Deceptive 3D bar chart claiming record sales of 35 million dollars with distorted bar heights">
+<figcaption>Slide: the deceptive 3D chart — version 1 (vis-3-variable-pipeline.pdf, p.30)</figcaption>
+</figure>
+<p>กลลวงของแท่งกราฟนี้คือมุมกล้อง: "Our Company" ถูกวางไว้แถวหน้าสุด (ใกล้ผู้ชมที่สุด) ส่วน Competitor 1-4 ถูกวางไว้ลึกเข้าไปด้านหลัง — ในมุมมอง 3 มิติ วัตถุที่อยู่ใกล้กล้องจะดู "ใหญ่กว่า" วัตถุที่อยู่ไกลออกไปโดยธรรมชาติ (perspective distortion) แม้ความสูงแท่งจริงจะเท่ากันเป๊ะ แท่ง "Our Company" ก็จะดูสูงเด่นกว่าคู่แข่งอยู่ดี บวกกับข้อความ "Record Sales!" ที่ดึงความสนใจไปที่ตัวเลข 35 ล้านดอลลาร์ (ตัวเลขเดี่ยว ไม่มีบริบทเทียบปีก่อน) — ผู้อ่านที่มองภาพนี้ 3 วินาทีจะรู้สึกว่า "บริษัทเราชนะขาด" ทั้งที่ยังไม่เห็นตัวเลขจริงของคู่แข่งเลยด้วยซ้ำ.</p>
+
+<figure>
+<img src="../assets/slides/vis3-p33-small-multiples-honest.png" alt="Three honest small-multiple charts: 2018 sales, Market share, Sales since 2011">
+<figcaption>Slide: the honest redesign as small multiples — final version (vis-3-variable-pipeline.pdf, p.33)</figcaption>
+</figure>
+<p>สังเกตว่าข้อมูลชุดเดียวกันเป๊ะ (ยอดขาย 35 ล้านดอลลาร์ของ "Our Company") ที่เคยถูกใช้สร้างความรู้สึก "ชนะขาด" ในเวอร์ชันแรก พอแยกออกมาเป็น 3 คำถามชัดเจน — "ปีนี้ขายได้เท่าไหร่" (แผงซ้าย), "ส่วนแบ่งตลาดเราเท่าไหร่" (แผงกลาง), "แนวโน้มหลายปีเป็นอย่างไร" (แผงขวา) — กลับเผยความจริงที่ต่างออกไปมาก เช่น อาจพบว่าถึงยอดขายจะสูง แต่ส่วนแบ่งตลาดยังตามหลังคู่แข่งอยู่ นี่คือบทเรียนสำคัญ: การ "รวมทุกอย่างในภาพเดียว" ไม่ได้แปลว่าให้ข้อมูลครบกว่า บางทีมันแค่ซ่อนความจริงที่ไม่อยากให้เห็นไว้เท่านั้น.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>How Charts Lie</span></div>
+  <div class="qtext">ปัญหาหลักของ 3D bar chart ในตัวอย่างของ Alberto Cairo คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">มุมมอง 3 มิติบิดเบือนการเปรียบเทียบความสูงของแท่ง</button>
+    <button class="opt" data-correct="false">ใช้สีมากเกินไปจนแยกแท่งไม่ออก</button>
+    <button class="opt" data-correct="false">ไม่มีตัวเลขกำกับแท่งเลย</button>
+    <button class="opt" data-correct="false">ใช้แกน log แทนแกนปกติ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 7</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">ทำไมการแยกชาร์ตเดียวเป็น small multiples (2018 sales / Market share / Sales since 2011) ถึงตรงไปตรงมากว่าการยัดทุกอย่างในชาร์ตเดียว?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">เพราะแต่ละคำถาม (ยอดขายปีเดียว / ส่วนแบ่งตลาด / แนวโน้มหลายปี) ใช้สเกลและหน่วยต่างกัน การยัดรวมในชาร์ตเดียวมักบังคับให้เลือกสเกลที่เข้าข้างข้อความใดข้อความหนึ่ง small multiples ให้แต่ละคำถามมีแกนของตัวเองที่เหมาะสม ไม่บิดเบือนเพื่อเล่าเรื่องเดียว</div>
+</div>
+
+<h2>5. กับดัก Ordinal/Nominal ที่ใช้ผิด Variable</h2>
+<p>Slide เตือนตรง ๆ: <strong>เอาข้อมูล Ordinal ไปเข้ารหัสด้วย channel แบบ Nominal = ผิด</strong> และ <strong>เอาข้อมูล Nominal ไปเข้ารหัสด้วย channel แบบ Ordinal = ผิด</strong> เช่นเดียวกัน — ตัวอย่าง: แผนที่สีตามชื่อประเทศ (nominal) ถ้าใช้ไล่โทนสีเข้ม-อ่อน (ordinal channel) ผู้อ่านจะเข้าใจผิดว่ามีลำดับความสำคัญระหว่างประเทศ ทั้งที่ไม่มี.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>กับดัก Ordinal/Nominal</span></div>
+  <div class="qtext">แผนที่ระบายสีประเทศเพื่อนบ้านด้วยโทนสีไล่ระดับเข้ม-อ่อน (เหมือนข้อมูลมีลำดับ) ทั้งที่ชื่อประเทศเป็นข้อมูล nominal มีปัญหาอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ผู้อ่านจะเข้าใจผิดว่าประเทศมีลำดับความสำคัญทั้งที่ไม่มี</button>
+    <button class="opt" data-correct="false">แผนที่จะแสดงผลช้าลงเมื่อมีสีเยอะ</button>
+    <button class="opt" data-correct="false">สีไล่ระดับใช้หมึกพิมพ์มากกว่าสีปกติ</button>
+    <button class="opt" data-correct="false">โปรแกรมส่วนใหญ่วาดแผนที่แบบนี้ไม่ได้</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. Visualization Pipeline: 3 ขั้นตอน</h2>
+<table>
+<tr><th>ขั้นตอน</th><th>รายละเอียด</th></tr>
+<tr><td><strong>Data Acquisition</strong></td><td>Self-tracking, Scraping, Download &amp; API (เช่น data.go.th, NSO Data Catalog)</td></tr>
+<tr><td><strong>Data Preparation</strong></td><td>Cleaning, Transformation — <em>"the hardest part is not to transform but to verify data"</em></td></tr>
+<tr><td><strong>Data Presentation</strong></td><td>Visual Mapping, Storytelling</td></tr>
+</table>
+
+<figure>
+<img src="../assets/slides/vis3-p44-pipeline-diagram.png" alt="Visualization Pipeline slide listing Data Acquisition, Data Preparation (Cleaning, Transformation), Data Presentation (Visual Mapping, Storytelling)">
+<figcaption>Slide: Visualization Pipeline (vis-3-variable-pipeline.pdf, p.44)</figcaption>
+</figure>
+<p>ลองไล่ตามกรณีจริง: อยากทำ visualization เปรียบเทียบงบประมาณแต่ละหน่วยงานรัฐ ขั้นแรก (Acquisition) ต้องไปโหลดข้อมูลจากแหล่งเปิดอย่าง data.go.th (ตัวอย่างที่สไลด์อ้างถึงจริง) — ได้ไฟล์ดิบมาแล้วยังใช้ไม่ได้ทันที ต้องผ่านขั้น Preparation ก่อน (ชื่อหน่วยงานสะกดต่างกัน หน่วยเงินไม่ตรงกัน มีแถวซ้ำ) ซึ่งมักกินเวลานานกว่าขั้นอื่นทั้งหมดรวมกัน สุดท้ายถึงจะมาถึงขั้น Presentation ที่เลือก chart type และลงมือวาด — สังเกตว่า 2 ใน 3 ขั้นตอนนี้ (Acquisition, Preparation) เกิดขึ้น<em>ก่อน</em>จะได้แตะเครื่องมือวาดกราฟด้วยซ้ำ นักเรียนที่รีบกระโดดไปเลือก chart type ก่อนเช็คคุณภาพข้อมูล มักเจอปัญหาย้อนกลับมาแก้ทีหลัง.</p>
+
+<p>ข้อมูลมักอยู่ในรูป <strong>wide table</strong>: แต่ละ <em>row</em> = 1 object/sample, แต่ละ <em>column</em> = 1 property/dimension — ต้องระบุก่อนว่าแต่ละ column เป็น nominal หรือ ordinal ก่อนเลือก visual variable (ตัวอย่างในสไลด์: ตารางเปรียบเทียบตุ๊กตุ๊ก/แท็กซี่/มอไซค์รับจ้าง — คอลัมน์ "แอร์" เป็น nominal, "จำนวนล้อ" เป็นเชิงปริมาณ).</p>
+
+<figure>
+<img src="../assets/slides/vis3-p70-wide-table-example.png" alt="Table of tuk-tuk, taxi, motorbike taxi with columns air-conditioned, wheels, metered, color, foreigners-only, dangerous">
+<figcaption>Slide: wide-table example — Thai vehicle types with nominal/ordinal columns (vis-3-variable-pipeline.pdf, p.70)</figcaption>
+</figure>
+<p>ลองเป็นคนออกแบบ visualization จากตารางนี้จริง ๆ: แถว TUK-TUK มีค่า AIR-CONDITIONED = NO, #WHEELS = 3, SYMBOL OF THAILAND = TRUE — คอลัมน์ "AIR-CONDITIONED" (มี/ไม่มี) เป็น nominal สองค่า เข้ารหัสด้วยไอคอนหรือสีคนละกลุ่มได้ แต่ห้ามใช้ไล่โทนเข้ม-อ่อน (เพราะ "มี" ไม่ได้ "มากกว่า" "ไม่มี") ส่วนคอลัมน์ "#WHEELS" (3 ล้อ, 4 ล้อ, 2 ล้อ) เป็นตัวเลขจริง เข้ารหัสด้วยความยาวแท่งหรือตำแหน่งบนแกนได้ตรง ๆ — ตารางเดียวกันนี้จึงต้องใช้ channel คนละแบบสำหรับแต่ละคอลัมน์ ไม่มีสูตรเดียวที่ใช้ได้ทั้งตาราง ต้องแยกพิจารณาทีละคอลัมน์.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Pipeline</span></div>
+  <div class="qtext">ขั้นตอนใดของ pipeline ที่ slide บอกว่า "ยากที่สุดไม่ใช่การแปลงข้อมูล แต่คือการตรวจสอบข้อมูล"?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Data Preparation</button>
+    <button class="opt" data-correct="false">Data Acquisition</button>
+    <button class="opt" data-correct="false">Data Presentation</button>
+    <button class="opt" data-correct="false">Data Storytelling</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 10</span><span>Pipeline</span></div>
+  <div class="qtext">ในตาราง wide table มาตรฐาน แต่ละ "row" หมายถึงอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">object หรือ sample หนึ่งตัว</button>
+    <button class="opt" data-correct="false">property หรือ dimension หนึ่งด้าน</button>
+    <button class="opt" data-correct="false">visual variable หนึ่งชนิด</button>
+    <button class="opt" data-correct="false">ขั้นตอนหนึ่งใน pipeline</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>7. Data Cleaning: ความสกปรกที่มาจาก "สมมติฐานผิด"</h2>
+<p>นอกจากตัวสะกดไม่ตรงกัน (McDonald's/McDonald/McDonalds, กรุงเทพ/กรุงเทพฯ/กทม.) slide ชี้ปัญหาที่ลึกกว่า: <strong>ความสกปรกบางอย่างมาจากสมมติฐานที่ผิดตั้งแต่ต้น</strong> เช่น สมมติว่าชื่อคนมีช่องว่างระหว่างชื่อ-นามสกุลแค่ 1 ที่เสมอ (ผิดกับ "นายสมชาย ณ อยุธยา") หรือสมมติว่าชื่อไม่มีอักขระพิเศษ (ผิดกับ "นางสาวณิชา สมหวัง" ที่มีวรรณยุกต์/สระซ้อน).</p>
+
+<p>สไลด์ยกตัวอย่างจริงระดับโลก 2 กรณีที่แสดงว่าสมมติฐานผิดเกี่ยวกับ Excel ก่อความเสียหายใหญ่แค่ไหน:</p>
+
+<figure>
+<img src="../assets/slides/vis3-p85-excel-covid-data-loss.png" alt="A Guardian news article headlined How Excel may have caused loss of 16,000 Covid tests in England, with the subheading Public Health England data error blamed on limitations of Microsoft spreadsheet">
+<figcaption>Slide: "How Excel may have caused loss of 16,000 Covid tests in England" (vis-3-variable-pipeline.pdf, p.85, The Guardian)</figcaption>
+</figure>
+<p>ปี 2020 หน่วยงาน Public Health England ใช้ไฟล์ Excel รูปแบบเก่า (.xls) ที่มีข้อจำกัดจำนวนแถวสูงสุดแค่ 65,536 แถว/คอลัมน์ในการรวมผลตรวจ COVID-19 จากทั่วประเทศ — เมื่อจำนวนเคสสะสมเกินขีดจำกัดนี้ ระบบไม่ได้ฟ้อง error ให้เห็นชัดเจน แต่กลับ<strong>เงียบ ๆ ตัดข้อมูลส่วนเกินทิ้งไปเฉย ๆ</strong> ทำให้ผลตรวจเกือบ 16,000 รายการหายไปจากระบบรายงานราชการโดยไม่มีใครรู้ตัวอยู่หลายวัน ส่งผลต่อกระบวนการตามรอยผู้สัมผัสเสี่ยง (contact tracing) ทั้งประเทศ — นี่คือสมมติฐานผิดระดับโครงสร้าง: ทีมงานสมมติว่าจำนวนแถวจะไม่มีวันเกินขีดจำกัดของ format ไฟล์ที่เลือกใช้ ทั้งที่ในสถานการณ์โรคระบาดจริง ข้อมูลโตเร็วกว่าที่คาดไว้มาก.</p>
+
+<figure>
+<img src="../assets/slides/vis3-p87-excel-gene-renaming.png" alt="A Verge news article headlined Scientists rename human genes to stop Microsoft Excel from misreading them as dates, with the subheading Sometimes it's easier to rewrite genetics than update Excel">
+<figcaption>Slide: "Scientists rename human genes to stop Microsoft Excel from misreading them as dates" (vis-3-variable-pipeline.pdf, p.87, The Verge)</figcaption>
+</figure>
+<p>ปัญหานี้ตลกร้ายกว่านั้นอีก: ชื่อยีนมนุษย์บางตัวสะกดแบบสั้น ๆ อย่าง "MARCH1" หรือ "SEPT1" — Excel เห็นรูปแบบตัวอักษร+ตัวเลขนี้แล้ว<strong>ตีความอัตโนมัติว่าเป็นวันที่</strong> ("March 1" หรือ "1-Sep") แล้วแปลงค่าทิ้งโดยไม่ถาม ทำให้ข้อมูลชื่อยีนต้นฉบับหายไปเงียบ ๆ ในไฟล์วิจัยนับพันฉบับทั่วโลก — ปัญหาใหญ่ขนาดที่นักวิทยาศาสตร์ยอมแพ้ ไม่พยายามแก้ที่ Excel แต่กลับไป<strong>เปลี่ยนชื่อยีนอย่างเป็นทางการ</strong>แทน (เช่น MARCH1 → MARCHF1) เพื่อไม่ให้ชนกับรูปแบบวันที่อีก — ประโยคใต้พาดหัวสรุปไว้กระชับมาก: "บางทีการเขียนพันธุศาสตร์ใหม่ยังง่ายกว่าการอัปเดต Excel" นี่คือตัวอย่างสุดโต่งของ "สมมติฐานผิด" ที่ Excel มีมาโดยไม่รู้ตัว (สมมติว่าทุกอย่างที่หน้าตาเหมือนวันที่ คือวันที่จริง) ส่งผลกระทบย้อนกลับไปถึงระดับมาตรฐานการตั้งชื่อทางวิทยาศาสตร์เลยทีเดียว.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 11</span><span>Excel Data Loss</span></div>
+  <div class="qtext">เหตุการณ์ Public Health England สูญเสียผลตรวจ COVID-19 เกือบ 16,000 รายการ มีสาเหตุหลักมาจากอะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ไฟล์ Excel รูปแบบเก่ามีขีดจำกัดจำนวนแถว เมื่อข้อมูลเกินขีดจำกัด ระบบตัดข้อมูลส่วนเกินทิ้งโดยไม่แจ้งเตือน</button>
+    <button class="opt" data-correct="false">พนักงานลบไฟล์ข้อมูลทิ้งโดยตั้งใจ</button>
+    <button class="opt" data-correct="false">ไวรัสคอมพิวเตอร์ทำลายฐานข้อมูล</button>
+    <button class="opt" data-correct="false">เซิร์ฟเวอร์ล่มระหว่างการอัปโหลดข้อมูล</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 12</span><span>Data Cleaning</span></div>
+  <div class="qtext">ปัญหา "ชื่อ-นามสกุลมีช่องว่างมากกว่า 1 ที่" (เช่น นายสมชาย ณ อยุธยา) จัดเป็นความสกปรกประเภทใดตาม slide?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">มาจากสมมติฐานที่ผิดเกี่ยวกับโครงสร้างข้อมูล</button>
+    <button class="opt" data-correct="false">มาจากการสะกดคำไม่สม่ำเสมอ</button>
+    <button class="opt" data-correct="false">มาจากรูปแบบวันที่ไม่ตรงกัน</button>
+    <button class="opt" data-correct="false">มาจากไฟล์ข้อมูลเสียหาย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>8. Bad Data Guide: ใครควรเป็นคนแก้</h2>
+<p><a href="https://github.com/Quartz/bad-data-guide" target="_blank" rel="noopener">Quartz Bad Data Guide</a> แบ่งปัญหาข้อมูลตาม "ใครควรรับผิดชอบแก้": ต้นทาง (ค่าหาย, ข้อมูลซ้ำ) / ตัวคุณเอง (ข้อมูลอยู่ใน PDF, granular เกินไป) / โปรแกรมเมอร์ (จัดกลุ่มผิด, สแกนเอกสาร) / ผู้เชี่ยวชาญภายนอก (ผู้เขียนไม่น่าเชื่อถือ, ค่าผิดปกติอธิบายไม่ได้).</p>
+
+<figure>
+<img src="../assets/slides/vis3-p82-bad-data-guide.png" alt="Guide to Bad Data table grouped by who should solve each issue: source, you, programmer, third-party expert">
+<figcaption>Slide: Guide to Bad Data (Quartz) (vis-3-variable-pipeline.pdf, p.82)</figcaption>
+</figure>
+<p>ลองใช้ตารางนี้วินิจฉัยปัญหาจริง 2 แบบ: เจอไฟล์ Excel ที่วันที่บางแถวเขียน "2/4/2023" บางแถวเขียน "2023-04-02" — นี่คือ "Date formats are inconsistent" ซึ่งอยู่ในคอลัมน์แรก แปลว่าต้องแก้ตั้งแต่ต้นทาง (ขอไฟล์ใหม่หรือคุยกับคนกรอกข้อมูล) ไม่ใช่เขียนโค้ดไล่แก้ทีหลัง เพราะรากปัญหาคือกระบวนการเก็บข้อมูลเอง เทียบกับอีกกรณี: เจอค่ายอดขายเดือนหนึ่งพุ่งสูงผิดปกติ 10 เท่าโดยไม่มีเหตุผลชัดเจน — นี่คือ "inexplicable outliers" อยู่ในคอลัมน์ขวาสุด ต้องให้ผู้เชี่ยวชาญนอกทีม (เช่นคนในธุรกิจนั้นจริง ๆ) ช่วยตัดสินว่าเป็นเหตุการณ์พิเศษ (เช่น โปรโมชั่นใหญ่) หรือเป็นข้อมูลผิดพลาด — 2 ปัญหาที่ "ดูคล้ายกัน" (ตัวเลขแปลก ๆ ในตาราง) จึงต้องส่งไปหาคนละคนแก้เลย.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 13</span><span>Bad Data Guide</span></div>
+  <div class="qtext">"ค่าผิดปกติที่อธิบายไม่ได้ (inexplicable outliers)" ตาม Quartz Bad Data Guide ควรให้ใครช่วยแก้?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ผู้เชี่ยวชาญบุคคลที่สาม</button>
+    <button class="opt" data-correct="false">ต้นทางข้อมูลเท่านั้น</button>
+    <button class="opt" data-correct="false">โปรแกรมเมอร์เท่านั้น</button>
+    <button class="opt" data-correct="false">ไม่ต้องแก้ ปล่อยไว้ได้</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>9. Visualization ไม่จำเป็นต้องอยู่บนจอ: งานวิจัยของอาจารย์เอง</h2>
+<p>ก่อนปิดท้าย pipeline สไลด์เชื่อมกลับไปที่ "Visualization Tools" (ที่ปกติหมายถึง Power BI, D3.js) ด้วยงานวิจัยของอาจารย์ผู้สอนเองที่ท้าทายว่า visualization ต้องอยู่บนหน้าจอเสมอไปหรือเปล่า:</p>
+
+<figure>
+<img src="../assets/slides/vis3-p114-handmade-soap-visualization.png" alt="Nine pairs of images: a digital chart on top (heatmap, scatterplot, sankey diagram, bubble chart, striped bar, treemap, bar chart, small multiples, streamgraph) and directly below each one a real bar of handmade soap recreated to visually match that exact chart using colored soap layers and embedded chunks">
+<figcaption>Slide: Puripant Ruchikachorn &amp; Namsai Supavong, "Exploring Handmade Soap as a Visualization Medium", PacificVis 2021 Posters (vis-3-variable-pipeline.pdf, p.114)</figcaption>
+</figure>
+<p>งานวิจัยนี้เอา chart แบบมาตรฐาน 9 ชนิดที่เรียนกันมาตลอด (heatmap, scatterplot, sankey/flow diagram, bubble chart, แถบสี, treemap, bar chart, ตาราง small multiples, streamgraph) มาทำเป็น<strong>สบู่ก้อนจริง</strong> — เช่น scatterplot (ชิ้นที่ 2) ทำเป็นก้อนสบู่สีขาวมีชิ้นสบู่สีเขียวเล็ก ๆ ฝังกระจายแทนจุดข้อมูล หรือ streamgraph (ชิ้นที่ 9) ทำเป็นชั้นสบู่สีสันไหลเป็นคลื่นซ้อนกันเหมือนกราฟจริงทุกประการ — แต่ละคู่ภาพแสดงให้เห็นว่าเทคนิคการเข้ารหัสข้อมูล (mark และ variable) ที่เรียนมาทั้งหมด ไม่ได้ผูกติดกับพิกเซลบนจอเลย สีของสบู่ = hue, ความหนาของชั้น = length/size, ตำแหน่งชิ้นสบู่ = position — ทุก visual variable แปลงเป็นวัสดุจริงที่จับต้อง ดม และสัมผัสได้ — นี่คือข้อคิดปิดท้ายบทเรียนที่สำคัญ: "Visualization" คือ<strong>หลักการเข้ารหัสข้อมูลด้วยการรับรู้ทางสายตา (และสัมผัส)</strong> ไม่ใช่ "ซอฟต์แวร์ตัวใดตัวหนึ่ง" — งานวิจัยของอาจารย์ชิ้นนี้เองก็เป็นหลักฐานว่าคอร์สนี้สอนหลักการที่ประยุกต์ใช้ได้ไกลกว่าแค่การเขียนโค้ด D3.js.</p>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+กรอบคิด 3 lecture เชื่อมกันครบแล้ว (Effective/Functional/Effective, Convincing/Truthful, Insightful/Expressive) และคุณควรอธิบาย pipeline 3 ขั้นตอนพร้อมชี้ได้ว่าปัญหาข้อมูลแบบไหนควรแก้ตรงไหน — ใช้ตอบข้อสอบแบบ "ให้ dataset มาออกแบบ visualization" ได้ทั้งขั้นเตรียมข้อมูลและขั้นเลือก encoding.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (116 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-3-variable-pipeline.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–5</td><td>นิยาม Visual Variables (Channels) + Ordinal/Nominal เกริ่นนำ</td><td>etc — สอนละเอียดแล้วใน <a href="0002-perception-and-visual-variables.html">Lesson 2</a></td></tr>
+<tr><td>6</td><td>อันดับความแม่นยำการรับรู้ (Position/Angle/Area) — สไลด์เดิมซ้ำจาก Lesson 2</td><td>etc — ซ้ำกับ <a href="0002-perception-and-visual-variables.html">Lesson 2 หัวข้อ 4</a></td></tr>
+<tr><td>7–8</td><td>Visual Variable = Density (แผนที่ choropleth)</td><td>✓ หัวข้อ 2</td></tr>
+<tr><td>9</td><td>Visual Variable = Speed (animation)</td><td>✓ หัวข้อ 2</td></tr>
+<tr><td>10–13</td><td>"เสียงเป็น visual variable ได้ไหม?" + ตัวอย่าง sonification/audio graphs</td><td>✓ หัวข้อ 2 (กล่าวถึงแนวคิด sonification แล้ว)</td></tr>
+<tr><td>14</td><td>นิยามทั่วไป Visual Mark vs Visual Variable</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>15</td><td>Pie chart: Mark = Slice, Variable = มุม/สี/สัดส่วน</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>16–17</td><td>เกริ่นนำ bar chart mark/variable + ชาร์ตการเมือง-เบียร์ (HBR) เวอร์ชันยังไม่กรอกตาราง</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>18</td><td>ชาร์ตการเมือง-ยี่ห้อเบียร์ HBR — ระบุ Hue/Position x/Position y/Size</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>19–24</td><td>ถกเถียงเรื่อง variable ที่แท้จริงของ pie chart (angle/arc/area) + อ้างอิงงานวิจัย Kosara และคณะ</td><td>✓ หัวข้อ 3 (สรุปแนวคิดแล้ว)</td></tr>
+<tr><td>25–27</td><td>ตัวอย่าง visual variable อื่น ๆ เกริ่นนำ</td><td>etc — เกริ่นนำก่อนภาพ p.28 (ลิงก์อ้างอิง)</td></tr>
+<tr><td>28</td><td>โลโก้บริษัทเทคใหญ่แสดงสัดส่วนเพศพนักงาน (fastcompany.com)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>29</td><td>เกริ่นนำตัวอย่างชาร์ตหลอกลวง (nominal variable)</td><td>etc — นำเข้าสู่หัวข้อ 4</td></tr>
+<tr><td>30</td><td>3D bar chart หลอกลวง "Record Sales!"</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>31–32</td><td>เวอร์ชันกลาง: pie/donut share chart → 2D bar chart</td><td>✓ หัวข้อ 4 (อธิบายในเนื้อหา)</td></tr>
+<tr><td>33</td><td>เวอร์ชันสุดท้าย: small multiples ตรงไปตรงมา</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>34</td><td>(ว่าง)</td><td>etc</td></tr>
+<tr><td>35–40</td><td>กับดัก Ordinal↔Nominal ผิด variable + ตัวอย่างแผนที่สี (เพื่อนบ้าน, COVID safety colors)</td><td>✓ หัวข้อ 5 (อธิบายแนวคิดแล้ว ตัวอย่างแผนที่เป็นลิงก์อ้างอิง)</td></tr>
+<tr><td>41</td><td>เกริ่นนำ Visualization Design</td><td>✓ ส่วนหนึ่งของหัวข้อ 1</td></tr>
+<tr><td>42</td><td>Visualization Design: Insightful=Expressive, Functional=Effective (Mackinlay 1986)</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>43</td><td>เกริ่นนำ Visualization Pipeline (แผนภาพสามเหลี่ยม)</td><td>✓ ส่วนหนึ่งของหัวข้อ 6</td></tr>
+<tr><td>44</td><td>Visualization Pipeline: Acquisition/Preparation/Presentation</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>45</td><td>Data Acquisition: self-tracking, scraping, download &amp; API</td><td>✓ หัวข้อ 6</td></tr>
+<tr><td>46–55</td><td>ตัวอย่างแหล่งข้อมูล (Instagram, blog, akc.org, cocktail db ฯลฯ)</td><td>etc — ตัวอย่างประกอบ (ลิงก์อ้างอิง)</td></tr>
+<tr><td>56–57</td><td>Data Acquisition: Download &amp; API — แหล่งข้อมูลเปิดจริง (Google Public Data, data.go.th)</td><td>✓ หัวข้อ 6 (ยกตัวอย่างในเนื้อหาแล้ว)</td></tr>
+<tr><td>58–62</td><td>แหล่งข้อมูลเปิดเพิ่มเติม (NYC Open Data, Wikipedia diff, Washington Post)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>63</td><td>Data Preparation: หาแหล่งข้อมูล/format ที่ใช้ได้</td><td>✓ ส่วนหนึ่งของหัวข้อ 6</td></tr>
+<tr><td>64–66</td><td>(ว่าง)</td><td>etc</td></tr>
+<tr><td>67</td><td>Data Preparation: ตาราง Visual Variables ตัวอย่าง (PROP1-3)</td><td>etc — ตัวอย่างรูปแบบตารางทั่วไป ก่อนตัวอย่างจริง</td></tr>
+<tr><td>68–69</td><td>ตารางตุ๊กตุ๊ก/แท็กซี่/มอไซค์รับจ้าง (ยังไม่ระบุ nominal/ordinal)</td><td>✓ ส่วนหนึ่งของหัวข้อ 6</td></tr>
+<tr><td>70</td><td>ตารางตุ๊กตุ๊ก/แท็กซี่/มอไซค์รับจ้าง ฉบับเต็ม</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>71</td><td>Data Cleaning: ลบคอลัมน์ที่ไม่จำเป็น, แก้การสะกดไม่ตรงกัน</td><td>✓ หัวข้อ 7</td></tr>
+<tr><td>72–74</td><td>ตัวอย่าง/อ้างอิง (Ben Jones, Avoiding Data Pitfalls)</td><td>etc — อ้างอิงประกอบ</td></tr>
+<tr><td>75</td><td>Data Cleaning: ความสกปรกจากสมมติฐานผิด (ชื่อคนไทย)</td><td>✓ หัวข้อ 7</td></tr>
+<tr><td>76–81</td><td>(ว่าง/ตัวอย่างข่าว เช่น Elon Musk DOGE data)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>82</td><td>Guide to Bad Data (Quartz)</td><td>✓ หัวข้อ 8 (มีรูป)</td></tr>
+<tr><td>83</td><td>ลิงก์ PDPC data anonymisation</td><td>etc</td></tr>
+<tr><td>84</td><td>Data Tools: Excel, R/SPSS/SAS, OpenRefine, Great Expectations/Airflow/n8n</td><td>etc — รายชื่อเครื่องมือ ไม่ใช่ทฤษฎีที่ทำ quiz</td></tr>
+<tr><td>85–86</td><td>Excel ทำให้ผลตรวจ COVID-19 หาย 16,000 รายการ (The Guardian)</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>87</td><td>นักวิทยาศาสตร์เปลี่ยนชื่อยีนหนีปัญหา Excel อ่านเป็นวันที่ (The Verge)</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>88–92</td><td>ตัวอย่างความเสียหายจากข้อมูลสกปรกเพิ่มเติม (ระบบแจ้งเตือนผิดพลาด, ราคายา)</td><td>etc — ตัวอย่างประกอบเสริมหัวข้อ 7-8</td></tr>
+<tr><td>93</td><td>Visualization Tools แบบ analog: Camera, Pen/Pencil/Stylus</td><td>etc — เกริ่นนำเครื่องมือ ไม่ใช่ทฤษฎีหลัก</td></tr>
+<tr><td>94–113</td><td>ตัวอย่างงาน visualization แบบ analog/ศิลปะ (นำเข้าสู่งานวิจัย Handmade Soap)</td><td>etc — ตัวอย่างประกอบ แรงบันดาลใจก่อนถึง p.114</td></tr>
+<tr><td>114</td><td>Exploring Handmade Soap as a Visualization Medium (Puripant Ruchikachorn — อาจารย์ผู้สอน)</td><td>✓ หัวข้อ 9 (มีรูป)</td></tr>
+<tr><td>115–116</td><td>Visualization Tools แบบ digital: Power BI, Looker Studio, Datawrapper, RAWGraphs, Flourish, Vega, R ggplot2, Observable</td><td>etc — รายชื่อเครื่องมือ (มินิโปรเจกต์ใช้ D3.js/Altair เป็นหลัก ดู Lesson 4)</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0002-perception-and-visual-variables.html">← Lesson 2: Perception &amp; Visual Variables</a></span>
+  <span><a href="0004-univariate-data-visualization.html">Lesson 4: Univariate Data Visualization →</a></span>
+
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

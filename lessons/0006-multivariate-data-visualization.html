@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 6: Multivariate Data Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 6 / 13 · Multivariate</span>
+  <span><a href="../reference/0006-multivariate-techniques.html">Reference: Multivariate Techniques →</a></span>
+</nav>
+
+<p class="kicker">vis-6-multivariate.pdf</p>
+<h1>Multivariate Data Visualization</h1>
+
+<p>บทเรียนสุดท้ายของครึ่งแรก — เมื่อข้อมูลมีมากกว่า 2 ตัวแปร การเข้ารหัสทุกอย่างลง mark เดียวเริ่มพังทลาย บทนี้รวมเทคนิคเฉพาะทางที่ออกแบบมาสำหรับข้อมูลหลายมิติโดยเฉพาะ พร้อมกับดักทางการรับรู้ (Simpson's Paradox, visual variable separability) ที่ทำให้การตีความข้อมูลหลายตัวแปรผิดพลาดได้ง่ายกว่าที่คิด.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Tamara Munzner, <em>Visualization Analysis and Design</em> (2014) บทว่าด้วย Channels/Separability เป็นแหล่งอ้างอิงหลักของ slide วันนี้ และ <a href="https://en.wikipedia.org/wiki/Parallel_coordinates" target="_blank" rel="noopener">Parallel Coordinates — Wikipedia</a> สำหรับตัวอย่างเชิงโต้ตอบของเทคนิคที่สำคัญที่สุดในบทนี้.
+</div>
+
+<h2>1. Simpson's Paradox: แนวโน้มที่กลับทิศเมื่อแยกกลุ่ม</h2>
+<p>Slide เตือนผ่านตัวอย่าง scatter plot: แนวโน้มภาพรวม (overall trend) อาจเป็น <strong>ขาขึ้น</strong> ทั้งที่ทุกกลุ่มย่อย (subgroup) เมื่อแยกดูกลับเป็น <strong>ขาลง</strong> ทั้งหมด — เกิดจากตัวแปรแฝง (confounding variable) ที่ไม่ได้แสดงในภาพ นี่คือเหตุผลสำคัญที่ต้องระวังเวลาสรุปผลจากข้อมูลหลายตัวแปรที่ยุบรวมกันเป็นภาพเดียว.</p>
+
+<figure>
+<img src="../assets/slides/vis6-p06-simpsons-paradox.png" alt="Scatter plot annotated with an overall down trend arrow while subgroup trends point up, illustrating Simpson's Paradox">
+<figcaption>Slide: Simpson's Paradox — overall trend vs subgroup trend (vis-6-multivariate.pdf, p.6)</figcaption>
+</figure>
+<p>ตัวอย่างจริงจาก Financial Times นี้อธิบายกับดักได้ชัดมาก: ถ้าดูแค่เส้นแนวโน้มรวมทั้งประเทศ (จุดทุกสีปนกัน) จะสรุปว่า "เขตที่มีคนไม่นับถือคริสต์เยอะ มักโหวต AfD มากกว่า" (trend ชี้ขึ้น, r²=0.33) แต่พอแยกสีตามภาค — ภาคตะวันออกกับภาคตะวันตก — กลับพบว่าเส้นแนวโน้ม<em>ภายใน</em>แต่ละภาคชี้ลงทั้งคู่ ทำไมถึงเป็นแบบนี้ได้? เพราะภาคตะวันออกมีทั้งสัดส่วนคนไม่นับถือศาสนาสูงกว่า<em>และ</em>ฐานเสียง AfD สูงกว่าภาคตะวันตกโดยรวมอยู่แล้ว (ด้วยเหตุผลทางประวัติศาสตร์อื่น) พอเอาสองภาคมาปนกัน จุดของภาคตะวันออกทั้งกลุ่มจึงลอยขึ้นไปอยู่มุมขวาบนของกราฟ ดึงเส้นแนวโน้มรวมให้ชี้ขึ้นตาม ทั้งที่แต่ละภาคแยกกันจริง ๆ กลับสัมพันธ์กันตรงข้าม — นี่คือเหตุผลที่ต้องถามเสมอว่า "จุดสีต่างกันในกราฟที่เห็นซ่อนตัวแปรที่สามอยู่หรือเปล่า" ก่อนเชื่อ trend รวม.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Simpson's Paradox</span></div>
+  <div class="qtext">Simpson's Paradox อธิบายปรากฏการณ์ใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">แนวโน้มภาพรวมกลับทิศทางเมื่อแยกข้อมูลเป็นกลุ่มย่อย</button>
+    <button class="opt" data-correct="false">ข้อมูลสองชุดที่มีค่าเฉลี่ยเท่ากันเสมอ</button>
+    <button class="opt" data-correct="false">กราฟที่มีจุดข้อมูลมากเกินไปจนอ่านไม่ออก</button>
+    <button class="opt" data-correct="false">สีที่ใช้ในชาร์ตขัดแย้งกับความหมายทางวัฒนธรรม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>2. ทำไมมิติที่ 4 ขึ้นไปถึงยาก</h2>
+<p>Visual mark หนึ่งชิ้นรับ visual variable ได้จำกัด ยิ่งยัดหลายมิติเข้า mark เดียว (position x, position y, size, color, shape พร้อมกัน) ยิ่งเกิดปัญหา <em class="term">many-to-one mapping</em> — mark เดียวพยายามสื่อความหมายมากเกินกว่าที่สมองจะแยกแยะได้ (Tamara Munzner, 2014).</p>
+
+<figure>
+<img src="../assets/slides/vis6-p34-4d-visual-variables.png" alt="Three scatter plots labeled 2D, 3D, 4D showing the same points with increasingly many colors and sizes crammed into each mark">
+<figcaption>Slide: 4D Visual Variables? — stacking more channels onto one mark (vis-6-multivariate.pdf, p.34)</figcaption>
+</figure>
+<p>ลองไล่ทีละขั้นตามสไลด์นี้: แผง 2D ใช้แค่ตำแหน่ง x,y — มองปราดเดียวก็เห็นว่าจุดส่วนใหญ่กระจุกอยู่มุมล่างซ้าย มีบางจุดกระเด็นออกไปไกล พอเพิ่มสีเข้ารหัสมิติที่ 3 (แผง 3D) มิติใหม่นี้เพิ่มข้อมูลเข้ามาจริง แต่บริเวณที่จุดชนกันแน่นอยู่แล้ว (มุมล่างซ้าย) สีของแต่ละจุดเริ่มบังกันเอง มองไม่ออกว่าจุดไหนสีอะไรกันแน่ พอเพิ่มขนาดเข้ารหัสมิติที่ 4 อีกชั้น (แผง 4D) บริเวณหนาแน่นเดิมนั้นกลายเป็นก้อนสีปนกันจนนับจุดไม่ได้เลย — สังเกตว่าปัญหาไม่ได้เกิดจาก "มิติเยอะ" โดยตรง แต่เกิดจากมิติใหม่ทุกมิติถูกยัดใส่ตำแหน่งเดิมที่แน่นอยู่แล้ว ยิ่งเพิ่มยิ่งบังกันเอง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Many-to-One Mapping</span></div>
+  <div class="qtext">ปัญหา "many-to-one mapping" ที่ Munzner อธิบาย เกิดขึ้นเมื่อใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เมื่อยัดหลาย visual variable เข้าไปใน visual mark เดียวมากเกินไป</button>
+    <button class="opt" data-correct="false">เมื่อใช้ mark หลายชนิดในชาร์ตเดียวกัน</button>
+    <button class="opt" data-correct="false">เมื่อข้อมูลมี missing value จำนวนมาก</button>
+    <button class="opt" data-correct="false">เมื่อจำนวน sample น้อยเกินไป</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. Visual Variable Separability</h2>
+<p>Munzner (2014) จัดระดับว่าคู่ visual variable ไหน "แยกรับรู้ได้อิสระ" (separable) กับไหน "รบกวนกันเอง" (interference) เวลาใช้พร้อมกันบน mark เดียว:</p>
+
+<figure>
+<img src="../assets/slides/vis6-p40-separability.png" alt="Visual Variable Separability: Position+Hue fully separable, Size+Hue some interference, Width+Height some/significant interference, Red+Green major interference">
+<figcaption>Slide: Visual Variable Separability (Tamara Munzner, Visualization Analysis and Design, 2014)</figcaption>
+</figure>
+<p>ลองเทียบ 2 สถานการณ์ที่ต่างกันสุดขั้ว: แผนที่จุดร้านค้าที่ใช้ "ตำแหน่ง" บอกที่ตั้งและ "เฉดสี" บอกประเภทร้าน (อาหาร/เสื้อผ้า/อิเล็กทรอนิกส์) — ต่อให้จุดสีต่างกันอยู่ใกล้กันมาก คุณยังกะระยะห่างจริงและแยกประเภทร้านได้พร้อมกันสบาย ๆ เพราะ Position กับ Hue เป็นคู่ "Fully separable" เทียบกับแผนภูมิที่ใช้ "สีแดง" บอกยอดขาย ตก และ "สีเขียว" บอกยอดขาย โต วางอยู่ติดกัน — คนตาบอดสีแดง-เขียว (~8% ของประชากร ตามที่เรียนใน Lesson 2) จะแยกสองสถานะนี้ไม่ออกเลย เพราะ Red+Green คือคู่ "Major interference" ที่แย่ที่สุดในตาราง บทเรียนคือ: เลือกคู่ channel ที่จะใช้ร่วมกันต้องเช็คตารางนี้ก่อน ไม่ใช่แค่เลือกเพราะแต่ละอันดูดีทีละตัว.</p>
+
+<table>
+<tr><th>คู่ Visual Variable</th><th>ระดับการรบกวน</th></tr>
+<tr><td>Position + Hue (Color)</td><td><strong>Fully separable</strong> — แยกอ่านได้อิสระที่สุด</td></tr>
+<tr><td>Size + Hue (Color)</td><td>Some interference</td></tr>
+<tr><td>Width + Height</td><td>Some/significant interference</td></tr>
+<tr><td>Red + Green</td><td><strong>Major interference</strong> — แย่ที่สุด (ซ้ำเติมปัญหา color blindness จาก Lesson 2 ด้วย)</td></tr>
+</table>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Separability</span></div>
+  <div class="qtext">ตามไดอะแกรมของ Munzner คู่ visual variable ใดจัดเป็น "Fully separable" (แยกรับรู้ได้อิสระที่สุด)?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Position และ Hue (Color)</button>
+    <button class="opt" data-correct="false">Size และ Hue (Color)</button>
+    <button class="opt" data-correct="false">Width และ Height</button>
+    <button class="opt" data-correct="false">Red และ Green</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Separability</span></div>
+  <div class="qtext">คู่ "Red และ Green" ที่มี "Major interference" ตามไดอะแกรมนี้ ซ้ำเติมปัญหาอะไรที่เรียนไปแล้วใน Lesson 2?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Color blindness (deuteranopia) ที่แยกแดง/เขียวไม่ได้อยู่แล้ว</button>
+    <button class="opt" data-correct="false">Chromatic aberration ระหว่างแดงกับน้ำเงิน</button>
+    <button class="opt" data-correct="false">Pre-attentive attributes ที่ประมวลผลช้าเกินไป</button>
+    <button class="opt" data-correct="false">Aspect ratio ของชาร์ตที่ผิดสัดส่วน</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. เทคนิคเฉพาะทางสำหรับข้อมูลหลายตัวแปร</h2>
+
+<h3>Ternary Plot</h3>
+<p>ใช้เมื่อมี 3 ตัวแปรที่รวมกันได้ค่าคงที่เสมอ (เช่น สัดส่วน 3 กลุ่มรวมเป็น 100%) พล็อตลงสามเหลี่ยม 2 มิติ — ใช้ได้เฉพาะกรณีพิเศษนี้เท่านั้น</p>
+
+<figure>
+<img src="../assets/slides/vis6-p29-ternary-plot.png" alt="Ternary plot with points positioned inside a triangle based on three proportional variables">
+<figcaption>Slide: Ternary Plot example (citiesmoving.com) (vis-6-multivariate.pdf, p.29)</figcaption>
+</figure>
+<p>ตัวอย่างนี้ใช้สัดส่วนการเดินทาง 3 แบบของแต่ละเมือง (bus/walking/car ที่ต้องรวมกันได้ 100% เสมอ) — เมืองที่คนเดินเท้าเป็นหลักไม่ใช้รถเลย จุดของมันจะอยู่ชิดมุม "walking" สุด ๆ ส่วนเมืองที่พึ่งรถยนต์เท่านั้นจุดจะอยู่ชิดมุม "car" ลองดูเมืองตัวอย่างที่มีสัดส่วน bus 50% / walking 50% / car 0% — เพราะไม่ใช้รถยนต์เลย จุดของมันจะต้องอยู่บน<em>เส้นขอบ</em>ระหว่างมุม bus กับมุม walking พอดี (ห่างจากมุม car เท่ากับระยะทางเต็มด้าน) ไม่มีทางลอยเข้ากลางสามเหลี่ยมได้ — นี่คือข้อจำกัดสำคัญของ ternary plot: ใช้ได้เฉพาะเมื่อ 3 ตัวเลขบวกกันได้ค่าคงที่เท่านั้น ถ้าเอาตัวแปรที่ไม่ได้บวกกันเป็น 100% (เช่น อายุเฉลี่ย, รายได้) มาใส่แทน ตำแหน่งบนสามเหลี่ยมจะไม่มีความหมายอะไรเลย.</p>
+
+<p>ตัวอย่างที่สองใช้ ternary plot วิเคราะห์การเมืองไทยได้อย่างน่าทึ่ง — เว็บ elect.in.th (ทีมเดียวกับที่ทำข้อมูล SEA Games ใน Lesson 3 และ 10) วางตำแหน่งคณะรัฐมนตรีแต่ละชุดตาม "สัดส่วนความสัมพันธ์" กับ 3 ขั้วอำนาจ:</p>
+
+<figure>
+<img src="../assets/slides/vis6-p32-thai-cabinet-dynasty-ternary.png" alt="A Thai political ternary plot from elect.in.th with three corners labeled Democrat faction, Military faction, and Pheu Thai faction, plotting dots for Thai cabinets numbered 53 to 62, with distinct colored clusters near each corner and a slider to scroll through cabinet history">
+<figcaption>Slide: "Cabinet Dynasty" — คณะรัฐมนตรีไทยบนสามเหลี่ยม 3 ขั้วอำนาจ (vis-6-multivariate.pdf, p.32, elect.in.th)</figcaption>
+</figure>
+<p>สามมุมของสามเหลี่ยมคือ 3 ขั้วอำนาจการเมืองไทย — ขั้วประชาธิปัตย์ (บนสุด) ขั้วทหาร (ล่างซ้าย) ขั้วเพื่อไทย (ล่างขวา) — แต่ละจุดคือคณะรัฐมนตรีชุดที่ 53-62 ตำแหน่งของแต่ละจุดสะท้อนว่ารัฐมนตรีชุดนั้นใกล้ชิดกับขั้วไหนมากที่สุด (สัดส่วนสามค่าที่รวมกันได้ 100% เสมอ ตรงตามเงื่อนไขที่ ternary plot ต้องการ) — สังเกตกลุ่มก้อนสีที่ชัดเจนมาก: จุดสีฟ้ากระจุกอยู่ใกล้มุมบนสุด (ยุครัฐบาลใกล้ชิดขั้วประชาธิปัตย์) จุดสีเขียวกับสีแดงกระจุกอยู่มุมล่างสองมุม (ยุครัฐบาลทหารกับยุครัฐบาลเพื่อไทย) ในขณะที่จุดสีม่วงลอยอยู่กลาง ๆ ค่อนไปทางขั้วเพื่อไทย (รัฐบาลผสมที่ยังโน้มเอียงทางหนึ่งชัดเจน) — ตัวอย่างนี้แสดงพลังของ ternary plot ได้ชัดกว่าตัวอย่างเมือง: มันไม่ได้แค่ "จัดกลุ่มข้อมูล" แต่เผยให้เห็น<strong>วิวัฒนาการ</strong>ของอำนาจการเมืองไทยเป็นภาพเดียวที่ตารางตัวเลขคณะรัฐมนตรี 62 ชุดไม่มีทางเล่าเรื่องแบบนี้ได้เร็วเท่า.</p>
+
+<h3>Glyph (เช่น Chernoff Face)</h3>
+<p>รวมหลาย visual variable ไว้ใน mark ผสม (glyph) เดียว — Chernoff Face คือตัวอย่างคลาสสิกที่แมปแต่ละมิติข้อมูลไปยังคุณลักษณะใบหน้า (รูปตา ความกว้างปาก ฯลฯ)</p>
+
+<figure>
+<img src="../assets/slides/vis6-p43-chernoff-face.png" alt="Chernoff Face glyph slide mapping data dimensions to facial features">
+<figcaption>Slide: Glyph — Chernoff Face (vis-6-multivariate.pdf, p.43)</figcaption>
+</figure>
+<p>ตัวอย่างนี้เข้ารหัสสถิติ 6 ตัวของแต่ละรัฐไว้ในหน้าเดียว (New York: Uninsured Rate 7.1%, Poverty 15.4%, Unemployment 4.3%, Obesity 25% ฯลฯ) แทนที่จะต้องเปิด 6 แผนที่แยกกันทีละมิติ — ข้อดีคือถ้าคุณคุ้นตากับใบหน้ามนุษย์อยู่แล้ว (สมองเชี่ยวชาญเรื่องนี้เป็นพิเศษ) จะ "รู้สึก" ได้ทันทีว่ารัฐไหน "หน้าบึ้ง" โดยรวม (สถิติแย่หลายด้านพร้อมกัน) โดยไม่ต้องอ่านตัวเลขทีละตัว — แต่ข้อเสียคือถ้าอยากรู้ตัวเลข Unemployment Rate ของรัฐหนึ่งแม่น ๆ การอ่านจาก "ขนาดตา" ในใบหน้าย่อมแม่นน้อยกว่าดูตัวเลขตรง ๆ มาก (ย้อนกลับไปที่อันดับความแม่นยำ Position > Angle > Area ใน Lesson 2 — ตา/ปาก/คิ้วส่วนใหญ่ก็คือ area/angle เข้ารหัสแบบอ้อม) glyph จึงเหมาะกับการดู "ภาพรวมหลายมิติแบบคร่าว ๆ" ไม่เหมาะกับการเทียบค่าที่ต้องแม่นเป๊ะ.</p>
+
+<p>ตัวอย่างที่สองใช้ glyph รูปหน้าคนแบบเดียวกัน แต่ทันสมัยและอ่านง่ายกว่า Chernoff Face ดั้งเดิมมาก เพราะมี legend อธิบายชัดเจนว่าแต่ละส่วนของใบหน้าแทนตัวแปรอะไร:</p>
+
+<figure>
+<img src="../assets/slides/vis6-p44-portrait-of-world-glyph.png" alt="A modern glyph legend mapping 7 statistics to facial features (eyebrow zigzags for population, diamond eye for Human Development Index, circle eye for CO2 emissions, dot for health expenditure, angled lines for GINI index, mouth curve for control of corruption, red cheek blush size for GDP per capita), applied to compare ten world regions such as Northern America, Eastern Asia, and Eastern Europe as distinct faces">
+<figcaption>Slide: "Portrait of the World" by Bielova, World Data Visualization Prize 2023 (vis-6-multivariate.pdf, p.44)</figcaption>
+</figure>
+<p>ภาพบนสุดคือ legend ที่แกะรหัสให้เห็นตรง ๆ ว่าอาจารย์หมายถึงอะไรตอนพูดว่า glyph "แมปแต่ละมิติข้อมูลไปยังคุณลักษณะใบหน้า": ทรงผม/คิ้ว = ประชากร, ตาข้างซ้าย (วงกลม) = CO2 emissions, ตาข้างขวา (จุด) = ค่าใช้จ่ายด้านสุขภาพ, รูปเพชรกลางหน้าผาก = Human Development Index, มุมเส้นจมูก = GINI index, ปาก = ระดับควบคุมคอร์รัปชัน, ขนาดวงสีแดงบนแก้ม = GDP ต่อหัว — ลองเทียบ 2 ภูมิภาคที่ต่างกันสุดขั้ว: "Eastern Asia" มีคิ้วหยักซิกแซกหนาผิดปกติ (ประชากรสูงมาก ตรงกับความจริงที่มีจีน/ญี่ปุ่น/เกาหลีรวมกัน) ในขณะที่ "Eastern Europe" มีปากตรงเรียบไม่ยิ้ม (ควบคุมคอร์รัปชันได้แย่กว่าภูมิภาคอื่น) และวงแก้มแดงเล็กกว่า Northern America ชัดเจน (GDP ต่อหัวต่ำกว่า) — เพราะมี legend กำกับความหมายของแต่ละส่วนหน้าไว้ชัดเจนตั้งแต่ต้น glyph ชุดนี้จึงใช้เปรียบเทียบภูมิภาคต่าง ๆ ได้อย่างมีหลักการ ไม่ใช่แค่ "รู้สึกว่าหน้าไหนดูดีกว่า" เฉย ๆ แบบที่ Chernoff Face ดั้งเดิมมักถูกวิจารณ์.</p>
+
+<h3>Dimension Stacking</h3>
+<p>ซ้อนมิติ categorical เพิ่มเข้าไปในชาร์ตเดียวผ่าน facet: ตัวอย่างจาก slide ใช้ Altair encode <code>x='host', y='mean(gold)', column='name', color='name'</code> — รวม 4 มิติ (host, gold, name×2 แบบ) ในชาร์ตเดียว</p>
+
+<figure>
+<img src="../assets/slides/vis6-p49-dimension-stacking.png" alt="SEA Games gold-medal CSV data next to Altair code using x, y, column, and color to stack four dimensions">
+<figcaption>Slide: Dimension Stacking (vis-6-multivariate.pdf, p.49)</figcaption>
+</figure>
+<p>ลองไล่ตามคำถามที่ dimension stacking ตอบ: "แต่ละประเทศในซีเกมส์ได้เหรียญทองเฉลี่ยเท่าไหร่ และปีที่เป็นเจ้าภาพเองได้เยอะกว่าปีที่ไม่ได้เป็นเจ้าภาพไหม?" คำถามนี้มี 3 มิติซ่อนอยู่ (ประเทศ, host หรือไม่, จำนวนเหรียญ) มากกว่าที่ scatter plot ธรรมดา (2 แกน) จะรับไหว — dimension stacking แก้โดยแยกเป็นแผงย่อยหนึ่งแผงต่อหนึ่งประเทศ (column='name') แล้วในแต่ละแผงค่อยเทียบ 2 แท่ง: host=n กับ host=y (x='host') ผลลัพธ์ที่เห็นจริงคือ Indonesia แท่ง host=y (~165 เหรียญ) สูงกว่า host=n (~65 เหรียญ) มาก แปลว่าตอนอินโดนีเซียเป็นเจ้าภาพเอง ได้เหรียญทองเยอะกว่าปกติชัดเจน — คำตอบที่ซับซ้อนขนาดนี้จะดูจากตารางตัวเลขดิบตรง ๆ ไม่มีทางเห็นภาพรวมได้เร็วขนาดนี้.</p>
+
+<h3>Scatterplot Matrix (SPLOM)</h3>
+<p>ตาราง scatter plot ของทุกคู่ตัวแปร (pairwise) ในชุดข้อมูล — เห็นความสัมพันธ์ระหว่างทุกคู่พร้อมกัน แต่จำนวน subplot โตเร็วตามจำนวนตัวแปร</p>
+
+<figure>
+<img src="../assets/slides/vis6-p55-scatterplot-matrix.png" alt="Scatterplot matrix grid showing pairwise scatterplots, with some cells using glyphs instead of plain points">
+<figcaption>Slide: Scatterplot Matrix (SPLOM), including glyph-based cells (vis-6-multivariate.pdf, p.55)</figcaption>
+</figure>
+<p>ลองนึกภาพเป้าหมายต่างกัน 2 แบบเวลาใช้ตารางแบบนี้: ถ้าอยากรู้แค่ "ภาพรวมคร่าว ๆ ว่าตัวแปรคู่ไหนมี pattern น่าสนใจ" ก่อนจะลงลึก — SPLOM (จุดกระจายเล็ก ๆ เต็มตาราง) พอเหลือบมองก็เห็นว่า cell ไหนมีรูปทรงแปลก ๆ (เช่นเป็นเส้นเฉียงชัด แปลว่าคู่นั้น correlation สูง) เหมาะกับขั้นสำรวจเร็ว ๆ — แต่ถ้าอยากรู้ค่าจริงของแต่ละคู่แม่น ๆ ต้องขยับไปทาง Heatmap (ไล่สีตามค่าตัวเลขจริง) ที่ให้รายละเอียดเชิงตัวเลขมากกว่า ต้นทุนคือภาพรวมทั้งตารางจะดูรกกว่าเพราะสีเข้ม-อ่อนสลับกันเยอะ อ่านทีละ cell ยากกว่าการกวาดตาดู pattern แบบ SPLOM — เลือกใช้แบบไหนขึ้นกับว่ากำลังอยู่ขั้นตอน "สำรวจหา pattern" หรือ "ยืนยันค่าตัวเลข" ของ pipeline ที่เรียนใน Lesson 3.</p>
+
+<h3>Radar / Spider Chart</h3>
+<p>แต่ละแกนพุ่งออกจากจุดศูนย์กลาง 1 แกน = 1 มิติ เชื่อมจุดเป็นรูปหลายเหลี่ยม — งานวิจัย "Surfacing Visualization Mirages" (McNutt, Kindlmann &amp; Correll, CHI 2020) ชี้ว่าพื้นที่รูปหลายเหลี่ยมที่เห็นบิดเบือนได้ง่ายมาก ขึ้นกับลำดับที่วางแกน</p>
+
+<figure>
+<img src="../assets/slides/vis6-p57-radar-spider-chart.png" alt="Radar/spider chart with multiple axes radiating from a center point, connected into a polygon">
+<figcaption>Slide: Radar/Spider Chart (vis-6-multivariate.pdf, p.57)</figcaption>
+</figure>
+<p>ตัวอย่างนี้ใช้ข้อมูลเดียวกันเป๊ะ (คะแนนความนิยม 6 ภาษาโปรแกรมมิง: ruby, python, js, haskell, c, java) วาด 2 ครั้ง สลับแค่ตำแหน่งแกนรอบวง — เวอร์ชัน "Original" ที่วางภาษาซึ่งมีคะแนนใกล้เคียงกันให้อยู่ติดกัน ได้รูปทรงคล้ายสี่เหลี่ยมป้าน ๆ พื้นที่ใหญ่ ดู "มั่นคง" เวอร์ชัน "Permuted" ที่สลับตำแหน่งจนภาษาคะแนนสูงกับต่ำอยู่สลับฟันปลากัน ได้รูปดาวแฉกแหลมพื้นที่เล็กกว่ามาก ดู "อ่อนแอ" กว่าเดิม — ถ้ามีคนเอา 2 ภาพนี้ไปเทียบ "บริษัท A" กับ "บริษัท B" โดยตั้งใจ (หรือไม่ตั้งใจ) วางลำดับแกนให้บริษัทหนึ่งได้รูปทรงใหญ่ อีกบริษัทได้รูปทรงแฉกเล็ก ผู้อ่านจะรู้สึกว่าบริษัทแรก "แข็งแกร่งกว่า" ทันที ทั้งที่ตัวเลขจริงเหมือนกันเป๊ะ — นี่คือเหตุผลที่ radar chart ถูกจัดเป็นชาร์ตที่ "หลอกตาได้ง่ายโดยไม่ต้องโกหกตัวเลขสักตัว" แค่เลือกลำดับแกนก็พอ.</p>
+
+<h3>Parallel Coordinates Plot</h3>
+<p>(Alfred Inselberg, 1985) แต่ละมิติ = แกนตั้งขนานกัน 1 เส้น แต่ละแถวข้อมูล = เส้น polyline ที่ลากผ่านทุกแกน (ตัวอย่างคลาสสิก: ชุดข้อมูลรถยนต์ MPG/Cylinders/Horsepower/Weight/Acceleration/Year/Origin) — <strong>ลำดับแกนมีผลมากต่อ pattern ที่มองเห็น</strong> ต้องลองสลับลำดับหลายแบบ</p>
+
+<figure>
+<img src="../assets/slides/vis6-p64-parallel-coordinates.png" alt="Parallel coordinates plot with vertical axes for MPG, Cylinders, Horsepower, Weight, Acceleration, Year, Origin connected by polylines">
+<figcaption>Slide: Parallel Coordinates Plot — classic cars dataset (vis-6-multivariate.pdf, p.64)</figcaption>
+</figure>
+<p>ตัวอย่างรถยนต์ 7 มิตินี้ตอบคำถามที่ scatter plot คู่เดียวตอบไม่ได้: "รถที่มี Cylinders เยอะ (แปดสูบ) กับรถที่มี Cylinders น้อย (สามสูบ) ต่างกันยังไงในมิติอื่นด้วย?" — เพราะแกน Cylinders-Horsepower-Weight ถูกวางติดกัน เส้นสีแดง (cylinders สูง) กับเส้นสีน้ำเงิน (cylinders ต่ำ) จึงลากผ่านช่วงนี้เป็น 2 กลุ่มแยกกันชัดเจน อ่านออกทันทีว่า "รถ cylinders เยอะ มักหนักและแรงม้าสูงตามไปด้วย" — แต่พอเลยไปถึงช่วง Acceleration-Year-Origin เส้นทุกสีเริ่มพันกันจนแยกกลุ่มไม่ออก ไม่ใช่เพราะไม่มีความสัมพันธ์ แต่อาจเป็นเพราะแกนที่วางติดกันไม่ใช่คู่ที่เผย pattern ได้ดีที่สุด — ถ้าลองสลับเอา "Origin" มาวางติด "MPG" แทน อาจเห็น pattern ใหม่ที่ตอนนี้มองไม่เห็นเลยก็ได้ นี่คือเหตุผลที่ต้อง "ลองสลับแกนหลายแบบ" ไม่ใช่วางตามลำดับที่ข้อมูลมาให้เฉย ๆ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Ternary Plot</span></div>
+  <div class="qtext">Ternary plot ใช้ได้ดีที่สุดกับข้อมูลลักษณะใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">3 ตัวแปรที่รวมกันได้ค่าคงที่เสมอ เช่น สัดส่วน 100%</button>
+    <button class="opt" data-correct="false">ตัวแปรจำนวนเท่าใดก็ได้ที่ไม่มีความสัมพันธ์กัน</button>
+    <button class="opt" data-correct="false">ข้อมูลอนุกรมเวลาความถี่สูง</button>
+    <button class="opt" data-correct="false">ข้อมูลที่มีค่าหายไปจำนวนมาก</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 6</span><span>Ternary Plot</span></div>
+  <div class="qtext">จากตัวอย่าง "Cabinet Dynasty" อธิบายสั้น ๆ ว่าตำแหน่งของแต่ละจุด (คณะรัฐมนตรีแต่ละชุด) บนสามเหลี่ยมสื่อความหมายอะไร และทำไมการเห็นจุดกระจุกเป็นกลุ่มสีถึงมีประโยชน์?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ตำแหน่งแต่ละจุดสื่อสัดส่วนความใกล้ชิดของคณะรัฐมนตรีชุดนั้นกับ 3 ขั้วอำนาจ (ยิ่งใกล้มุมไหน ยิ่งโน้มเอียงไปทางขั้วนั้น) การเห็นจุดกระจุกเป็นกลุ่มสีชัดเจนช่วยระบุ "ยุค" ทางการเมืองที่มีลักษณะคล้ายกันได้ทันทีโดยไม่ต้องอ่านรายชื่อรัฐมนตรีทีละคน และช่วยให้เห็นวิวัฒนาการ/การเปลี่ยนขั้วอำนาจของการเมืองไทยข้ามเวลาได้ในภาพเดียว</div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Glyph</span></div>
+  <div class="qtext">Chernoff Face เป็นตัวอย่างของเทคนิคใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Glyph — รวมหลายมิติไว้ใน mark ผสมเดียว</button>
+    <button class="opt" data-correct="false">Ternary plot</button>
+    <button class="opt" data-correct="false">Parallel coordinates plot</button>
+    <button class="opt" data-correct="false">Scatterplot matrix</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Glyph</span></div>
+  <div class="qtext">ทำไม "Portrait of the World" ถึงใช้เปรียบเทียบสถิติของแต่ละภูมิภาคได้อย่างมีหลักการ มากกว่า Chernoff Face แบบดั้งเดิมที่มักถูกวิจารณ์?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">เพราะมี legend อธิบายชัดเจนว่าแต่ละส่วนของใบหน้า (คิ้ว ตา ปาก แก้ม) แทนตัวแปรอะไร ผู้อ่านจึงตีความตามหลักการได้ ไม่ใช่แค่รู้สึกเอาเอง</button>
+    <button class="opt" data-correct="false">เพราะใช้สีสันมากกว่า Chernoff Face หลายเท่า</button>
+    <button class="opt" data-correct="false">เพราะไม่ได้เข้ารหัสข้อมูลเชิงตัวเลขเลยสักตัว</button>
+    <button class="opt" data-correct="false">เพราะวาดด้วยโปรแกรมคอมพิวเตอร์แทนการวาดมือ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Scatterplot Matrix</span></div>
+  <div class="qtext">ข้อจำกัดหลักของ Scatterplot Matrix (SPLOM) คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">จำนวน subplot เพิ่มขึ้นอย่างรวดเร็วตามจำนวนตัวแปร</button>
+    <button class="opt" data-correct="false">ใช้ได้กับข้อมูล nominal เท่านั้น</button>
+    <button class="opt" data-correct="false">ไม่สามารถแสดง correlation ได้เลย</button>
+    <button class="opt" data-correct="false">ต้องมีตัวแปรอย่างน้อย 10 ตัวจึงจะใช้ได้</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 10</span><span>Radar Chart</span></div>
+  <div class="qtext">งานวิจัย "Surfacing Visualization Mirages" (CHI 2020) ชี้ปัญหาอะไรของ radar/spider chart?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">พื้นที่รูปหลายเหลี่ยมที่เห็นบิดเบือนได้ง่ายตามลำดับแกน</button>
+    <button class="opt" data-correct="false">radar chart ใช้สีได้จำกัดเกินไป</button>
+    <button class="opt" data-correct="false">radar chart แสดงข้อมูลได้สูงสุด 2 มิติเท่านั้น</button>
+    <button class="opt" data-correct="false">radar chart ไม่รองรับข้อมูลตัวเลขติดลบ</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 11</span><span>Parallel Coordinates</span></div>
+  <div class="qtext">ใน Parallel Coordinates Plot สิ่งใดมีผลอย่างมากต่อ pattern ที่ผู้อ่านมองเห็น จนต้องลองสลับดูหลายแบบ?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ลำดับการวางแกน (axis order)</button>
+    <button class="opt" data-correct="false">สีพื้นหลังของชาร์ต</button>
+    <button class="opt" data-correct="false">ฟอนต์ที่ใช้กำกับชื่อแกน</button>
+    <button class="opt" data-correct="false">ความละเอียดของหน้าจอที่แสดงผล</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 12</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">มีชุดข้อมูลรถยนต์ 7 มิติ (MPG, Cylinders, Horsepower, Weight, Acceleration, Year, Origin) จะเลือกใช้ parallel coordinates plot หรือ scatterplot matrix ดี? อธิบายเหตุผลสั้น ๆ</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ทั้งสองใช้ได้ แต่ให้มุมมองต่างกัน: Scatterplot matrix จะมี 7×7 = 49 ช่อง (21 คู่ไม่ซ้ำ) เห็นความสัมพันธ์แบบคู่ (pairwise) ชัดแต่ตารางใหญ่มาก ส่วน Parallel coordinates ใช้พื้นที่กะทัดรัดกว่า เห็นทุกมิติพร้อมกันในภาพเดียว เหมาะกับการหา pattern ข้ามหลายมิติพร้อมกัน (เช่น กลุ่มรถที่มี weight สูง แต่ MPG ต่ำ และ cylinders มาก) แต่ต้องระวังเรื่องลำดับแกนที่มีผลต่อการตีความ</div>
+</div>
+
+<h2>5. เชื่อมทุกอย่างเข้าด้วยกัน: จาก Lesson 1 ถึง Lesson 6</h2>
+<p>ตลอดครึ่งแรกของวิชา กรอบคิดเดียวกันวนกลับมาซ้ำแล้วซ้ำเล่า: <strong>Effective/Functional</strong> (ใช้งานได้จริง), <strong>Convincing/Truthful</strong> (ไม่บิดเบือนข้อมูล), <strong>Insightful/Expressive</strong> (สื่อเฉพาะสิ่งที่มีจริง ไม่มากไม่น้อยไป) — ไม่ว่าจะเป็นข้อมูล 1 ตัวแปรหรือ 7 ตัวแปร คำถามที่ต้องถามตัวเองเสมอคือ: <em>ข้อมูลประเภทไหน (nominal/ordinal) → visual variable ไหนแม่นยำที่สุด (position &gt; angle &gt; area) → ยังคง truthful และ expressive อยู่หรือไม่</em>.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 13</span><span>สรุปทั้งเทอม</span></div>
+  <div class="qtext">3 คำถามหลักที่ควรถามตัวเองทุกครั้งก่อนเลือก visualization ตามกรอบคิดที่เรียนมาทั้ง 6 lecture คือข้อใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ข้อมูลประเภทไหน → variable ไหนแม่นยำสุด → ยัง truthful/expressive อยู่ไหม</button>
+    <button class="opt" data-correct="false">สีอะไรสวยที่สุด → ฟอนต์อะไรทันสมัยที่สุด → ขนาดไฟล์เล็กที่สุดไหม</button>
+    <button class="opt" data-correct="false">ใช้เครื่องมืออะไร → ใช้เวลานานแค่ไหน → ราคาเท่าไหร่</button>
+    <button class="opt" data-correct="false">มีกี่สี → มีกี่แกน → มีกี่ legend</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้ — และครึ่งแรกทั้งหมด</div>
+คุณควรเรียกชื่อและอธิบายจุดแข็ง/จุดอ่อนของเทคนิค multivariate หลักได้ครบ (ternary, glyph, dimension stacking, SPLOM, radar, parallel coordinates) พร้อมระวัง Simpson's Paradox และปัญหา separability — และเชื่อมทุกอย่างกลับไปยังกรอบคิด Effective/Convincing/Insightful ตั้งแต่ Lesson 1 ได้ นี่คือฐานความรู้ครบสำหรับสอบ comprehensive ครึ่งแรกของวิชา.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (76 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-6-multivariate.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–13</td><td>Scatterplot &amp; Correlation ทบทวนจาก Lesson 5 (Mark/Var, guessthecorrelation.com, Cleveland/Diaconis/McGill 1982)</td><td>etc — สอนละเอียดแล้วใน <a href="0005-bivariate-data-visualization.html">Lesson 5 หัวข้อ 5</a></td></tr>
+<tr><td>14–19</td><td>Shuffling/Binning/Sampling ทบทวนจาก Lesson 5</td><td>etc — สอนละเอียดแล้วใน <a href="0005-bivariate-data-visualization.html">Lesson 5 หัวข้อ 6</a></td></tr>
+<tr><td>20–24</td><td>บันไดมิติ 1D→2D→3D และปัญหาการอ่านชาร์ต 3D</td><td>etc — ปูพื้นก่อนเข้าเนื้อหาหลัก (นำไปสู่หัวข้อ 2)</td></tr>
+<tr><td>25–27</td><td>ตัวอย่าง 3D chart ที่อ่านยาก + อ้างอิง (Ben Orlin; Shukla &amp; Parsons 2023)</td><td>etc — ตัวอย่างประกอบ ไม่ใช่ทฤษฎีที่ทำ quiz แยก</td></tr>
+<tr><td>28</td><td>เกริ่นนำ Ternary Plot</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>29–30</td><td>Ternary Plot ตัวอย่างจริง (citiesmoving.com)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>31</td><td>ตัวอย่าง ternary plot เลือกตั้งสิงคโปร์ (whatthestreet.com)</td><td>etc — ตัวอย่างประกอบ (ลิงก์อ้างอิง)</td></tr>
+<tr><td>32</td><td>Cabinet Dynasty — คณะรัฐมนตรีไทยบน ternary plot (elect.in.th)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>33</td><td>คำถาม "4D and beyond?"</td><td>✓ ส่วนหนึ่งของหัวข้อ 2</td></tr>
+<tr><td>34–35</td><td>ไดอะแกรม 4D Visual Variables (2D/3D/4D บน mark เดียว)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>36</td><td>(ว่าง)</td><td>etc</td></tr>
+<tr><td>37–39</td><td>Visual Variable Separability (ทยอยแสดงทีละคู่)</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>40</td><td>Visual Variable Separability ฉบับเต็ม (Position+Hue ถึง Red+Green)</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>41–42</td><td>เกริ่นนำ Glyph + อ้างอิง Borgo et al. 2013</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>43</td><td>Glyph: Chernoff Face</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>44</td><td>Portrait of the World by Bielova, World Data Visualization Prize 2023</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>45–48</td><td>ตัวอย่าง glyph เพิ่มเติม (National Geographic, VisualIDs, semen analysis, MetaGlyph)</td><td>etc — ตัวอย่างประกอบ Glyph เพิ่มเติมนอกเหนือ Chernoff Face/Portrait of the World</td></tr>
+<tr><td>49–50</td><td>Dimension Stacking (ข้อมูล SEA Games + โค้ด Altair)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>51–54</td><td>เกริ่นนำ Scatterplot Matrix + อ้างอิง (Towers et al. 2015, mass killings dataset)</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>55</td><td>Scatterplot Matrix พร้อม glyph ในแต่ละช่อง (Yates et al. 2014)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>56</td><td>เกริ่นนำ Radar/Spider Chart</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>57</td><td>Radar/Spider Chart + อ้างอิง Surfacing Visualization Mirages</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>58</td><td>ลิงก์ tpmap.in.th (ตัวอย่างประยุกต์ใช้จริงในไทย)</td><td>etc</td></tr>
+<tr><td>59–63</td><td>เกริ่นนำ Parallel Coordinates Plot + อ้างอิง Inselberg 1985</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>64–67</td><td>Parallel Coordinates ตัวอย่างข้อมูลรถยนต์ (ลองสลับลำดับแกนหลายแบบ)</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>68</td><td>ลิงก์ Washington Post Olympics (ตัวอย่างประยุกต์ใช้จริง)</td><td>etc</td></tr>
+<tr><td>69</td><td>(ว่าง)</td><td>etc</td></tr>
+<tr><td>70–76</td><td>งานวิจัยเชิงลึกต่อยอด Parallel Coordinates (Parallel Sets สำหรับ categorical data, การจัดการ missing data, Line Weaver, Shifted Paired Coordinates 3D)</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก แต่เป็นแหล่งอ่านต่อดี ๆ ถ้าสนใจ parallel coordinates เพิ่มเติม</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ. เมื่อพร้อมทบทวนรวม ให้บอกได้เลย จะออกแบบ quiz แบบผสมข้ามบทให้.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0005-bivariate-data-visualization.html">← Lesson 5: Bivariate Data Visualization</a></span>
+  <span><a href="0007-relational-hierarchical-data-visualization.html">Lesson 7: Relational &amp; Hierarchical Data Visualization →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 7: Relational &amp; Hierarchical Data Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 7 / 13 · Relational &amp; Hierarchical</span>
+  <span><a href="../reference/0007-relational-hierarchical-cheatsheet.html">Reference: Techniques Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-7-relational-hierarchical.pdf</p>
+<h1>Relational &amp; Hierarchical Data Visualization</h1>
+
+<p>บทนี้ขึ้นสัปดาห์ที่ 9 — ก้าวข้าม "ตัวแปรกี่ตัว" (univariate/bivariate/multivariate) ไปสู่ "ความสัมพันธ์<em>ระหว่าง</em>ตัวแปร/ตัวอย่าง" โดยตรง อาจารย์ใช้ตัวอย่างจริงเยอะมาก ทั้งงานวิจัยของตัวเอง (สไลด์นี้มีถึง 2 ชิ้น) และเดโมที่ทำเอง — บทเรียนนี้จะเดินตามตัวอย่างเหล่านั้นเป็นหลัก.</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+<a href="https://www.data-to-viz.com/#network" target="_blank" rel="noopener">From Data to Viz — Network diagrams</a> และ <a href="https://www.data-to-viz.com/#hierarchy" target="_blank" rel="noopener">Hierarchical diagrams</a> — decision tree เลือกเทคนิคตามขนาด/ความหนาแน่นของข้อมูล ตรงกับปัญหา "hairball" ที่บทนี้พูดถึงโดยตรง.
+</div>
+
+<h2>1. Curse of Dimensionality: ทำไมต้องมีบทนี้เลย</h2>
+<p>อาจารย์เปิดด้วยตารางคะแนนนักเรียน A-D ใน 3 วิชา (English/Math/Science) แล้วค่อย ๆ เติมคอลัมน์ใหม่ทีละคอลัมน์ (Thai, Social...) — แต่ละครั้งที่เพิ่มมิติ การจะ "มองเห็น" ว่านักเรียนกลุ่มไหนคล้ายกันด้วยตาเปล่ายากขึ้นเรื่อย ๆ จนเกิน 3 มิติก็พล็อตตรง ๆ ไม่ได้แล้ว. Curse of Dimensionality อธิบายเชิงคณิตศาสตร์ว่าทำไมถึงยากขึ้น:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p13-curse-of-dimensionality.png" alt="Table showing hypersphere-to-hypercube volume ratio dropping from ~75% at 2D to ~50% at 3D to ~30% at 4D">
+<figcaption>Slide: Curse of Dimensionality — hypersphere/hypercube ratio (vis-7-relational-hierarchical.pdf, p.13)</figcaption>
+</figure>
+<p>ลองตามตัวเลขในตาราง: อัตราส่วนปริมาตร "วงกลม/ทรงกลมในกรอบสี่เหลี่ยม" เทียบกับกรอบสี่เหลี่ยมนั้นเอง อยู่ที่ ~75% ตอน 2 มิติ ลดเหลือ ~50% ตอน 3 มิติ และ ~30% ตอน 4 มิติ — พอลากแนวโน้มนี้ต่อไปเรื่อย ๆ (โน้ตลายมือกำกับว่า "ถ้า dimension เยอะ → หลอน cluster ทุกที่") อัตราส่วนจะเข้าใกล้ 0% เมื่อมิติสูงมาก หมายความว่าจุดข้อมูลเกือบทั้งหมดไปกระจุกอยู่ที่ "มุม" ของพื้นที่ ไม่ใช่ตรงกลาง — ระยะห่างระหว่างจุดข้อมูลจะเริ่มไม่มีความหมาย (ทุกจุดห่างจากกันพอ ๆ กันหมด) ทำให้เทคนิค clustering แบบวัดระยะทางตรง ๆ ใช้ไม่ได้ผลอีกต่อไป นี่คือเหตุผลที่ต้องมี "embedding" มาช่วยบีบอัดข้อมูลหลายมิติกลับเป็น 2D ก่อนจะมองหา pattern.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>Curse of Dimensionality</span></div>
+  <div class="qtext">ตามตารางอัตราส่วน hypersphere/hypercube ยิ่งจำนวนมิติเพิ่มขึ้น อัตราส่วนมีแนวโน้มเป็นอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ลดลงเรื่อย ๆ เข้าใกล้ 0%</button>
+    <button class="opt" data-correct="false">เพิ่มขึ้นเรื่อย ๆ เข้าใกล้ 100%</button>
+    <button class="opt" data-correct="false">คงที่ไม่ว่าจะกี่มิติ</button>
+    <button class="opt" data-correct="false">แกว่งขึ้นลงแบบสุ่ม</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>2. Embedding: บีบอัดหลายมิติกลับเป็น 2D</h2>
+<p>เทคนิคอย่าง MDS, PCA, t-SNE, UMAP ใช้ "บีบ" ข้อมูลหลายมิติให้เหลือ 2 มิติสำหรับพล็อต โดยพยายามรักษาว่าจุดที่ใกล้กันในพื้นที่จริงยังใกล้กันบนภาพ 2D ตัวอย่างจริงจากงานวิจัยของอาจารย์ผู้สอนเอง:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p20-thai-parliament-embedding.png" alt="t-SNE-style embedding scatter plot clustering Thai members of parliament by voting record, colored by political party">
+<figcaption>Slide: Clusters of Members of Parliament in Thailand — Puripant Ruchikachorn (vis-7-relational-hierarchical.pdf, p.20)</figcaption>
+</figure>
+<p>ข้อมูลตั้งต้นคือ ส.ส. แต่ละคนโหวตอย่างไรในแต่ละมติ (แต่ละมติ = 1 มิติ อาจมีเป็นร้อยมิติถ้ามีหลายร้อยมติ) — เยอะเกินกว่าจะพล็อตตรง ๆ ได้ อาจารย์ใช้ embedding บีบให้เหลือ 2 มิติ แล้วให้สีแทนพรรค ผลลัพธ์คือกลุ่มก้อนสีแยกกันชัดเจนตามพรรค (สีแดง=เพื่อไทย, สีน้ำเงิน=พลังประชารัฐ, สีเทา=วุฒิสมาชิก ฯลฯ) — แปลว่า ส.ส. พรรคเดียวกันมักโหวตไปในทิศทางเดียวกัน (จุดอยู่ใกล้กันในพื้นที่หลายมิติเดิม) กลุ่มสีเทา (วุฒิสมาชิก) แยกตัวออกไปไกลสุดในมุมขวาบน สื่อว่าโหวตต่างจากทุกพรรคเลย — นี่คือตัวอย่างที่แสดงให้เห็นว่า embedding ไม่ได้แค่ "ลดมิติ" แต่ช่วยตอบคำถามวิจัยได้จริง (ใครโหวตคล้ายใคร) โดยไม่ต้องดูมติทีละมติ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 2</span><span>Embedding</span></div>
+  <div class="qtext">ในตัวอย่าง embedding ส.ส. ไทย เหตุผลหลักที่ต้องใช้ embedding (ไม่ plot ข้อมูลดิบตรง ๆ) คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ข้อมูลมิติเท่ากับจำนวนมติ ซึ่งมีมากเกินกว่าจะ plot บนแกน x,y ตรง ๆ</button>
+    <button class="opt" data-correct="false">ข้อมูลมีแค่ 2 มิติอยู่แล้วแต่ยังไม่ได้ทำความสะอาด</button>
+    <button class="opt" data-correct="false">เพื่อให้ภาพมีสีสันสวยงามขึ้นเท่านั้น</button>
+    <button class="opt" data-correct="false">เพราะข้อมูลเป็น nominal ล้วน plot ไม่ได้เลย</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Embedding</span></div>
+  <div class="qtext">ข้อใดต่อไปนี้ไม่ใช่เทคนิค embedding/dimensionality reduction ที่ slide กล่าวถึง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Force-Directed Layout</button>
+    <button class="opt" data-correct="false">t-SNE</button>
+    <button class="opt" data-correct="false">UMAP</button>
+    <button class="opt" data-correct="false">PCA</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>3. Relational Data: 3 วิธีเก็บข้อมูลความสัมพันธ์</h2>
+<p>Relational data คือข้อมูลที่ "ความสัมพันธ์ระหว่างตัวแปร" สำคัญพอ ๆ กับตัวแปรเอง เช่น ตัวแปรไหนสัมพันธ์กับตัวแปรไหนในชุดข้อมูล iris ตัวอย่างจริงจากสไลด์:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p27-iris-relational-data.png" alt="Iris dataset variable correlations shown as edge list, adjacency list, and adjacency matrix — Sepal.Width has no edges to other variables">
+<figcaption>Slide: Relational Data — 3 representations, iris variable correlations (vis-7-relational-hierarchical.pdf, p.27)</figcaption>
+</figure>
+<p>ในชุดข้อมูล iris พบว่า Sepal.Length, Petal.Length, Petal.Width สัมพันธ์กันเองทั้งหมด (Edge List มี 3 คู่: SL-PL, SL-PW, PL-PW) แต่ <strong>Sepal.Width ไม่ปรากฏในคู่ไหนเลย</strong> — สังเกตว่า Sepal.Width ถูกวาดแยกไว้มุมบนสุดของภาพ ไม่มีเส้นโยงไปหาตัวแปรอื่น นี่คือใจความสำคัญของ "relational data": ข้อมูลที่น่าสนใจไม่ใช่ตัวเลขแต่ละตัวแปร แต่คือ<em>โครงสร้างความสัมพันธ์</em> — จะรู้แบบนี้ได้ต้องมองเป็นกราฟ ไม่ใช่มองทีละคอลัมน์ตัวเลข.</p>
+
+<figure>
+<img src="../assets/slides/vis7-p28-adjacency-list-matrix.png" alt="Same iris correlation data represented as Python-style adjacency list dictionary and as a full adjacency matrix with X marks">
+<figcaption>Slide: same relationship, coded as adjacency list (dict) and adjacency matrix (vis-7-relational-hierarchical.pdf, p.28)</figcaption>
+</figure>
+<p>ข้อมูลเดียวกันเป๊ะ (ความสัมพันธ์ 3 คู่ในหมู่ SL/PL/PW) ถูกเขียนใหม่เป็น dictionary แบบ Python — <code>s.w: []</code> (ลิสต์ว่าง เพราะไม่เชื่อมกับใครเลย) เทียบกับ <code>s.l: [p.l, p.w]</code> (เชื่อม 2 ตัว) — และเป็น adjacency matrix 4×4 ที่แถว/คอลัมน์ S.W ไม่มี X แม้แต่ช่องเดียว ในขณะที่แถว S.L, P.W, P.L มี X ตัดกันเป็นสามเหลี่ยม — ทั้ง 3 แบบ (edge list, adjacency list, adjacency matrix) คือข้อมูลเดียวกันเป๊ะ ต่างกันแค่ "จะค้นหาอะไรได้เร็ว": adjacency list ตอบเร็วว่า "X เชื่อมกับใครบ้าง" ส่วน adjacency matrix ตอบเร็วว่า "X กับ Y เชื่อมกันไหม" (เช็คช่องเดียวจบ).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Relational Data</span></div>
+  <div class="qtext">ในตัวอย่างชุดข้อมูล iris ตัวแปรใดไม่สัมพันธ์กับตัวแปรอื่นเลยตาม edge list ที่ให้มา?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Sepal.Width</button>
+    <button class="opt" data-correct="false">Sepal.Length</button>
+    <button class="opt" data-correct="false">Petal.Length</button>
+    <button class="opt" data-correct="false">Petal.Width</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Relational Data</span></div>
+  <div class="qtext">ถ้าต้องการเช็คเร็ว ๆ ว่า "Sepal.Length กับ Petal.Width เชื่อมกันหรือไม่" ควรใช้ representation แบบใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Adjacency Matrix (เช็คช่องเดียว)</button>
+    <button class="opt" data-correct="false">Edge List (ต้องไล่ทั้งลิสต์)</button>
+    <button class="opt" data-correct="false">ไม่มี representation ไหนตอบได้</button>
+    <button class="opt" data-correct="false">ต้อง plot กราฟใหม่ทุกครั้ง</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. Node-Link Diagram: Mark และ Variable</h2>
+<p>Node-Link diagram (aka "graph") มี mark 2 แบบ: Node (จุด/วงกลม) และ Link (เส้น) แต่ละแบบเข้ารหัสได้ด้วย variable ของตัวเอง ตัวอย่างขำ ๆ ที่อาจารย์ใช้สอน:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p31-node-link-visual-mark.png" alt="Node-link diagram using food emoji as nodes (fire, pig, burger, hotdog) connected by lines, with a note about adding a visual variable for line thickness">
+<figcaption>Slide: Node/Link visual marks, illustrated with emoji (vis-7-relational-hierarchical.pdf, p.31)</figcaption>
+</figure>
+<p>Node ในภาพนี้คืออีโมจิ (ไฟ🔥, หมู🐷, เบอร์เกอร์🍔, ฮอทดอก🌭) และ Link คือเส้นเชื่อม — โน้ตลายมือเสนอเพิ่ม "+var" ให้เส้น เช่น ความหนาของเส้นแทน "ปริมาณ" (เช่น ไฟ-หมู เส้นหนา แปลว่าย่างหมูบ่อย) นี่คือตัวอย่างง่าย ๆ ที่ทำให้เห็นว่า node ไม่จำเป็นต้องเป็นวงกลมเปล่า ๆ (ใช้ shape/icon เป็น mark ได้) และ link ก็เข้ารหัสข้อมูลเพิ่มได้นอกจากแค่ "มี/ไม่มี" ความสัมพันธ์.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 6</span><span>Node-Link Visual Variables</span></div>
+  <div class="qtext">Visual variable "ความหนาของเส้น" (thickness) ในตัวอย่าง node-link diagram ใช้เข้ารหัสองค์ประกอบใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Link</button>
+    <button class="opt" data-correct="false">Node เท่านั้น</button>
+    <button class="opt" data-correct="false">Background</button>
+    <button class="opt" data-correct="false">Legend</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p>ตำแหน่ง (position) ของ node มักไม่มีความหมายเชิงข้อมูลตรง ๆ แต่ layout algorithm (เช่น force-directed layout) เลือกตำแหน่งให้เพื่อความสวยงาม/อ่านง่าย ลอง comparing 4 การจัดวางของกราฟข้อมูลเดียวกันเป๊ะ:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p43-force-directed-layout.png" alt="Same 4-node graph drawn 4 different ways: asymmetric, crossing lines, sharp angles, and a symmetric diamond marked as the best layout">
+<figcaption>Slide: same graph topology, 4 different layouts — position isn't data but layout quality matters (vis-7-relational-hierarchical.pdf, p.43)</figcaption>
+</figure>
+<p>ทั้ง 4 ภาพนี้คือกราฟเดียวกันเป๊ะ (node 1,2,3,4 เชื่อมกันแบบเดียวกันทุกภาพ) — เวอร์ชันบนซ้ายถูกกำกับว่า "ไม่สมมาตร", บนขวากำกับ "เส้นไขว้" (เส้นตัดกันโดยไม่จำเป็น), ล่างซ้ายกำกับ "มุมแหลมเกิน" (มุมระหว่างเส้นแคบจนอ่านยาก), ส่วนล่างขวาถูกกำกับ "#The best" เพราะจัดเป็นรูปข้าวหลามตัดสมมาตร ไม่มีเส้นตัดกัน มุมกว้างพอดี — บทเรียนคือ: ตำแหน่ง node ไม่ใช่ข้อมูล แต่<em>คุณภาพของ layout</em> (สมมาตร, ไม่ไขว้, มุมไม่แหลม) ส่งผลโดยตรงต่อว่าคนอ่านจะเห็นโครงสร้างกราฟได้ง่ายหรือยาก แม้ข้อมูลเบื้องหลังจะเหมือนกันทุกประการ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Graph Layout</span></div>
+  <div class="qtext">ในตัวอย่าง 4 layout ของกราฟเดียวกัน อะไรทำให้เวอร์ชันหนึ่งถูกเลือกว่า "#The best"?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สมมาตร ไม่มีเส้นตัดกัน มุมไม่แหลมเกินไป</button>
+    <button class="opt" data-correct="false">มีจำนวน node มากกว่าเวอร์ชันอื่น</button>
+    <button class="opt" data-correct="false">ใช้สีสันมากกว่าเวอร์ชันอื่น</button>
+    <button class="opt" data-correct="false">ข้อมูลเบื้องหลังต่างจากเวอร์ชันอื่น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>5. เมื่อ Node-Link ใหญ่เกินไป: "Hairball" และทางแก้</h2>
+<p>Node-link diagram อ่านง่ายตอนกราฟเล็ก แต่พอ node/link เยอะขึ้นมาก ๆ จะกลายเป็น "ก้อนขนยุ่ง" ที่อ่านอะไรไม่ได้เลย:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p53-hairball.png" alt="Two dense network diagrams of academic citations, both looking like tangled balls of thread with thousands of overlapping edges">
+<figcaption>Slide: "Hairball" — a real citation network too dense to read as a node-link diagram (vis-7-relational-hierarchical.pdf, p.53)</figcaption>
+</figure>
+<p>เครือข่ายจริงในภาพนี้ (นักวิจัยที่อ้างอิงงานกันและกัน) มีจุดและเส้นเยอะจนกลายเป็นก้อนสีเทาทึบ อ่านชื่อคนหรือโครงสร้างกลุ่มไม่ออกเลย ยกเว้นจุดไม่กี่จุดตรงกลางที่ label ไว้ — โน้ตลายมือกำกับว่า "ปน. เส้นเยอะ รุงรัง" นี่คือข้อจำกัดจริงของ node-link diagram: มันดีมากตอนกราฟมีไม่กี่สิบ node แต่พอเป็นหลักพัน/หมื่น edge การวาดเส้นตรงทับกันไปมาไม่ช่วยอะไรเลย ทางแก้คือเปลี่ยนไปใช้ Arc Diagram, Chord Diagram หรือ Adjacency Matrix/Heatmap แทน (เทคนิคเดียวกับ matrix reordering ที่เรียนใน Lecture 5) ซึ่งไม่มีปัญหาเส้นทับกันเพราะไม่ได้วาดเส้นเชื่อมเลย.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Hairball</span></div>
+  <div class="qtext">ปัญหา "Hairball" เกิดขึ้นเมื่อใด และควรแก้ด้วยเทคนิคใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Node-link diagram มีจุด/เส้นเยอะเกินไป ควรเปลี่ยนไปใช้ adjacency matrix/heatmap</button>
+    <button class="opt" data-correct="false">ข้อมูลมี missing value เยอะเกินไป ควรลบแถวที่ขาดข้อมูล</button>
+    <button class="opt" data-correct="false">สีที่ใช้ซ้ำกันเกินไป ควรเปลี่ยนจานสี</button>
+    <button class="opt" data-correct="false">กราฟมีแค่ node เดียว ควรรวมกับกราฟอื่น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>6. Hierarchical Data: กรณีพิเศษของ Relational Data</h2>
+<p>Hierarchical data คือ relational data ที่ "ห้ามมี loop" (technically คือ tree ไม่ใช่ graph ทั่วไป) — ตัวอย่างที่ inherent hierarchical โดยธรรมชาติ: เวลา (ศตวรรษ→ทศวรรษ→ปี→ไตรมาส→เดือน→สัปดาห์) และภูมิศาสตร์ (ทวีป→ประเทศ→ภาค→จังหวัด→อำเภอ) เทคนิคสำหรับวาด tree มีหลายแบบ: Reingold-Tilford Layout (ต้นไม้แนวตั้งมาตรฐาน), Radial Tree (รากอยู่กลาง กิ่งกางเป็นวงกลม), Cone Tree (ต้นไม้ 3 มิติ — อ้างอิงงานวิจัยปี 1991 ของ <strong>Jock Mackinlay</strong> คนเดียวกับที่นิยาม "Insightful = Expressive" ใน Lecture 3!).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Hierarchical Data</span></div>
+  <div class="qtext">อะไรคือเงื่อนไขที่ทำให้ relational data กลายเป็น hierarchical data?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ต้องไม่มี loop/cycle เลย (เป็นโครงสร้างแบบ tree)</button>
+    <button class="opt" data-correct="false">ต้องมีอย่างน้อย 2 loop ขึ้นไป</button>
+    <button class="opt" data-correct="false">ต้องเป็นข้อมูลตัวเลขเท่านั้น</button>
+    <button class="opt" data-correct="false">ต้องมี node ไม่เกิน 10 โหนด</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>7. Icicle Plot: ตัวอย่างการ "ทาย" ที่เป็น Hierarchy</h2>
+<p>Icicle plot ใช้แท่งซ้อนกันตามลำดับชั้น ความกว้างแท่ง = สัดส่วน/จำนวน ตัวอย่างจริงจาก The Pudding (บทความ "ทายชื่อดาราจากตัวอักษรนำ"):</p>
+
+<figure>
+<img src="../assets/slides/vis7-p82-icicle-plot.png" alt="Icicle plot tracing guesses of the name JOHAN letter by letter, branching into percentages at each step, highlighting the path to Scarlett Johansson">
+<figcaption>Slide: Icicle Plot — guessing "JOHAN..." letter by letter (vis-7-relational-hierarchical.pdf, p.82, via pudding.cool)</figcaption>
+</figure>
+<p>เริ่มจากตัวอักษร J-O-H-A-N แต่ละตัวมีแท่งกว้างเท่ากับ 100% (ทุกคนที่เดาชื่อในกลุ่มนี้ผ่านตัวอักษรเหล่านี้หมด) พอถึงตัวที่ 5 แท่งเริ่มแตกเป็นสาขา: 75% ไปทาง "S" (เดาต่อว่า JOHANS...) อีก 25% ไปทาง "N" หรือทางอื่น จากนั้นแตกย่อยไปอีกเป็น S/E/O ฯลฯ จนถึงคำตอบที่ถูกต้องจริง (Scarlett Johansson) ซึ่งมีคนเดาถูกแค่ 8.6K จาก 26.9K คน (~32%) — ความกว้างของแท่งที่ค่อย ๆ แคบลงเรื่อย ๆ ตามชั้นแสดงให้เห็นเป็นภาพว่า "ความมั่นใจ" ในการเดาลดลงเรื่อย ๆ ยิ่งเดาไปไกลจากตัวอักษรแรก.</p>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 10</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: ความกว้างของแท่งใน icicle plot แต่ละชั้นสื่อความหมายอะไร และทำไมยิ่งลึกลงไปแท่งยิ่งแคบ?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ความกว้างแท่งแทนสัดส่วน/จำนวนของกลุ่มย่อยเทียบกับกลุ่มแม่ในชั้นนั้น ยิ่งลึกลงไปแต่ละชั้นคือการแตกสาขาความเป็นไปได้ที่แคบลง (เดาตัวอักษรถัดไปแม่นน้อยลงเรื่อย ๆ) ผลรวมความกว้างของทุกกิ่งในชั้นเดียวกันจะเท่ากับความกว้างของแท่งแม่เสมอ ทำให้เห็นภาพรวมของการกระจายความเป็นไปได้ทั้งหมดในโครงสร้างเดียว</div>
+</div>
+
+<h2>8. Sunburst Chart ≠ Rose Diagram (กับดักที่ข้อสอบชอบถาม)</h2>
+<p>Sunburst chart คือ icicle plot ที่โค้งเป็นวงแหวนซ้อนกันแทนแท่งตรง แต่มีชาร์ตหน้าตาคล้ายกันมากที่<strong>คนละหลักการ</strong>เข้ารหัส:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p84-sunburst-vs-rose.png" alt="Florence Nightingale's historic Rose Diagram (Diagram of the Causes of Mortality) shown as an example that looks like a sunburst chart but is not one">
+<figcaption>Slide: Sunburst Chart ≠ Polar Area Diagram / Rose Diagram — Florence Nightingale's 1858 mortality diagram (vis-7-relational-hierarchical.pdf, p.84)</figcaption>
+</figure>
+<p>แผนภาพของ Florence Nightingale ปี 1858 (บันทึกสาเหตุการเสียชีวิตของทหารอังกฤษ แบ่งตามเดือน) หน้าตาคล้าย sunburst มาก แต่จริง ๆ คือ <em>Rose Diagram</em> ที่เข้ารหัสค่าข้อมูลด้วย<strong>รัศมี</strong>โดยตรง — ปัญหาคือพื้นที่ของวงแปรผันตามรัศมี<em>ยกกำลังสอง</em> (เหมือนกับดักวงกลม COVID map ใน Lecture 2!) ทำให้เดือนที่มีค่าสูงกว่าดู "ใหญ่กว่าที่ควรจะเป็น" มาก โน้ตลายมือกำกับไว้ว่า "stack barchart ทำเป็นวงกลม" — เพราะ sunburst chart ที่ถูกต้องจริง ๆ คือการเอา stacked bar chart มาโค้งเป็นวงแหวน ความกว้างมุม (ไม่ใช่รัศมี) ต่างหากที่เข้ารหัสค่าข้อมูล ทำให้พื้นที่แต่ละวงยังสัดส่วนถูกต้อง — อาจารย์ผู้สอนมีงานวิจัยของตัวเองเรื่องนี้โดยตรง: "Familiarity vs. Correctness: Arcs and Angles in Sunburst Charts" (Songsakulkiat &amp; Ruchikachorn, PacificVis 2021).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 11</span><span>Sunburst vs Rose</span></div>
+  <div class="qtext">ความต่างหลักระหว่าง Sunburst Chart กับ Rose Diagram (Polar Area Diagram) คืออะไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Sunburst เข้ารหัสด้วยมุม/พื้นที่ถูกสัดส่วน ส่วน Rose Diagram เข้ารหัสด้วยรัศมีตรง ๆ ทำให้พื้นที่บิดเบือน</button>
+    <button class="opt" data-correct="false">Sunburst ใช้สีได้เท่านั้น ส่วน Rose Diagram ใช้ได้แค่ขาวดำ</button>
+    <button class="opt" data-correct="false">ทั้งสองแบบเข้ารหัสเหมือนกันทุกประการ ต่างกันแค่ชื่อเรียก</button>
+    <button class="opt" data-correct="false">Sunburst ใช้กับข้อมูล 1 มิติเท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>9. Mosaic Plot / Marimekko Chart</h2>
+<p>สี่เหลี่ยมที่แบ่งทั้งความกว้างและความสูงตามสัดส่วน 2 มิติพร้อมกันในภาพเดียว อาจารย์มีเดโมของตัวเอง 2 ชิ้น: <a href="http://puripant.github.io/animated-mosaic/" target="_blank" rel="noopener">animated-mosaic</a> (แสดงการเปลี่ยนสัดส่วนแบบ animated) และ <a href="http://puripant.github.io/thai-lottery-stat/" target="_blank" rel="noopener">thai-lottery-stat</a> (สถิติเลขท้ายหวยไทย) — เหมาะกับตอนต้องการเห็นทั้ง "สัดส่วนของกลุ่มใหญ่" และ "สัดส่วนย่อยภายในแต่ละกลุ่ม" พร้อมกัน โดยที่พื้นที่แต่ละช่องยังสื่อขนาดสัมพัทธ์ได้ถูกต้อง (ต่างจาก bar chart ปกติที่บอกได้แค่มิติเดียว).</p>
+
+<h2>10. Treemap: Containment เป็น Visual Variable</h2>
+<p>Treemap ใช้ "การซ้อนกันของสี่เหลี่ยม" (containment) เป็น visual variable หลักแทน hierarchy:</p>
+
+<figure>
+<img src="../assets/slides/vis7-p92-treemap-containment.png" alt="Tree diagram A-B-C-D-E with percentages next to the equivalent treemap made of nested rectangles">
+<figcaption>Slide: Treemap — Visual Variable = Containment (vis-7-relational-hierarchical.pdf, p.92)</figcaption>
+</figure>
+<p>ต้นไม้ทางซ้าย: A (100%) แตกเป็น B (50%) กับ C (50%), และ C แตกต่อเป็น D (40%) กับ E (60%) — พอแปลงเป็น treemap ทางขวา สี่เหลี่ยมทั้งหมดถูกบรรจุอยู่ในกรอบใหญ่ (=A) แบ่งเป็น B (ครึ่งซ้าย กว้าง 50% ของพื้นที่) กับอีกครึ่ง (=C) ซึ่งแบ่งต่อเป็น D (40% ของพื้นที่ C) และ E (60% ของพื้นที่ C) วางซ้อนกันในแนวตั้ง — สังเกตว่าพื้นที่ของ D ในภาพจริง ๆ คือ 40% × 50% = 20% ของพื้นที่ทั้งหมด ไม่ใช่ 40% ตรง ๆ เพราะ containment คือการซ้อนกันหลายชั้น พื้นที่จึงคูณกันไปเรื่อย ๆ ตามความลึกของ hierarchy.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 12</span><span>Treemap</span></div>
+  <div class="qtext">ในตัวอย่าง treemap (A→B 50%,C 50% / C→D 40%,E 60%) พื้นที่ของ D เทียบกับพื้นที่ทั้งหมด (A) มีค่าประมาณเท่าไหร่?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">20% (40% ของ 50%)</button>
+    <button class="opt" data-correct="false">40%</button>
+    <button class="opt" data-correct="false">90% (40%+50%)</button>
+    <button class="opt" data-correct="false">60%</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>11. Group-in-a-Box และ Flow Map</h2>
+<p><strong>Group-in-a-Box Layout</strong> ผสม node-link เข้ากับ treemap: จัดกลุ่ม node (เช่น ตามชุมชน/cluster) ไว้ในกล่องแยกกันก่อน แล้วค่อยวาด node-link ภายในแต่ละกล่อง — แก้ปัญหา hairball โดยลด "การพันกันข้ามกลุ่ม" ลง <strong>Flow Map</strong> วาดข้อมูล relational/hierarchical ทับบนแผนที่จริง (เช่น เส้นทางการเดินทาง) — สไลด์อ้างถึง flow map ชิ้นแรกในประวัติศาสตร์ ปี 1837 ที่ใช้แสดงการขนส่งผู้โดยสารในไอร์แลนด์ ก่อนจะทิ้งท้ายด้วยคำถามเปิด "Spatial &amp; Geographical Data Vis = Map?" ซึ่งเป็นสะพานไปสู่ Lesson 8 โดยตรง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 13</span><span>Group-in-a-Box &amp; Flow Map</span></div>
+  <div class="qtext">Group-in-a-Box Layout ผสมแนวคิดของเทคนิคใดเข้าด้วยกัน?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Node-link diagram และ treemap (จัดกลุ่มเป็นกล่องก่อนวาด node-link ในแต่ละกล่อง)</button>
+    <button class="opt" data-correct="false">Scatter plot และ heatmap</button>
+    <button class="opt" data-correct="false">Bar chart และ pie chart</button>
+    <button class="opt" data-correct="false">Sunburst chart และ icicle plot เท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรอธิบายได้ว่าทำไมข้อมูลหลายมิติต้องใช้ embedding ก่อนจะมองเห็น pattern, เลือก representation ของ relational data ได้ตามโจทย์ (edge list/adjacency list/adjacency matrix), รู้ว่า node-link diagram พังเมื่อไหร่ (hairball) และควรเปลี่ยนไปใช้อะไรแทน, และแยก sunburst chart ออกจาก rose diagram ได้ด้วยเหตุผลเดียวกับกับดักวงกลม COVID map ใน Lecture 2.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (114 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-7-relational-hierarchical.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/ลิงก์อ้างอิง/งานวิจัยเชิงลึก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–9</td><td>Curse of Dimensionality เกริ่นนำ (ตารางคะแนนนักเรียนเพิ่มคอลัมน์ทีละคอลัมน์)</td><td>✓ ส่วนหนึ่งของหัวข้อ 1</td></tr>
+<tr><td>10–13</td><td>Curse of Dimensionality: สูตร/ตารางอัตราส่วน hypersphere/hypercube</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>14</td><td>Subspace (การวิเคราะห์แค่บางมิติ ไม่ใช่ทุกมิติ)</td><td>etc — แนวคิดเสริม นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>15–19</td><td>Embedding เกริ่นนำ (MDS, PCA, t-SNE, UMAP) + อ้างอิงงานวิจัย + เครื่องมือ DruidJS</td><td>✓ หัวข้อ 2</td></tr>
+<tr><td>20</td><td>Embedding: Clusters of Members of Parliament in Thailand (งานวิจัยอาจารย์)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>21–22</td><td>อ้างอิงงานวิจัย embedding เพิ่มเติม (Rubik's Cube, Subset Embedding)</td><td>etc — อ้างอิงเชิงลึก</td></tr>
+<tr><td>23–26</td><td>Relational Data เกริ่นนำ + ตัวอย่าง iris เบื้องต้น</td><td>✓ ส่วนหนึ่งของหัวข้อ 3</td></tr>
+<tr><td>27</td><td>Relational Data: iris correlations เป็น edge list/adjacency list/matrix (เวอร์ชันแนวคิด)</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>28</td><td>Relational Data: เวอร์ชันโค้ด/ตารางเต็ม</td><td>✓ หัวข้อ 3 (มีรูป)</td></tr>
+<tr><td>29–30</td><td>เกริ่นนำ Node-Link diagram (ตัวอักษรย่อ)</td><td>etc — เกริ่นนำก่อนหัวข้อ 4</td></tr>
+<tr><td>31</td><td>Node-Link visual mark ตัวอย่างอีโมจิ</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>32–38</td><td>ตัวอย่าง node-link diagram ที่ใช้จริง (Marvel universe, IMDB, งานวิจัยแนะนำหนัง/เพลง)</td><td>etc — ตัวอย่างประกอบ (ลิงก์อ้างอิง)</td></tr>
+<tr><td>39–42</td><td>Node/Link visual variables รายละเอียด (position, size, color, shape) + ตัวอย่าง Chula timeline, royal constellations</td><td>✓ ส่วนหนึ่งของหัวข้อ 4</td></tr>
+<tr><td>43</td><td>4 layout ของกราฟเดียวกัน เทียบคุณภาพ</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>44–51</td><td>Force-Directed Layout เกริ่นนำ + โค้ด D3.js เต็ม (forceSimulation, forceLink, forceManyBody, forceCollide)</td><td>✓ ส่วนหนึ่งของหัวข้อ 4 (สรุปแนวคิดแล้ว โค้ดเต็มไม่ทำ quiz แยก)</td></tr>
+<tr><td>52</td><td>เกริ่นนำ "Hairball"</td><td>✓ ส่วนหนึ่งของหัวข้อ 5</td></tr>
+<tr><td>53</td><td>Hairball ตัวอย่างจริง (เครือข่ายงานวิจัย)</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>54–56</td><td>ตัวอย่าง node-link ขนาดใหญ่เพิ่มเติม (การเมือง, bullying network)</td><td>etc — ตัวอย่างประกอบ</td></tr>
+<tr><td>57</td><td>Arc Diagram</td><td>✓ หัวข้อ 5 (สรุปในตารางอ้างอิง)</td></tr>
+<tr><td>58–59</td><td>Chord Diagram</td><td>✓ หัวข้อ 5 (สรุปในตารางอ้างอิง)</td></tr>
+<tr><td>60–66</td><td>Heatmap/Adjacency matrix + matrix reordering (Behrisch et al. 2016, 2020)</td><td>✓ หัวข้อ 5 (เชื่อมกับ Lecture 5 แล้ว)</td></tr>
+<tr><td>67–74</td><td>เทคนิคเสริมสำหรับกราฟใหญ่ (super node, edge bundling, NodeTrix, motif simplification)</td><td>etc — งานวิจัยเชิงลึก นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>75–76</td><td>นิยาม Hierarchical Data</td><td>✓ หัวข้อ 6</td></tr>
+<tr><td>77</td><td>Reingold-Tilford Layout</td><td>✓ หัวข้อ 6 (สรุปในตาราง)</td></tr>
+<tr><td>78</td><td>Radial Tree</td><td>✓ หัวข้อ 6 (สรุปในตาราง)</td></tr>
+<tr><td>79</td><td>Cone Tree (Mackinlay et al. 1991)</td><td>✓ หัวข้อ 6</td></tr>
+<tr><td>80–82</td><td>Icicle Plot + ตัวอย่าง JOHAN/Scarlett Johansson</td><td>✓ หัวข้อ 7 (มีรูป)</td></tr>
+<tr><td>83–85</td><td>Sunburst Chart ≠ Rose Diagram + อ้างอิงงานวิจัยอาจารย์</td><td>✓ หัวข้อ 8 (มีรูป)</td></tr>
+<tr><td>86–91</td><td>Mosaic Plot/Marimekko + เดโมของอาจารย์ + ตัวอย่างข่าว</td><td>✓ หัวข้อ 9 (อธิบายในเนื้อหาแล้ว)</td></tr>
+<tr><td>92</td><td>Treemap: containment เป็น visual variable</td><td>✓ หัวข้อ 10 (มีรูป)</td></tr>
+<tr><td>93–97</td><td>อ้างอิงงานวิจัย treemap (Shneiderman 1992, squarified, Voronoi treemaps)</td><td>✓ หัวข้อ 10 (อ้างอิงในเนื้อหาแล้ว)</td></tr>
+<tr><td>98–100</td><td>Group-in-a-Box Layout</td><td>✓ หัวข้อ 11</td></tr>
+<tr><td>101–108</td><td>Flow Map เกริ่นนำ + ตัวอย่างจริง (COVID spread, คลองกรุงเทพฯ, Premier League passes)</td><td>✓ หัวข้อ 11</td></tr>
+<tr><td>109–114</td><td>เปลี่ยนหัวข้อเข้าสู่ Spatial &amp; Geographical Data Vis (คำถามเปิด "= Map?")</td><td>etc — เกริ่นนำ Lesson 8 โดยตรง</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0006-multivariate-data-visualization.html">← Lesson 6: Multivariate Data Visualization</a></span>
+  <span><a href="0008-spatial-geographical-data-visualization.html">Lesson 8: Spatial &amp; Geographical Data Visualization →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

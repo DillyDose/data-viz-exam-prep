@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Visual Analytics</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 10</p>
+<h1>Visual Analytics Cheat Sheet</h1>
+
+<h2>นิยามสั้น</h2>
+<p>Visual Analytics = Visualization + Interaction + (บ่อยครั้ง) Machine Learning/Analysis อัตโนมัติ — ใช้ตอบคำถามที่ยังไม่รู้คำตอบ (to explore) ผ่านการวนลูป: <strong>ดูภาพ → ตั้งสมมติฐาน → โต้ตอบเพื่อเจาะลึก/กรอง → เห็น pattern ใหม่ → ตั้งคำถามใหม่</strong> (Sensemaking Loop)</p>
+
+<h2>Visual Analytics Mantras (เทียบ 3 แบบ)</h2>
+<table>
+<tr><th>Mantra</th><th>ผู้เสนอ</th><th>ใจความ</th></tr>
+<tr><td>Visual Information Seeking Mantra</td><td>Ben Shneiderman, 1996</td><td>Overview first, zoom and filter, then details-on-demand</td></tr>
+<tr><td>Visual Analytics Mantra</td><td>Daniel Keim, 2006</td><td>Analyze first, show the important, zoom/filter/analyze further, details on demand</td></tr>
+<tr><td>"Namredienhs" Mantra (Shneiderman สลับตัวอักษร)</td><td>van den Elzen &amp; van Wijk, 2014</td><td>Details, select &amp; aggregate, overview</td></tr>
+</table>
+<p>Keim ปรับจาก "Overview first" เป็น "Analyze first" เพราะข้อมูลยุค Big Data ใหญ่เกินกว่าจะแสดง overview ที่มีความหมายได้เลยตั้งแต่ต้น (ต้องให้ machine วิเคราะห์/ย่อยก่อน ถึงจะมี overview ให้ดู)</p>
+
+<h2>Sensemaking ในทางปฏิบัติ</h2>
+<ul>
+<li><strong>Closed-ended</strong> คำถาม: มีคำตอบเดียวชัดเจน (เช่น "ปีไหนได้เหรียญทองเยอะสุด")</li>
+<li><strong>Open-ended</strong> คำถาม: "How &amp; Why" — ต้องอาศัยการสำรวจ ไม่มีคำตอบสำเร็จรูป ถ้าเครื่องมือควบคุมผู้ใช้มากเกินไป (ให้ทางเลือกน้อยเกินไป) จะตอบคำถามแบบนี้ไม่ได้</li>
+</ul>
+
+<h2>Explainable AI (XAI) = Visual Analytics ประยุกต์กับโมเดล ML</h2>
+<p>โมเดล ML สมัยใหม่ (โดยเฉพาะ deep learning) มักเป็น "black box" — รู้ input/output แต่ไม่รู้กลไกภายใน แนวทางแก้ 2 แบบหลัก:</p>
+<ul>
+<li><strong>สร้างโมเดลใหม่มาอธิบายโมเดลเดิม</strong> (surrogate model ที่ตีความง่ายกว่า)</li>
+<li><strong>Visualize โมเดลเดิมตรง ๆ</strong> ผ่านเครื่องมือเช่น Squares, LSTMVis, seq2seq-vis</li>
+</ul>
+<p>เหตุผลที่ต้องมี XAI: ความน่าเชื่อถือ (trust), ตรวจจับ bias/ความไม่เป็นธรรม (fairness), debug โมเดลที่ทำงานผิดพลาด</p>
+
+<hr>
+<p><a href="../lessons/0010-visual-analytics.html">← กลับไป Lesson 10</a></p>
+
+</body>
+</html>

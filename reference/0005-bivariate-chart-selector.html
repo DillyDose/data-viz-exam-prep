@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Bivariate Chart Selector</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 5</p>
+<h1>Bivariate Chart Selection Matrix</h1>
+
+<h2>เลือกชาร์ตจากคู่ประเภทข้อมูล</h2>
+<table>
+<tr><th></th><th>Nominal (คอลัมน์ที่ 2)</th><th>Ordinal (คอลัมน์ที่ 2)</th></tr>
+<tr><td><strong>Nominal (คอลัมน์ที่ 1)</strong></td><td>Heatmap</td><td>Bar chart (Line chart)</td></tr>
+<tr><td><strong>Ordinal (คอลัมน์ที่ 1)</strong></td><td>Bar chart (Line chart)</td><td>Scatter plot (Line chart)</td></tr>
+</table>
+<p><em class="term">จำหลัก:</em> Nominal×Nominal ไม่มีลำดับทั้งคู่ → ต้องใช้ matrix ของสี (heatmap) เพราะไม่มีแกนต่อเนื่องให้พล็อตจุด. พอมี "ordinal" อย่างน้อย 1 แกน → เริ่มพล็อตแบบมีตำแหน่งได้ (bar/line/scatter).</p>
+
+<h2>Heatmap: การจัดเรียง (Reordering) สำคัญกว่าที่คิด</h2>
+<p>Jacques Bertin's reorderable matrices — heatmap แถว/คอลัมน์เดียวกัน แต่เรียงลำดับต่างกัน เผยให้เห็น block pattern/cluster ที่มองไม่เห็นเลยถ้าเรียงตามตัวอักษร (alphabetical) เฉย ๆ</p>
+
+<h2>Bar Chart — กับดักที่พบบ่อย</h2>
+<ul>
+<li><strong>Y-axis ไม่เริ่มที่ 0 / broken axis</strong> — ขยายผลต่างเกินจริง (Correll, Bertini &amp; Franconeri, CHI 2020)</li>
+<li><strong>Aspect ratio บิดเบือนความจำ</strong> — สัดส่วนกว้าง/สูงของแท่งมีผลต่อการจำตำแหน่งข้อมูล (Ceja et al., TVCG 2021, "Truth or Square")</li>
+<li><strong>Bar-Tip Limit error</strong> — คนอ่านตีความ error bar/ค่าเฉลี่ยบน bar graph ผิดพลาดอย่างเป็นระบบ (Kerns &amp; Wilmer, JOV 2021)</li>
+</ul>
+
+<h2>Line Chart — ข้อควรระวัง</h2>
+<ul>
+<li>บอกเป็นนัยว่าข้อมูล<strong>ต่อเนื่องและมีค่าสัมบูรณ์ (continuous and absolute)</strong> — อย่าใช้กับข้อมูล categorical ที่ไม่มีลำดับต่อเนื่องจริง</li>
+<li><strong>Banking to 45°</strong> (Cleveland 1993; Heer &amp; Agrawala TVCG 2006) — ปรับ aspect ratio ให้ความชันเฉลี่ยของเส้นอยู่ราว 45° จะอ่านแนวโน้มได้แม่นยำที่สุด</li>
+<li><strong>Dual-axis อันตราย</strong> — การ scale แกนซ้าย/ขวาต่างกันสามารถ "สร้าง" ความสัมพันธ์ปลอมระหว่างสองเส้นได้</li>
+<li>แกนไม่จำเป็นต้องเริ่มที่ 0 (ต่างจาก bar chart) แต่หลีกเลี่ยง dual axes</li>
+</ul>
+
+<h2>Scatter Plot</h2>
+<ul>
+<li><strong>Aspect ratio บิดเบือนการรับรู้ correlation</strong> — ยิ่งบีบสเกลแกนให้ชันขึ้น ยิ่งดูเหมือนมี correlation สูงขึ้น ทั้งที่ข้อมูลเหมือนเดิม (Cleveland, Diaconis &amp; McGill, 1982)</li>
+<li><strong>Overplotting</strong> — จุดทับกันเยอะเกินอ่านไม่ออก แก้ด้วย: <strong>Shuffling</strong> (สลับลำดับวาดจุด), <strong>Binning</strong> (รวมกลุ่มเป็นตาราง/hexbin), <strong>Sampling</strong> (สุ่ม/blue-noise/density-based)</li>
+</ul>
+
+<hr>
+<p><a href="../lessons/0005-bivariate-data-visualization.html">← กลับไป Lesson 5</a></p>
+
+</body>
+</html>

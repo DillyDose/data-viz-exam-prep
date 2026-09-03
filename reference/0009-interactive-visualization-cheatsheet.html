@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Reference: Interactive Visualization</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<p class="kicker">Reference · Lecture 9</p>
+<h1>Interactive Visualization Cheat Sheet</h1>
+
+<h2>Spatiotemporal Data: 2 วิธีเพิ่มมิติเวลา</h2>
+<table>
+<tr><th>วิธี</th><th>ข้อดี</th><th>ข้อเสีย</th></tr>
+<tr><td><strong>Small Multiples</strong></td><td>เทียบทุกช่วงเวลาได้พร้อมกันในสายตาเดียว ไม่ต้องรอ/จำ</td><td>กินพื้นที่มาก (Space) เมื่อมีหลายช่วงเวลา</td></tr>
+<tr><td><strong>Animation</strong></td><td>กินพื้นที่น้อย (Space) เห็นการเปลี่ยนแปลงต่อเนื่องลื่นไหล</td><td>ต้องรอดู (Time) จำช่วงก่อนหน้าไม่ได้ถ้าพลาด</td></tr>
+</table>
+<p>นี่คือตัวอย่างของ <strong>Space-Time Tradeoff</strong> ที่วนกลับมาซ้ำหลายรอบตลอดบทนี้: ยิ่งประหยัดพื้นที่ (space) มักต้องแลกด้วยเวลาที่ผู้ใช้ต้องเสีย (time) ไปเปิดดู/รอ และกลับกัน.</p>
+
+<h2>Interaction Techniques (Shneiderman-style taxonomy)</h2>
+<table>
+<tr><th>เทคนิค</th><th>ทำอะไร</th></tr>
+<tr><td>Sort</td><td>เรียงลำดับข้อมูลใหม่แบบโต้ตอบ</td></tr>
+<tr><td>Details on Demand</td><td>hover/select แล้วเผยรายละเอียดเพิ่ม (tooltip)</td></tr>
+<tr><td>Dynamic Filtering</td><td>ปรับ slider/checkbox แล้วข้อมูลที่แสดงเปลี่ยนทันที</td></tr>
+<tr><td>Pan &amp; Zoom</td><td>เลื่อนดู/ขยายเฉพาะส่วนที่สนใจ</td></tr>
+<tr><td>Link &amp; Brush</td><td>เลือก (brush) ในภาพหนึ่ง ไฮไลต์จุดที่สัมพันธ์กันในอีกภาพ (link)</td></tr>
+<tr><td>Overview + Detail</td><td>มุมมองรวมกับมุมมองละเอียดแยกกันคนละพื้นที่ แต่ sync กัน</td></tr>
+<tr><td>Focus + Context</td><td>บิด/ขยายเฉพาะจุดสนใจ โดยยังเห็นบริบทรอบข้าง (เช่น fisheye)</td></tr>
+<tr><td>Direct Manipulation</td><td>โต้ตอบกับตัว mark ในภาพโดยตรง ไม่ผ่าน widget แยก (proxy)</td></tr>
+</table>
+
+<h2>Objective ของ Interaction</h2>
+<p>ทุกเทคนิคข้างบนคือการเปลี่ยนพารามิเตอร์ของขั้นตอนใดขั้นตอนหนึ่งใน pipeline (Lecture 3): <strong>Data processing</strong> (เช่น filter), <strong>Visual mapping</strong> (เช่น เปลี่ยน encoding), หรือ <strong>Visual rendering</strong> (เช่น zoom/pan) — เพื่อช่วยให้ผู้ใช้หา insight ที่ static chart เดียวให้ไม่ได้.</p>
+
+<h2>Dashboard</h2>
+<p>"A dashboard is a visual display of the most important information needed to achieve one or more objectives, consolidated and arranged on a single screen so the information can be monitored at a glance" — หลักออกแบบสำคัญ: จัด <strong>Hierarchy</strong> (ข้อมูลสำคัญสุดควรเด่นสุด/อยู่บนสุด) และ <strong>Layout</strong> ที่ไม่บังคับให้ scroll เพื่อดูภาพรวม (ต้อง "glanceable" จริง ๆ)</p>
+
+<h2>Grand Tour</h2>
+<p>แปลง SPLOM (scatterplot matrix, Lecture 6) ให้เป็น animation — หมุน/ไล่ดูแต่ละคู่มิติทีละคู่ (หรือ interpolate ระหว่างมุมมอง) แทนที่จะกางดูทุกคู่พร้อมกันในตารางใหญ่ (Daniel Asimov, 1985)</p>
+
+<hr>
+<p><a href="../lessons/0009-interactive-visualization.html">← กลับไป Lesson 9</a></p>
+
+</body>
+</html>

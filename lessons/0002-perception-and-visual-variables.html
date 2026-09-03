@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Lesson 2: Visual Perception & Visual Variables</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav class="lesson-nav">
+  <span>Lesson 2 / 13 · Perception</span>
+  <span><a href="../reference/0002-visual-variables-cheatsheet.html">Reference: Visual Variables Cheat Sheet →</a></span>
+</nav>
+
+<p class="kicker">vis-2-perception.pdf</p>
+<h1>Visual Perception &amp; Visual Variables</h1>
+
+<p>Lecture นี้ต่อยอดจากกรอบคิด Effective/Convincing/Insightful ใน Lesson 1 ให้เป็นรูปธรรมขึ้น: <strong>Good = Functional</strong> (มาจาก Effective) และ <strong>Good = Truthful</strong> (มาจาก Convincing) แล้วอธิบายว่า "การรับรู้ทางสายตา" (perception) และ "ตัวแปรเชิงภาพ" (visual variables) คือเครื่องมือที่ทำให้ visualization ทำหน้าที่ทั้งสองอย่างนี้ได้.</p>
+
+<figure>
+<img src="../assets/slides/vis2-p57-good-visualizations-framework.png" alt="Good Visualizations slide: Effective maps to Functional, Convincing maps to Truthful, Insightful left open">
+<figcaption>Slide: Good Visualizations — Effective→Functional, Convincing→Truthful (vis-2-perception.pdf, p.57)</figcaption>
+</figure>
+<p>สังเกตว่าบรรทัด "Insightful" ในสไลด์นี้ยังไม่มีคำตอบต่อท้าย ทั้งที่ Effective กับ Convincing มีคำตอบชัดเจนแล้ว — นี่ไม่ใช่ความผิดพลาด แต่เป็นช่องว่างที่จงใจเปิดค้างไว้ เพราะคำตอบของมันต้องรอทฤษฎีจาก Lesson 3 (Mackinlay 1986) มาเติมให้ ระหว่างนี้จำไว้แค่ว่า Good visualization วันนี้มี 2 เสาที่ตอบได้แล้ว: Functional (ใช้งานได้จริง ตรงกับ Effective) กับ Truthful (ไม่บิดเบือนข้อมูล ตรงกับ Convincing).</p>
+
+<div class="box source">
+<div class="label">อ่านเพิ่มก่อนเริ่ม (แนะนำ)</div>
+Claus O. Wilke, <a href="https://clauswilke.com/dataviz/aesthetic-mapping.html" target="_blank" rel="noopener">Fundamentals of Data Visualization — ch. 2 Visualizing Data</a> (aesthetic mappings) และ <a href="https://clauswilke.com/dataviz/color-basics.html" target="_blank" rel="noopener">ch. 4 Color Scales</a> — ครอบคลุม visual variables และการใช้สีอย่างถูกต้อง ตรงกับเนื้อหาวันนี้.
+</div>
+
+<h2>1. อะไรคือ Good Visualization? เริ่มด้วยตัวอย่างสด ๆ ร้อน ๆ</h2>
+<p>ก่อนเข้าเนื้อหาทฤษฎี อาจารย์เปิดด้วยตัวอย่างจากข่าวจริงล่าสุด (2025) — การเปิดตัว GPT-5 ของ OpenAI ที่มีคนวิจารณ์กราฟในงานแถลงข่าวทันทีที่จบ:</p>
+
+<figure>
+<img src="../assets/slides/vis2-p12-gpt5-stacked-bar.png" alt="OpenAI's GPT-5 launch benchmark chart: the GPT-5 bar is split into two stacked pink segments totaling 74.9% (52.8% without thinking plus a pink cap up to 74.9% with thinking), while the competing OpenAI o3 bar (69.1%) and GPT-4o bar (30.8%) are drawn as plain single-color bars with no split, with a pink hand-drawn circle highlighting the GPT-5 bar's two-part structure">
+<figcaption>Slide: GPT-5 launch keynote — SWE-bench Verified benchmark chart (vis-2-perception.pdf, p.12, จาก OpenAI Summer Update)</figcaption>
+</figure>
+<p>ตัวเลขจริง: GPT-5 ทำได้ 74.9% (แบ่งเป็นสีชมพูอ่อน "without thinking" 52.8% บวกสีชมพูเข้มด้านบนอีก 22.1% เมื่อเปิด "with thinking") เทียบกับ OpenAI o3 ที่ 69.1% และ GPT-4o ที่ 30.8% — ตัวเลข 74.9% มากกว่า 69.1% จริง แต่สังเกตว่ามีแค่แท่ง GPT-5 เท่านั้นที่ถูกวาดแบบแบ่งสองสี (stacked) ส่วนแท่งคู่แข่งเป็นสีเดียวล้วน — การแบ่งสีสองชั้นทำให้แท่ง GPT-5 "ดูมีเนื้อหา/ซับซ้อนกว่า" แท่งอื่นโดยไม่ได้ตั้งใจ (หรือตั้งใจ) ทั้งที่ส่วนต่าง 74.9% กับ 69.1% จริง ๆ ไม่ได้ห่างกันมาก — นี่คือตัวอย่างว่าแม้ตัวเลขจะไม่โกหก แต่การเลือก "จะแบ่งสีแท่งไหนบ้าง" ก็ยังเอนเอียงการรับรู้ได้.</p>
+
+<figure>
+<img src="../assets/slides/vis2-p13-gpt5-deception-chart-mismatch.png" alt="Two versions of the same OpenAI Deception evals across models chart shown side by side: the top version from the live keynote shows GPT-5 with thinking at 50.0% coding deception with a pink hand-drawn circle around it, while the bottom version from OpenAI's official published page shows the same GPT-5 coding deception metric as 16.5% instead — a large discrepancy in the same chart category">
+<figcaption>Slide: กราฟ "Deception evals" เวอร์ชันในงานแถลงสด เทียบกับเวอร์ชันทางการบนเว็บ OpenAI (vis-2-perception.pdf, p.13)</figcaption>
+</figure>
+<p>นี่คือจุดที่น่าสนใจกว่าเดิม: กราฟ "Coding deception" เวอร์ชันที่ฉายสดในงานแถลงข่าว (บนสุด) แสดงว่า GPT-5 (with thinking) มีอัตรา deception 50.0% แทบจะเท่ากับ o3 ที่ 47.4% — แต่กราฟชุดเดียวกันที่โพสต์ทางการบนเว็บ OpenAI ภายหลัง (ล่างสุด) กลับแสดงตัวเลข GPT-5 อยู่ที่ 16.5% เท่านั้น ต่างจากตัวเลขในงานแถลงสดเกือบ 3 เท่า ทั้งที่เป็นหมวด "Coding deception" เดียวกันเป๊ะ — ไม่ว่าสาเหตุจะเป็นการแก้บั๊กหรือความผิดพลาดตอนเตรียมสไลด์ บทเรียนสำหรับนักวิเคราะห์ visualization คือ: ก่อนเชื่อตัวเลขในกราฟใด ๆ (แม้จะมาจากบริษัทระดับโลกในงานแถลงข่าวใหญ่) ควรเช็คแหล่งอ้างอิงทางการเสมอ อย่าเชื่อภาพที่เห็นครั้งเดียวจบ.</p>
+
+<p>ตัวอย่างที่สามแสดงว่า channel หลายตัวใช้ร่วมกันอย่างสมเหตุสมผลก็ทำให้ข้อมูลซับซ้อนเข้าใจง่ายได้:</p>
+
+<figure>
+<img src="../assets/slides/vis2-p16-thai-airport-profit-map.png" alt="A real Thai infographic map showing the Department of Airports' fiscal year 2018 profit and loss by airport: airplane icons placed at each airport's real geographic location, colored red for a loss or green for a profit, and sized larger for bigger magnitudes, each labeled with its exact baht figure">
+<figcaption>Slide: ผลประกอบการของกรมท่าอากาศยาน ปีงบประมาณ 2561 (vis-2-perception.pdf, p.16, thansettakij.com)</figcaption>
+</figure>
+<p>แผนที่นี้ใช้ 3 channel พร้อมกันอย่างสอดคล้องกัน: <strong>ตำแหน่ง</strong> (position) ของไอคอนเครื่องบินตรงกับตำแหน่งภูมิศาสตร์จริงของแต่ละสนามบิน <strong>เฉดสี</strong> (hue, แดง/เขียว) บอกหมวดหมู่ขาดทุน/กำไร (เช่น แม่ฮ่องสอน -15,442,218.63 = สีแดง, สุราษฎร์ธานี +85,706,175.11 = สีเขียว) และ <strong>ขนาดไอคอน</strong> (size) สื่อขนาดของกำไร/ขาดทุนคร่าว ๆ (กระบี่กับแม่ฮ่องสอนมีไอคอนใหญ่กว่าสนามบินอื่นเพราะตัวเลขสูงกว่ามาก) — สังเกตว่า hue ในที่นี้ใช้ถูกหลักการที่เรียนไปแล้ว (แดง/เขียว = nominal, ไม่มีลำดับ แค่สองหมวดหมู่ขาด/กำไร) ในขณะที่ขนาดไอคอนทำหน้าที่สื่อ ordinal (มาก-น้อย) แยกจากกันชัดเจน — นี่คือตัวอย่างเปรียบเทียบก่อนเข้าเนื้อหาว่า channel ที่ถูกต้องกับข้อมูลแต่ละประเภท ทำให้อ่านแผนที่ที่ซับซ้อนนี้ได้ในไม่กี่วินาที.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 1</span><span>GPT-5 Chart</span></div>
+  <div class="qtext">การวาดแท่ง GPT-5 แบบแบ่งสองสี (stacked) ในขณะที่แท่งคู่แข่งเป็นสีเดียวล้วน ส่งผลต่อการรับรู้อย่างไร แม้ตัวเลขจะไม่ผิด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ทำให้แท่ง GPT-5 ดูโดดเด่น/ซับซ้อนกว่าแท่งอื่นโดยไม่ได้ตั้งใจ ทั้งที่ส่วนต่างตัวเลขจริงไม่ได้มากขนาดนั้น</button>
+    <button class="opt" data-correct="false">ไม่มีผลต่อการรับรู้เลย เพราะตัวเลขสุดท้ายถูกต้อง</button>
+    <button class="opt" data-correct="false">ทำให้อ่านตัวเลขแม่นยำน้อยลงเพราะมีสีเยอะเกินไป</button>
+    <button class="opt" data-correct="false">ทำให้ผู้อ่านเข้าใจผิดว่า GPT-5 มีราคาถูกกว่า</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 2</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">จากแผนที่กำไร/ขาดทุนสนามบินไทย อธิบายว่า channel ทั้ง 3 ตัว (ตำแหน่ง เฉดสี ขนาด) แต่ละตัวสื่อข้อมูลอะไร และทำไมการแยกหน้าที่กันชัดเจนแบบนี้ถึงทำให้แผนที่อ่านง่าย?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ตำแหน่งไอคอน = ตำแหน่งภูมิศาสตร์จริงของสนามบิน (nominal/spatial) เฉดสีแดง/เขียว = หมวดหมู่ขาดทุน/กำไร (nominal) ขนาดไอคอน = ขนาดของกำไร/ขาดทุน (ordinal) เพราะแต่ละ channel สื่อข้อมูลคนละมิติและใช้ตรงกับประเภทข้อมูลของตัวเอง (hue กับข้อมูลไม่มีลำดับ, size กับข้อมูลมีลำดับ) ผู้อ่านจึงแยกแยะได้พร้อมกันหลายมิติโดยไม่สับสน ต่างจากการยัดทุกอย่างไว้ใน channel เดียว</div>
+</div>
+
+<h2>2. Good = Truthful: เมื่อภาพ "โกหก" ข้อมูล</h2>
+<p>Slide ยกตัวอย่างจริง 3 กรณีที่ visualization ทำให้ข้อมูล "ดูไม่ตรง" กับความเป็นจริง — จำไว้เป็น checklist เวลาวิเคราะห์ visualization ในข้อสอบ:</p>
+
+<table>
+<tr><th>ตัวอย่าง</th><th>ปัญหา</th></tr>
+<tr><td>Fox News 2012 GOP pie chart</td><td>70% + 63% + 60% = 193% — pie chart ที่ผลรวม % เกิน 100% ทำให้สัดส่วนภาพไม่มีความหมายจริง</td></tr>
+<tr><td>Bar chart ยอดเข้าเว็บไซต์ไทย (Google/YouTube/Facebook…)</td><td>ถ้าแกน bar chart ไม่เริ่มที่ 0 ผลต่างระหว่างแท่งจะถูกขยายเกินจริง</td></tr>
+<tr><td>แผนที่ COVID-19 แบบวงกลมตามจำนวนผู้ติดเชื้อ</td><td>ถ้า scale ขนาดวงกลมด้วย "รัศมี" แทน "พื้นที่" ตามค่าข้อมูล ตัวเลขที่มากจะดูใหญ่เกินจริงมาก (พื้นที่ ∝ รัศมี²)</td></tr>
+</table>
+
+<figure>
+<img src="../assets/slides/vis2-p21-fox-news-pie-chart.png" alt="Fox News 2012 GOP pie chart where Back Palin 70%, Back Huckabee 63%, Back Romney 60% sum to 193%">
+<figcaption>Slide: the Fox News pie chart that sums to 193% (vis-2-perception.pdf, p.21)</figcaption>
+</figure>
+<p>ลองคิดตามเป็นขั้นเป็นตอน: ปกติ pie chart 1 วง = 100% พอเห็นวงกลมถูกแบ่งเป็น 3 เสี้ยว สมองจะเดาอัตโนมัติว่า 3 เสี้ยวนั้นรวมกันได้ 100% แต่ตัวเลขกำกับจริงคือ 70% (Back Palin) + 63% (Back Huckabee) + 60% (Back Romney) = 193% เพราะแต่ละตัวเลขมาจากโพลคนละสำนักที่ถามคนละกลุ่ม ไม่ใช่สัดส่วนของกลุ่มเดียวกัน การเอาตัวเลขที่ "บวกกันไม่ได้" (ไม่ใช่ part-of-whole เดียวกัน) มาวาดเป็น pie chart จึงผิดตั้งแต่เลือกชนิดชาร์ต — นี่คือตัวอย่างที่ต่อให้วาดพื้นที่แต่ละเสี้ยวถูกสัดส่วนตามตัวเลขเป๊ะ ภาพที่ได้ก็ยัง "โกหก" อยู่ดี เพราะตัวข้อมูลเองไม่เหมาะกับชาร์ตชนิดนี้ตั้งแต่ต้น.</p>
+
+<p>ต่อยอดจากปัญหาของ pie chart อาจารย์ให้เทียบข้อมูลชุดเดียวกันในหลายรูปแบบเพื่อโชว์ว่า "การเลือกชนิดชาร์ต" กับ "การจัดเรียง" ส่งผลต่อการอ่านค่าคนละแบบกัน:</p>
+
+<figure>
+<img src="../assets/slides/vis2-p22-pie-vs-bar-ordering.png" alt="The same five categories A through E shown as both pie charts and bar charts in three different orderings: alphabetical, sorted descending by value, and sorted ascending by value, with a handwritten Thai note about choosing the chart and ordering appropriate to the question">
+<figcaption>Slide: เลือก chart ให้เหมาะกับโจทย์ — pie vs bar ในลำดับต่างกัน 3 แบบ (vis-2-perception.pdf, p.22)</figcaption>
+</figure>
+<p>ทั้ง 3 คู่ pie/bar ใช้ข้อมูล A-E ชุดเดียวกันเป๊ะ ต่างกันแค่ลำดับที่จัดเรียง (ตามตัวอักษร A-B-C-D-E / เรียงมากไปน้อย / เรียงน้อยไปมาก) — สังเกตว่า pie chart ทั้ง 3 วง แทบแยกไม่ออกเลยว่าอันไหนจัดเรียงต่างจากอันไหน เพราะการหมุนตำแหน่งเสี้ยวไปรอบวงไม่ได้ช่วยให้เทียบขนาดง่ายขึ้นเลย แต่ bar chart กลับต่างกันชัดเจนมาก: เวอร์ชันเรียงมากไปน้อย (ตรงกลาง) ทำให้เห็นอันดับ A>B>C>D>E ได้ทันทีโดยไม่ต้องเทียบความสูงเอง ในขณะที่เวอร์ชันเรียงตามตัวอักษร (ซ้ายสุด) ต้องกวาดตาเทียบทีละคู่เอง — โน้ตกำกับเขียนไว้ตรง ๆ ว่า "เลือก chart ให้เหมาะกับโจทย์" และ "เหมาะกับดูภาพรวม จัดเรียงเพื่อให้จดจำง่าย" นี่คือบทเรียนสำคัญที่มักถูกมองข้าม: แค่เปลี่ยนลำดับหมวดหมู่ในแกน x (ไม่แตะข้อมูลเลย) ก็ทำให้ bar chart เดิมอ่านง่ายขึ้นได้มาก แต่ pie chart ทำแบบเดียวกันแล้วไม่ได้ผลอะไรเลย.</p>
+
+<p>อีกตัวอย่างหนึ่งแสดงปัญหาตรงข้าม — เมื่อสีถูกใช้แบบ "ใช่/ไม่ใช่" (binary) จนซ่อนความแตกต่างของขนาดชัยชนะไปหมด:</p>
+
+<figure>
+<img src="../assets/slides/vis2-p23-bangkok-election-map.png" alt="A Thai TV news broadcast showing a Bangkok governor election result map with every one of the 50 districts colored the exact same solid red because a single candidate won all 50, even though the margin of victory varied enormously district by district">
+<figcaption>Slide: แผนที่ผลเลือกตั้งผู้ว่า กทม. — ทุกเขตสีแดงเดียวกันหมด (vis-2-perception.pdf, p.23)</figcaption>
+</figure>
+<p>ผู้สมัครหมายเลข 8 (ชัชชาติ) ชนะทั้ง 50 เขตของกรุงเทพฯ ด้วยคะแนนรวม 83,125 เทียบกับอันดับสอง 16,634 — แผนที่จึงระบายทุกเขตเป็นสีแดงเข้มเหมือนกันหมด เพราะใช้ hue แค่บอก "ใครชนะเขตนี้" (nominal, มีผู้ชนะแค่คนเดียวทุกเขต) แต่ปัญหาคือแผนที่นี้<strong>ซ่อน</strong>ข้อมูลสำคัญไปเลย — บางเขตอาจชนะขาดลอย บางเขตอาจสูสีมาก แต่สีแดงเข้มเท่ากันหมดทำให้ดูเหมือนชนะขาดลอยทุกที่เหมือนกัน ทั้งที่ตัวเลข ณ ขณะนั้นนับคะแนนไปเพียง 25.64% เท่านั้น (ยังไม่ใช่ผลสุดท้าย) — นี่คือตัวอย่างของการใช้ hue แบบ nominal ถูกหลักการ (แดง = ผู้สมัครคนนี้ชนะ) แต่พลาดโอกาสใช้ channel อื่น (เช่น ความเข้มสี/ความอิ่มตัวของสี) มาสื่อ "ขนาดของชัยชนะ" (ordinal) เพิ่มเติม ทำให้แผนที่นี้ตอบคำถาม "ใครชนะ" ได้ แต่ตอบคำถาม "ชนะขาดหรือชนะเฉียด" ไม่ได้เลย.</p>
+
+<figure>
+<img src="../assets/slides/vis2-p20-bar-axis-question.png" alt="Bar chart of Thai website visits with a handwritten question asking where the bar's starting point is set">
+<figcaption>Slide: "จุดเริ่มต้นของ bar ตั้งค่าไหน?" — questioning the bar chart's baseline (vis-2-perception.pdf, p.20)</figcaption>
+</figure>
+<p>ตัวอย่างนี้ใช้อันดับเว็บไซต์ยอดนิยมของไทยมาทดสอบสมมติฐาน: Google เข้า 2,213 ล้านครั้ง ส่วน YouTube เข้า 2,161 ล้านครั้ง — ต่างกันแค่ ~2% แต่ถ้าแท่งของทั้งคู่ถูกวาดโดยเริ่มแกนที่ 2,000 ล้าน (ไม่ใช่ 0) แท่ง Google จะยาวกว่า YouTube เกือบเท่าตัวในภาพ ทั้งที่ตัวเลขจริงต่างกันนิดเดียว — นี่คือเหตุผลที่คำถาม "จุดเริ่มต้นของ bar ตั้งค่าไหน?" สำคัญมาก: ก่อนจะเชื่อว่าแท่งไหน "ยาวกว่ามาก" ต้องเช็คแกน x/y ก่อนเสมอว่าเริ่มที่ 0 จริงหรือถูกตัดขอบมา.</p>
+
+<figure>
+<img src="../assets/slides/vis2-p19-covid-map-example.png" alt="COVID-19 proportional-symbol map with a handwritten question about whether scaling circle size by radius is truthful">
+<figcaption>Slide: proportional-symbol COVID-19 map — "ถ้าปรับขนาดวงกลมให้สะท้อนข้อมูล จะ Truthfully มั้ย?" (vis-2-perception.pdf, p.19)</figcaption>
+</figure>
+<p>ตัวอย่างจริง: กรุงเทพฯ มีผู้ติดเชื้อสะสม 213 ราย ขณะที่จังหวัดอื่นส่วนใหญ่มีแค่ 1-2 ราย ต่างกันเป็นร้อยเท่า — ถ้าคนออกแบบ map เอา "213" ไปกำหนดรัศมีวงกลมตรง ๆ (รัศมีกรุงเทพฯ = 213 หน่วย, รัศมีจังหวัดอื่น = 1-2 หน่วย) วงกลมกรุงเทพฯ จะมีพื้นที่ใหญ่กว่าจังหวัดอื่นเป็น <em>หมื่นเท่า</em> ไม่ใช่ร้อยเท่า เพราะพื้นที่วงกลมแปรผันตามรัศมี<em>ยกกำลังสอง</em> — นี่คือเหตุผลที่คำถามในสไลด์ถามว่าวงกลมถูก scale ด้วยรัศมีหรือพื้นที่กันแน่ ถ้าอยากให้ตัวเลขต่างกัน 100 เท่า ดูแล้ว "รู้สึก" ว่าต่างกัน 100 เท่าจริง ๆ ต้อง scale รัศมีด้วยรากที่สองของค่าข้อมูล ไม่ใช่ตัวข้อมูลตรง ๆ.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 3</span><span>Truthful</span></div>
+  <div class="qtext">Pie chart ที่มีผลรวม % ของทุกชิ้นเกิน 100% (เช่น 70%+63%+60%) มีปัญหาอะไรโดยตรง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สัดส่วนพื้นที่ในภาพไม่ตรงกับสัดส่วนข้อมูลจริง</button>
+    <button class="opt" data-correct="false">สีที่ใช้แยกชิ้นส่วนมองไม่เห็นความต่าง</button>
+    <button class="opt" data-correct="false">จำนวนชิ้นส่วนในวงกลมมากเกินไป</button>
+    <button class="opt" data-correct="false">ตัวอักษรกำกับเปอร์เซ็นต์เล็กเกินไป</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 4</span><span>Truthful</span></div>
+  <div class="qtext">ทำไมวงกลมบนแผนที่ที่ scale ขนาดด้วย "รัศมี" ตามค่าข้อมูล ถึงทำให้ค่าที่มากดูใหญ่เกินจริง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">พื้นที่วงกลมโตเป็นกำลังสองของรัศมีที่ใช้ scale</button>
+    <button class="opt" data-correct="false">สีของวงกลมเข้มขึ้นตามขนาดเสมอ</button>
+    <button class="opt" data-correct="false">แผนที่บิดเบือนตำแหน่งทางภูมิศาสตร์</button>
+    <button class="opt" data-correct="false">วงกลมที่ใหญ่ขึ้นจะบังวงกลมข้างเคียง</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 5</span><span>Chart + Ordering</span></div>
+  <div class="qtext">จากตัวอย่าง pie chart กับ bar chart ที่จัดเรียงลำดับต่างกัน 3 แบบ ทำไมการเรียงลำดับถึงช่วย bar chart ให้อ่านง่ายขึ้น แต่ไม่ช่วย pie chart เลย?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Bar chart ใช้ตำแหน่ง/ความสูงตามแนวแกนเดียวกัน การเรียงตามค่าทำให้เห็นอันดับต่อเนื่องกันได้ทันที ส่วน pie chart เปรียบเทียบมุม/พื้นที่ซึ่งไม่ได้ง่ายขึ้นจากการหมุนตำแหน่งเสี้ยว</button>
+    <button class="opt" data-correct="false">เพราะ pie chart มีจำนวนสีน้อยกว่า bar chart</button>
+    <button class="opt" data-correct="false">เพราะการเรียงลำดับเปลี่ยนค่าตัวเลขที่แสดงจริง</button>
+    <button class="opt" data-correct="false">ไม่จริง การเรียงลำดับช่วย pie chart ได้ผลเท่ากับ bar chart</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 6</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">แผนที่ผลเลือกตั้งผู้ว่า กทม. ที่ระบายทุกเขตเป็นสีแดงเข้มเท่ากันหมด มีข้อมูลอะไรที่ "ซ่อน" ไปจากผู้อ่าน และควรแก้อย่างไร?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">ซ่อนขนาดของชัยชนะ (margin) ในแต่ละเขต — เขตที่ชนะขาดลอยกับเขตที่ชนะเฉียดฉิวถูกระบายสีแดงเข้มเท่ากันหมด ทำให้ดูเหมือนชนะขาดทุกที่เท่ากัน ควรแก้โดยใช้ความเข้ม/ความอิ่มตัวของสี (อีก channel หนึ่ง) ไล่ระดับตามส่วนต่างคะแนนในแต่ละเขต เพื่อสื่อทั้ง "ใครชนะ" (hue) และ "ชนะขาดแค่ไหน" (saturation) พร้อมกัน</div>
+</div>
+
+<h2>3. Visual Marks vs Visual Variables (Channels)</h2>
+<p><em class="term">Visual Mark</em> คือรูปทรงพื้นฐานที่แทนข้อมูล 1 จุด (เส้น สี่เหลี่ยม วงกลม) ส่วน <em class="term">Visual Variable</em> (aka Channel) คือคุณสมบัติที่ใช้ "เข้ารหัส" ค่าข้อมูลลงบน mark นั้น เช่น ความยาว (length) พื้นที่ (area) ความเข้มสี (color brightness) เฉดสี (hue).</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 7</span><span>Marks vs Channels</span></div>
+  <div class="qtext">ข้อใดคือ "Visual Variable (Channel)" ไม่ใช่ "Visual Mark"?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ความเข้มของสี (color brightness)</button>
+    <button class="opt" data-correct="false">รูปสี่เหลี่ยม (square)</button>
+    <button class="opt" data-correct="false">รูปวงกลม (circle)</button>
+    <button class="opt" data-correct="false">เส้นตรง (line)</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>4. จับคู่ Channel กับประเภทข้อมูล: Ordinal vs Nominal</h2>
+<p>Slide แบ่งชัดเจน: ข้อมูล <em class="term">Ordinal</em> (มีลำดับ ต่อเนื่องจาก x ถึง x+a) ควรเข้ารหัสด้วย <strong>ตำแหน่ง ความยาว มุม ขนาด หรือความเข้มสี</strong> — ทั้งหมดนี้ไล่ระดับได้ตามธรรมชาติ ส่วนข้อมูล <em class="term">Nominal</em> (ไม่มีลำดับ) ควรเข้ารหัสด้วย <strong>เฉดสี (hue) หรือรูปทรง (shape)</strong> เท่านั้น เพราะสมองไม่สามารถเรียงลำดับสีหรือรูปทรงได้ตามธรรมชาติ.</p>
+
+<figure>
+<img src="../assets/slides/vis2-p63-ordinal-nominal-channels.png" alt="Diagram: ordinal data encoded with position, length, angle, size, darkness; nominal data encoded with hue and shape">
+<figcaption>Slide: Ordinal channels (position/length/angle/size/darkness) vs Nominal channels (hue/shape) (vis-2-perception.pdf, p.63)</figcaption>
+</figure>
+<p>ลองทำแบบทดสอบง่าย ๆ ตามที่สไลด์ตั้งใจสื่อ: มองสี่เหลี่ยม 3 ชิ้นที่ไล่ขนาดเล็ก-กลาง-ใหญ่ คุณจะเรียงลำดับ "น้อยไปมาก" ได้ทันทีโดยไม่ต้องคิด เพราะขนาด/ความยาว/ความเข้มสี ทุกอย่างมีสเกลต่อเนื่องในตัวมันเองอยู่แล้ว (นี่คือฝั่ง Ordinal) แต่ลองมองสี่เหลี่ยมสีฟ้า สามเหลี่ยมสีเขียว วงกลมสีส้มวางเรียงกัน — ไม่มีทางบอกได้ว่าอันไหน "มากกว่า" อันไหน เพราะรูปทรงกับเฉดสีไม่มีสเกลในตัวเอง (ฝั่ง Nominal) ต้องอาศัย legend มาบอกความหมายแทน นี่คือเหตุผลเชิงกลไกที่ทำให้ quiz ข้อ 4 ถามว่าทำไมเฉดสีเข้ารหัสข้อมูลเชิงปริมาณไม่ได้.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 8</span><span>Ordinal / Nominal</span></div>
+  <div class="qtext">ทำไม "เฉดสี" (hue) ถึงไม่เหมาะกับการเข้ารหัสข้อมูลเชิงปริมาณ (ordinal)?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สมองจัดลำดับเฉดสีตามธรรมชาติไม่ได้</button>
+    <button class="opt" data-correct="false">เฉดสีแสดงผลบนจอไม่ครบทุกเครื่อง</button>
+    <button class="opt" data-correct="false">เฉดสีใช้พื้นที่ในภาพมากเกินไป</button>
+    <button class="opt" data-correct="false">เฉดสีทำให้ไฟล์ภาพมีขนาดใหญ่ขึ้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 9</span><span>Ordinal / Nominal</span></div>
+  <div class="qtext">ข้อมูลยอดขาย 5 ระดับ (ต่ำ กลาง สูง สูงมาก สูงสุด) ควรเข้ารหัสด้วย channel ใดจึงจะสื่อลำดับได้ถูกต้อง?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ความเข้มของสีเดียว ไล่จากอ่อนไปเข้ม</button>
+    <button class="opt" data-correct="false">เฉดสีต่างกัน 5 เฉดแบบสุ่ม</button>
+    <button class="opt" data-correct="false">รูปทรง 5 แบบที่ต่างกัน</button>
+    <button class="opt" data-correct="false">รูปแบบเส้นขอบ (ทึบ/ประ/จุด) ต่างกัน</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<h2>5. อันดับความแม่นยำของการรับรู้ (Perceptual Ranking)</h2>
+<p>งานวิจัยดั้งเดิมของ Cleveland &amp; McGill ถูกทดสอบซ้ำผ่าน crowdsourcing บน Mechanical Turk โดย <a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/" target="_blank" rel="noopener">Heer &amp; Bostock (CHI 2010)</a> และสรุปไว้ใน Tamara Munzner, <em>Visualization Analysis and Design</em> (2014): เรียงจากแม่นยำที่สุดไปน้อยที่สุด — <strong>Position → Angle → Circular area → Rectangular area</strong> (วัดจาก log error ที่เพิ่มขึ้นเรื่อย ๆ).</p>
+
+<figure>
+<img src="../assets/slides/vis2-p66-perceptual-ranking-chart.png" alt="Chart ranking Position, Angle, Circular area, Rectangular area tasks by log error from crowdsourced results">
+<figcaption>Slide: Perceptual accuracy ranking by log error (Munzner 2014, after Heer & Bostock 2010) (vis-2-perception.pdf, p.66)</figcaption>
+</figure>
+<p>งานทดลองนี้ให้คนอ่านค่าจากชาร์ตหลายแบบแล้ววัดว่า "เดาผิดไปเท่าไหร่" (log error) ผลคือกลุ่ม Position (เช่น จุดบน bar chart หรือ scatter plot) มี error ต่ำสุดอย่างชัดเจน ตามด้วย Angle (เช่น เสี้ยวมุมของ pie chart) แล้วค่อยเป็น Circular area (เช่น ขนาดวงกลมใน bubble chart) และ Rectangular area (เช่น กล่องใน treemap) มี error สูงสุด — แปลเป็นภาษาคนคือ: ถ้าเอาข้อมูลชุดเดียวกันไปทำเป็น bar chart กับ pie chart แล้วให้คนอ่านค่าออกมา คนอ่าน bar chart จะเดาตัวเลขได้แม่นกว่าคนอ่าน pie chart อย่างมีนัยสำคัญ ทั้งที่ข้อมูลเหมือนกันทุกตัว.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 10</span><span>Perceptual Ranking</span></div>
+  <div class="qtext">ตาม Cleveland &amp; McGill / Heer &amp; Bostock ผู้อ่านอ่านค่าได้แม่นยำที่สุดจาก channel ใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Position (ตำแหน่งบนแกนร่วม)</button>
+    <button class="opt" data-correct="false">Angle (มุม)</button>
+    <button class="opt" data-correct="false">Circular area (พื้นที่วงกลม)</button>
+    <button class="opt" data-correct="false">Rectangular area (พื้นที่สี่เหลี่ยม)</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 11</span><span>Perceptual Ranking</span></div>
+  <div class="qtext">จากอันดับความแม่นยำ เพราะเหตุใด bar chart จึงมักถูกแนะนำมากกว่า pie chart เมื่อผู้อ่านต้องเปรียบเทียบค่าให้แม่นยำ?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">Bar chart ใช้ position ซึ่งแม่นยำกว่า angle ของ pie chart</button>
+    <button class="opt" data-correct="false">Bar chart ใช้สีได้หลากหลายกว่า pie chart</button>
+    <button class="opt" data-correct="false">Bar chart ใช้พื้นที่หน้ากระดาษน้อยกว่า pie chart</button>
+    <button class="opt" data-correct="false">Bar chart แสดงจำนวนหมวดหมู่ได้มากกว่า pie chart เท่านั้น</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 12</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อธิบายสั้น ๆ: treemap (rectangular area) อยู่ตำแหน่งไหนของอันดับความแม่นยำ และควรใช้ treemap เมื่อไหร่ถึงจะเหมาะสม ทั้งที่ความแม่นยำต่ำ?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">Treemap อยู่อันดับท้ายสุด (แม่นยำน้อยที่สุด) เพราะใช้ rectangular area เปรียบเทียบค่า ควรใช้เมื่อเป้าหมายคือแสดงโครงสร้างลำดับชั้น (hierarchy) และสัดส่วนคร่าว ๆ ของหมวดหมู่จำนวนมากในพื้นที่จำกัด ไม่ใช่เมื่อผู้อ่านต้องเปรียบเทียบค่าตัวเลขที่แม่นยำระหว่างสองรายการ</div>
+</div>
+
+<h2>6. ข้อจำกัดทางสรีรวิทยาของการมองสี</h2>
+<ul>
+<li><strong>Chromatic aberration / Chromostereopsis</strong> — เลนส์ตาโฟกัสสีแดงกับสีน้ำเงินพร้อมกันไม่ได้ ตัวอักษรแดงบนพื้นน้ำเงิน (หรือกลับกัน) จะดูเบลอ</li>
+<li><strong>Color blindness</strong> — ~8% ของประชากรโลก (ส่วนใหญ่เพศชาย) มี deuteranopia (บกพร่องแยกแดง/เขียว) — ตัวอย่าง bad design: ไฟจราจร, เส้นขยักสีแดง/เขียวใน Microsoft Word</li>
+</ul>
+
+<figure>
+<img src="../assets/slides/vis2-p32-color-blindness.png" alt="Slide on color blindness: ~8% of the world's population are born with deuteranopia, mostly male, with bad interface examples like traffic lights">
+<figcaption>Slide: Color Blindness (vis-2-perception.pdf, p.32)</figcaption>
+</figure>
+<p>ลองนึกภาพคนที่แยกไฟแดง/ไฟเขียวไม่ออก (deuteranopia พบใน ~8% ของประชากรโลก) ต้องพึ่งแค่ "ตำแหน่ง" ของดวงไฟ (บน/กลาง/ล่าง) ในการขับรถแทนสี — ไฟจราจรออกแบบมาให้พอใช้ตำแหน่งแทนได้ แต่ Microsoft Word ที่ขีดเส้นใต้คำผิดด้วยสีแดง (สะกดผิด) กับสีเขียว (ไวยากรณ์ผิด) ไม่มีสัญญาณอื่นช่วยเลย คนตาบอดสีจึงแยกไม่ออกว่าคำที่ขีดเส้นใต้ผิดแบบไหน — บทเรียนสำหรับตอนออกแบบเอง: ถ้าจะใช้สีแดง/เขียวสื่อความหมายสองอย่างที่ต่างกัน ต้องมีสัญญาณสำรอง (ไอคอน, ตำแหน่ง, ลายเส้น) เสมอ ห้ามฝากความหมายไว้ที่สีคู่นี้เพียงอย่างเดียว.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 13</span><span>Color Perception</span></div>
+  <div class="qtext">Deuteranopia ที่พบใน ~8% ของประชากรโลก คือความบกพร่องในการแยกคู่สีใด?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">แดงกับเขียว</button>
+    <button class="opt" data-correct="false">น้ำเงินกับเหลือง</button>
+    <button class="opt" data-correct="false">ดำกับขาว</button>
+    <button class="opt" data-correct="false">ส้มกับม่วง</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p>ปัญหาเรื่องสีไม่ได้จบแค่ระดับสรีรวิทยา — สีบางคู่ยัง "ความหมายไม่เหมือนกันทั่วโลก" ด้วย ต่างจาก position/length ที่ตีความเหมือนกันไม่ว่าใครจะดู:</p>
+
+<figure>
+<img src="../assets/slides/vis2-p24-japan-stock-exchange-colors.png" alt="A photo of a Japanese stock exchange display board where numbers rise (positive change) are shown in red text and numbers that fall (negative change) are shown in green text — the exact opposite of the red-down, green-up convention used on most Western stock tickers">
+<figcaption>Slide: กระดานหุ้นญี่ปุ่น — สีแดง/เขียวสลับความหมายกับตะวันตก (vis-2-perception.pdf, p.24)</figcaption>
+</figure>
+<p>กระดานหุ้นนี้ใช้ตัวเลขสีแดงกับสีเขียวปนกันเต็มจอ — แต่ถ้าลองเทียบกับตลาดหุ้นสหรัฐฯ ที่ทุกคนคุ้นเคย (เขียว = ราคาขึ้น, แดง = ราคาลง) จะพบว่ากระดานหุ้นญี่ปุ่นนี้ใช้<strong>สลับกัน</strong>: สีแดงหมายถึงราคา<em>ขึ้น</em> ส่วนสีเขียวหมายถึงราคา<em>ลง</em> (ธรรมเนียมนี้ใช้ทั่วไปในตลาดเอเชียตะวันออก เช่น ญี่ปุ่น จีน ไต้หวัน เพราะสีแดงเป็นสีมงคล/สีแห่งความเจริญในวัฒนธรรมนั้น) — นี่คือหลักฐานสำคัญว่า hue ไม่ใช่แค่ nominal (แยกหมวดหมู่) เฉย ๆ แต่ยัง<strong>ผูกกับธรรมเนียมทางวัฒนธรรม</strong>ด้วย คนที่คุ้นชินกับตลาดหุ้นสหรัฐฯ เปิดกระดานหุ้นญี่ปุ่นครั้งแรกอาจตีความราคาขึ้น-ลงผิดทันทีถ้าไม่รู้ธรรมเนียมนี้ก่อน — บทเรียนสำหรับนักออกแบบ: ห้ามสมมติว่าความหมายของสีที่ตัวเองคุ้นเคยเป็น "สากล" เสมอไป ต้องระบุ legend กำกับชัดเจนเมื่อออกแบบสำหรับผู้ชมข้ามวัฒนธรรม.</p>
+
+<p>ตัวอย่างสุดท้ายเป็นกรณีศึกษาประวัติศาสตร์ที่ทั้งโด่งดังและก่อให้เกิดข้อถกเถียงเรื่องจริยธรรมในการออกแบบ:</p>
+
+<figure>
+<img src="../assets/slides/vis2-p25-isotype-population-infographic.png" alt="A 20th-century ISOTYPE infographic titled United States and Great Britain in the World, where each stylized human icon represents 30 million people, colored by a rigid racial classification scheme (white, red, black, yellow, brown) to compare the population composition of different countries and empires">
+<figcaption>Slide: ISOTYPE — "United States and Great Britain in the World" (vis-2-perception.pdf, p.25, ผ่าน Nightingale/Data Visualization Society)</figcaption>
+</figure>
+<p>อินโฟกราฟิกนี้ (ระบบ ISOTYPE จากทศวรรษ 1930s-1940s โดยทีม Otto และ Marie Neurath) ใช้หลักการเดียวกับที่เรียนมาตลอดบทนี้: 1 ไอคอนคน = ประชากร 30 ล้านคน (unit-based, เหมือนหลักการ isotype ที่ทำให้นับด้วยตาได้ทันที) แต่ประเด็นที่ทำให้ตัวอย่างนี้ถูกหยิบมาเป็นกรณีศึกษาคือการเลือกใช้ <strong>เฉดสี (hue)</strong> แทนกลุ่มเชื้อชาติ (ขาว แดง ดำ เหลือง น้ำตาล ตามคำบรรยายใต้ภาพต้นฉบับ) — แม้จะใช้ channel ถูกหลักวิชาการ (hue = nominal, ไม่มีลำดับ) แต่การเลือก "เชื้อชาติ" มาเป็นตัวแปรหลักและระบายสีตามภาพเหมารวมของยุคนั้น สะท้อนมุมมองแบบอาณานิคมที่ล้าสมัยและเป็นปัญหาทางจริยธรรมอย่างมากตามมาตรฐานปัจจุบัน — ตัวอย่างนี้เตือนไว้ล่วงหน้าก่อนถึง Lesson 13 (Current Issues): การเลือก "ตัวแปรอะไรมาลงสี" สำคัญพอ ๆ กับการเลือก "จะใช้สีถูกหลักไหม" เพราะ visualization ที่ถูกหลักเทคนิคทุกอย่าง ก็ยังสื่อสารอคติร้ายแรงได้ถ้าเลือกตัวแปรที่จะเข้ารหัสผิด.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 14</span><span>Color Convention</span></div>
+  <div class="qtext">กระดานหุ้นญี่ปุ่นใช้สีแดง/เขียวสื่อความหมายอย่างไร เทียบกับตลาดหุ้นสหรัฐฯ?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">สลับกัน — ญี่ปุ่นใช้สีแดงแทนราคาขึ้นและสีเขียวแทนราคาลง ตรงข้ามกับธรรมเนียมสหรัฐฯ</button>
+    <button class="opt" data-correct="false">ใช้ความหมายเดียวกันทุกประการกับตลาดหุ้นสหรัฐฯ</button>
+    <button class="opt" data-correct="false">ญี่ปุ่นไม่ใช้สีแดง/เขียวเลย ใช้แค่ตัวเลขสีขาว</button>
+    <button class="opt" data-correct="false">ทั้งสองตลาดใช้สีน้ำเงิน/เหลืองแทนแดง/เขียว</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<div class="quiz free">
+  <div class="qhead"><span>คำถาม 15</span><span>เขียนตอบสั้น</span></div>
+  <div class="qtext">อินโฟกราฟิก ISOTYPE เรื่องประชากรโลก ใช้เทคนิค channel ถูกหลักวิชาการ (hue เป็น nominal) แต่ยังถูกวิจารณ์ด้านจริยธรรม เพราะอะไร?</div>
+  <textarea rows="3" placeholder="พิมพ์คำตอบของคุณที่นี่ก่อนกดเฉลย..."></textarea>
+  <button class="reveal-btn">เฉลย</button>
+  <div class="model-answer">เพราะปัญหาไม่ได้อยู่ที่เทคนิคการเข้ารหัส (hue ใช้ถูกกับข้อมูลไม่มีลำดับจริง) แต่อยู่ที่ "ตัวแปรที่เลือกมาเข้ารหัส" เอง — การแบ่งกลุ่มประชากรโลกด้วยเชื้อชาติแบบเหมารวมและระบายสีตามภาพจำแบบอาณานิคมของยุคนั้น สะท้อนอคติที่ฝังอยู่ในตัวข้อมูล/กรอบคิดของผู้ออกแบบเอง แสดงว่า visualization ที่ถูกหลักเทคนิคทุกอย่างก็ยังสื่อสารอคติร้ายแรงได้ถ้าเลือกตัวแปรที่จะ visualize ผิดตั้งแต่ต้น</div>
+</div>
+
+<h2>7. เชื่อมกับ Lesson 1: Datasaurus ภาคต่อ</h2>
+<p>Slide อ้างงานวิจัย <em>"Jurassic Mark: Inattentional Blindness for a Datasaurus Reveals that Visualizations are Explored, not Seen"</em> (Boger, Most &amp; Franconeri, Vis 2021) — ขยายบทเรียนจาก Datasaurus Dozen ใน Lesson 1: การ "เข้าใจ" กราฟไม่ใช่การมองเฉย ๆ (passive seeing) แต่ต้องอาศัยการสำรวจเชิงรุก (active visual exploration) สมองจึงจะจับรูปแบบที่ซ่อนอยู่ได้ — นี่คือเหตุผลที่ pre-attentive attributes (สี ขนาด ตำแหน่งที่เด่นชัด) สำคัญ เพราะช่วยลดภาระการสำรวจนั้นลง.</p>
+
+<div class="quiz">
+  <div class="qhead"><span>คำถาม 16</span><span>Datasaurus ภาคต่อ</span></div>
+  <div class="qtext">งานวิจัย "Jurassic Mark" (2021) สรุปว่าการรับรู้ visualization เป็นอย่างไร?</div>
+  <div class="options">
+    <button class="opt" data-correct="true">ต้องอาศัยการสำรวจเชิงรุก ไม่ใช่การมองเฉย ๆ</button>
+    <button class="opt" data-correct="false">เกิดขึ้นอัตโนมัติโดยไม่ต้องใช้ความสนใจเลย</button>
+    <button class="opt" data-correct="false">ขึ้นกับความจำระยะยาวเพียงอย่างเดียว</button>
+    <button class="opt" data-correct="false">ไม่เกี่ยวข้องกับรูปร่างของกราฟที่ใช้</button>
+  </div>
+  <div class="feedback"></div>
+</div>
+
+<p class="quiz-score"></p>
+
+<hr>
+
+<div class="box win">
+<div class="label">ชัยชนะของบทเรียนนี้</div>
+คุณควรจับคู่ channel กับประเภทข้อมูลได้ถูกต้อง (ordinal → position/length/angle/size/darkness, nominal → hue/shape) ท่องอันดับความแม่นยำ Position &gt; Angle &gt; Circular area &gt; Rectangular area ได้ และชี้จุดที่ visualization "ไม่ truthful" ได้จากตัวอย่างจริง 3 แบบ — พร้อมใช้ตอบข้อสอบแบบวิเคราะห์ visualization ที่ให้มา.
+</div>
+
+<h2>ภาคผนวก: Slide ทั้งหมดใน Deck (73 หน้า) — เช็คว่าอ่านครบ</h2>
+<p>ไล่ทุกหน้าของ <code>vis-2-perception.pdf</code> — หน้าที่มี ✓ ถูกอธิบายและ/หรือใส่รูปในเนื้อหาข้างบนแล้ว ที่เหลือเป็นตัวอย่างประกอบ/อ้างอิงงานวิจัยที่ไม่ได้ทำ quiz แยก (etc).</p>
+<table>
+<tr><th>หน้า</th><th>เนื้อหา</th><th>สถานะ</th></tr>
+<tr><td>1–2</td><td>ปก + ตารางเรียนทั้งเทอม</td><td>etc — บริบทวิชา</td></tr>
+<tr><td>3–11</td><td>"What is a good visualization?" เกริ่นนำหัวข้อ</td><td>etc — เกริ่นนำ (ลิงก์อ้างอิง)</td></tr>
+<tr><td>12</td><td>GPT-5 launch keynote: SWE-bench stacked bar chart</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>13</td><td>GPT-5 Deception evals chart — ตัวเลขไม่ตรงกันระหว่างเวอร์ชันสด/ทางการ</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>14–15</td><td>(เปลี่ยนหัวข้อ ไม่มีข้อความ)</td><td>etc</td></tr>
+<tr><td>16</td><td>แผนที่กำไร/ขาดทุนสนามบินไทย (thansettakij.com)</td><td>✓ หัวข้อ 1 (มีรูป)</td></tr>
+<tr><td>17</td><td>(เปลี่ยนหัวข้อ ไม่มีข้อความ)</td><td>etc</td></tr>
+<tr><td>18</td><td>GOOD = TRUTHFUL</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>19</td><td>คำถามต่อยอด "Truthfully มั้ย?" (แผนที่ COVID-19)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>20</td><td>คำถาม bar chart เริ่มที่ 0 หรือไม่</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>21</td><td>ตัวอย่าง Fox News 2012 GOP pie chart (193%)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>22</td><td>Pie chart vs bar chart จัดเรียง 3 แบบ (ตัวอักษร/มากไปน้อย/น้อยไปมาก)</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>23</td><td>แผนที่ผลเลือกตั้งผู้ว่า กทม. — ทุกเขตสีแดงเดียวกันหมด</td><td>✓ หัวข้อ 2 (มีรูป)</td></tr>
+<tr><td>24</td><td>กระดานหุ้นญี่ปุ่น — สีแดง/เขียวสลับความหมายกับตะวันตก</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>25</td><td>ISOTYPE "United States and Great Britain in the World"</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>26–27</td><td>ตัวอย่างแผนที่/สีอื่น ๆ ที่ตีความผิดได้ (จากข่าว/บล็อก)</td><td>etc — ตัวอย่างประกอบเพิ่มเติม (ลิงก์อ้างอิง) ครอบคลุมแนวคิดเดียวกับ p.23-25 แล้ว</td></tr>
+<tr><td>28–30</td><td>อ้างอิงงานวิจัยการเลือกสีตามความหมาย (Setlur &amp; Stone 2016; El-Assady et al. 2022; Reda et al. 2021)</td><td>etc — อ้างอิงเชิงลึกเรื่อง color mapping นอกขอบเขต quiz หลัก</td></tr>
+<tr><td>31</td><td>Chromatic Aberration &amp; Chromostereopsis</td><td>✓ หัวข้อ 6 (อธิบายในเนื้อหา ไม่มีรูปแยก)</td></tr>
+<tr><td>32</td><td>Color Blindness</td><td>✓ หัวข้อ 6 (มีรูป)</td></tr>
+<tr><td>33–39</td><td>ตัวอย่าง/อ้างอิงเพิ่มเติมเรื่อง color blindness (แผนที่ ECDC, บทความ, Franconeri et al. 2021)</td><td>etc — อ้างอิงประกอบ</td></tr>
+<tr><td>40–45</td><td>เครื่องมือช่วยเลือกสี (viz-palette, Sim Daltonism) + งานวิจัย photosensitive accessibility</td><td>etc — เครื่องมือ/อ้างอิงเสริม ไม่ใช่ทฤษฎีหลัก</td></tr>
+<tr><td>46–54</td><td>ตัวอย่าง optical illusion และงานวิจัยการรับรู้สี (Maureen Stone 2012, TED Talk, psmag)</td><td>etc — ตัวอย่างประกอบเรื่องการรับรู้ นอกขอบเขต quiz</td></tr>
+<tr><td>55</td><td>อ้างอิง "Jurassic Mark" (Boger, Most &amp; Franconeri, 2021)</td><td>✓ หัวข้อ 7</td></tr>
+<tr><td>56</td><td>GOOD = FUNCTIONAL</td><td>✓ ส่วนหนึ่งของบทนำ (แนวคิดในกรอบ Effective/Functional)</td></tr>
+<tr><td>57</td><td>Good Visualizations: Effective→Functional, Convincing→Truthful</td><td>✓ บทนำ (มีรูป)</td></tr>
+<tr><td>58–61</td><td>นิยาม Visual Marks (ตัวอย่าง [60, 189, 257])</td><td>✓ หัวข้อ 3 (อธิบายแนวคิดแล้ว ไม่มีรูปแยก)</td></tr>
+<tr><td>62</td><td>นิยาม Visual Variables (Channels)</td><td>✓ หัวข้อ 3</td></tr>
+<tr><td>63–65</td><td>Ordinal data vs Nominal data → channel ที่เหมาะสม</td><td>✓ หัวข้อ 4 (มีรูป)</td></tr>
+<tr><td>66</td><td>อันดับความแม่นยำการรับรู้ (Position &gt; Angle &gt; Circular &gt; Rectangular area)</td><td>✓ หัวข้อ 5 (มีรูป)</td></tr>
+<tr><td>67</td><td>(ว่าง)</td><td>etc</td></tr>
+<tr><td>68–73</td><td>ตัวอย่าง visual variable แบบ density/animation/sound (นำเข้าสู่หัวข้อถัดไป)</td><td>etc — เนื้อหาเดียวกันถูกสอนละเอียดใน <a href="0003-visualization-pipeline.html">Lesson 3 หัวข้อ 2</a> แล้ว</td></tr>
+</table>
+
+<p>สงสัยตรงไหน ถามได้เลยในแชท — ผมเป็นผู้สอนของคุณ ถามซ้ำได้ ถามลึกได้ ไม่ต้องเกรงใจ.</p>
+
+<nav class="lesson-nav">
+  <span><a href="0001-why-visualization.html">← Lesson 1: ทำไมต้อง Visualization?</a></span>
+  <span><a href="0003-visualization-pipeline.html">Lesson 3: Visual Variables &amp; Pipeline →</a></span>
+</nav>
+
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
